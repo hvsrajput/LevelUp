@@ -1,0 +1,363 @@
+// =============================================================================
+// Level Up — Prisma Schema
+// =============================================================================
+// Full schema defined upfront. Later phases (RAG, groups, LeetCode) add
+// features but need ZERO migrations on these core tables.
+//
+// Conventions:
+//   - cuid() for all primary keys (collision-safe, sortable)
+//   - nanoid shortCode for human-friendly URLs
+//   - Soft-delete not used (YAGNI for a personal tracker)
+//   - JSON columns for ordered lists that aren't queried independently
+//   - pgvector for embedding columns (1536-dim for OpenAI ada-002)
+// =============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+// =============================================================================
+// Auth.js models (NextAuth v5 + Prisma Adapter)
+// =============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  // LeetCode integration (Phase 7)
+  leetcodeUsername String? @unique
+
+  accounts Account[]
+  sessions Session[]
+
+  // Domain relations
+  problems       Problem[]
+  submissions    Submission[]
+  groupMembers   GroupMember[]
+  roadmaps       Roadmap[]
+  dailyQuestions DailyQuestion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =============================================================================
+// Core Domain: Problems
+// =============================================================================
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ProblemSource {
+  MANUAL
+  LEETCODE
+}
+
+enum ProblemStatus {
+  ATTEMPTED
+  SOLVED
+  REVISIT
+}
+
+model Problem {
+  id        String @id @default(cuid())
+  shortCode String @unique // nanoid, human-friendly URL slug
+
+  title       String
+  description String   @db.Text
+  difficulty  Difficulty
+  source      ProblemSource @default(MANUAL)
+  status      ProblemStatus @default(ATTEMPTED)
+
+  // LeetCode columns — nullable, present from day one so import needs no migration
+  leetcodeQuestionId Int?    @unique
+  titleSlug          String?
+
+  constraints String? @db.Text
+
+  // Ordered lists stored as JSON (not queried independently)
+  hints      Json @default("[]") // string[]
+  approaches Json @default("[]") // { title: string, description: string }[]
+
+  notes    String?   @db.Text
+  solvedAt DateTime?
+
+  // pgvector embedding for RAG (Phase 3) — 1536 dims for OpenAI ada-002
+  // Using Unsupported type since Prisma doesn't natively support vector yet
+  // We'll handle this via raw SQL in migrations
+  // embedding Unsupported("vector(1536)")?
+
+  // Relations
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  topics      TopicOnProblem[]
+  testCases   TestCase[]
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([difficulty])
+  @@index([status])
+  @@index([source])
+  @@index([userId, status])
+  @@index([userId, difficulty])
+}
+
+// =============================================================================
+// Topics (many-to-many with Problems)
+// =============================================================================
+
+model Topic {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique // URL-friendly version of the name
+
+  problems TopicOnProblem[]
+
+  createdAt DateTime @default(now())
+}
+
+// Explicit join table for many-to-many (allows future metadata like "confidence")
+model TopicOnProblem {
+  problemId String
+  topicId   String
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([problemId, topicId])
+  @@index([topicId])
+}
+
+// =============================================================================
+// Test Cases (one-to-many with Problems)
+// =============================================================================
+
+model TestCase {
+  id             String  @id @default(cuid())
+  input          String  @db.Text
+  expectedOutput String  @db.Text
+  explanation    String? @db.Text
+
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([problemId])
+}
+
+// =============================================================================
+// Submissions / Code (one-to-many with Problems)
+// =============================================================================
+
+model Submission {
+  id       String @id @default(cuid())
+  language String // e.g., "python", "javascript", "cpp"
+  code     String @db.Text
+
+  // Optional metadata
+  runtime String?
+  memory  String?
+  notes   String? @db.Text
+
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([problemId])
+  @@index([userId])
+}
+
+// =============================================================================
+// Private Groups (Phase 4)
+// =============================================================================
+
+enum GroupRole {
+  OWNER
+  MEMBER
+}
+
+model Group {
+  id       String @id @default(cuid())
+  name     String
+  joinCode String @unique // nanoid, regenerable by owner
+
+  ownerId String
+
+  members GroupMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GroupMember {
+  id   String    @id @default(cuid())
+  role GroupRole @default(MEMBER)
+
+  userId  String
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupId String
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, groupId])
+  @@index([groupId])
+}
+
+// =============================================================================
+// RAG: DSA Pattern Knowledge Base (Phase 3)
+// =============================================================================
+
+model DsaPattern {
+  id          String @id @default(cuid())
+  topic       String // e.g., "Two Pointers", "Sliding Window"
+  signals     String @db.Text // Typical signals in a problem statement
+  approaches  Json   // { title: string, steps: string[] }[]
+  hints       Json   // { level: "nudge" | "strong", text: string }[]
+  description String @db.Text
+
+  // Embedding for vector search — handled via raw SQL
+  // embedding Unsupported("vector(1536)")?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topic])
+}
+
+// =============================================================================
+// RAG: Seeded Problem Catalog (Phase 5)
+// =============================================================================
+
+model CatalogProblem {
+  id         String     @id @default(cuid())
+  title      String
+  difficulty Difficulty
+  topicTags  Json       // string[] — tags like "Array", "DP", "Graph"
+  patternTag String?    // e.g., "sliding-window", "monotonic-stack"
+  summary    String     @db.Text
+
+  // Embedding for vector search — handled via raw SQL
+  // embedding Unsupported("vector(1536)")?
+
+  createdAt DateTime @default(now())
+}
+
+// =============================================================================
+// Roadmap (Phase 5)
+// =============================================================================
+
+model Roadmap {
+  id       String @id @default(cuid())
+  title    String
+  goal     String // "Full DSA", "Graphs", "DP", etc.
+  level    String // "beginner", "intermediate", "advanced"
+  timeline String // "4 weeks", "8 weeks", etc.
+
+  items RoadmapItem[]
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model RoadmapItem {
+  id          String  @id @default(cuid())
+  weekNumber  Int
+  topicName   String
+  concept     String
+  problemIds  Json    @default("[]") // string[] — references to Problem or CatalogProblem
+  isCompleted Boolean @default(false)
+  order       Int     // ordering within the week
+
+  roadmapId String
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@index([roadmapId])
+  @@index([roadmapId, weekNumber])
+}
+
+// =============================================================================
+// Daily Question (Phase 5)
+// =============================================================================
+
+model DailyQuestion {
+  id     String @id @default(cuid())
+  date   DateTime @db.Date // one per user per day
+  reason String   @db.Text // explainability — why this was picked
+
+  // Can reference either a Problem or CatalogProblem
+  problemId        String?
+  catalogProblemId String?
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date])
+  @@index([userId])
+}
