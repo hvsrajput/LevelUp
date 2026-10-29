@@ -3,14 +3,14 @@
 // POST /api/problems/[id]/submissions — Record a new code submission
 // =============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSubmissionSchema } from "@/lib/validators/submission";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-export async function GET(_request: NextRequest, ctx: Ctx) {
+export async function GET(_request: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,7 +41,7 @@ export async function GET(_request: NextRequest, ctx: Ctx) {
   return NextResponse.json(submissions);
 }
 
-export async function POST(request: NextRequest, ctx: Ctx) {
+export async function POST(request: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -4,7 +4,7 @@
 // DELETE /api/problems/[id] — Delete a problem
 // =============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateProblemSchema } from "@/lib/validators/problem";
@@ -40,7 +40,7 @@ async function getProblemForUser(id: string, userId: string) {
 // GET — Get a single problem by ID or shortCode
 // ---------------------------------------------------------------------------
 
-export async function GET(_request: NextRequest, ctx: Ctx) {
+export async function GET(_request: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -75,7 +75,7 @@ export async function GET(_request: NextRequest, ctx: Ctx) {
 // PUT — Update a problem
 // ---------------------------------------------------------------------------
 
-export async function PUT(request: NextRequest, ctx: Ctx) {
+export async function PUT(request: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -187,7 +187,7 @@ export async function PUT(request: NextRequest, ctx: Ctx) {
 // DELETE — Delete a problem
 // ---------------------------------------------------------------------------
 
-export async function DELETE(_request: NextRequest, ctx: Ctx) {
+export async function DELETE(_request: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

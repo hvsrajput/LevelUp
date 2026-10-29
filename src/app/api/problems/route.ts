@@ -3,7 +3,7 @@
 // POST /api/problems — Create a new problem
 // =============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -17,14 +17,15 @@ import type { Prisma } from "@prisma/client";
 // GET — List problems
 // ---------------------------------------------------------------------------
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Parse query parameters through Zod
-  const searchParams = Object.fromEntries(request.nextUrl.searchParams);
+  const url = new URL(request.url);
+  const searchParams = Object.fromEntries(url.searchParams);
   const parsed = problemQuerySchema.safeParse(searchParams);
 
   if (!parsed.success) {
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest) {
 // POST — Create a new problem
 // ---------------------------------------------------------------------------
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

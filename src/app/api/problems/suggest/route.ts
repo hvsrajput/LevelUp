@@ -2,13 +2,13 @@
 // POST /api/problems/suggest — Grounded RAG Suggestions for Topics & Hints
 // =============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { suggestInputSchema } from "@/lib/validators/suggest";
 import { generateSuggestions } from "@/lib/rag/service";
 import { suggestionCache, ragRateLimiter } from "@/lib/rag/cache";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
