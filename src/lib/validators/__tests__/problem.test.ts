@@ -98,13 +98,18 @@ describe("problemQuerySchema", () => {
     }
   });
 
-  it("parses filter parameters", () => {
+  it("parses filter parameters including topic, date range and sort options", () => {
     const result = problemQuerySchema.safeParse({
       page: "2",
       limit: "50",
       difficulty: "MEDIUM",
       status: "SOLVED",
+      topic: "dynamic-programming",
       search: "binary search",
+      from: "2026-01-01T00:00:00.000Z",
+      to: "2026-01-31T23:59:59.000Z",
+      sortBy: "solvedAt",
+      sortOrder: "asc",
     });
 
     expect(result.success).toBe(true);
@@ -113,7 +118,11 @@ describe("problemQuerySchema", () => {
       expect(result.data.limit).toBe(50);
       expect(result.data.difficulty).toBe("MEDIUM");
       expect(result.data.status).toBe("SOLVED");
+      expect(result.data.topic).toBe("dynamic-programming");
       expect(result.data.search).toBe("binary search");
+      expect(result.data.from).toBe("2026-01-01T00:00:00.000Z");
+      expect(result.data.sortBy).toBe("solvedAt");
+      expect(result.data.sortOrder).toBe("asc");
     }
   });
 });

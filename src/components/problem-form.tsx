@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,24 @@ type TestCaseInput = {
   explanation?: string;
 };
 
+const COMMON_TOPICS = [
+  "Array",
+  "String",
+  "Hash Table",
+  "Dynamic Programming",
+  "Two Pointers",
+  "Binary Search",
+  "Tree",
+  "Graph",
+  "Stack",
+  "Sliding Window",
+  "Greedy",
+  "Backtracking",
+  "Heap",
+  "Linked List",
+  "Bit Manipulation",
+];
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -65,11 +83,29 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
   );
   const [notes, setNotes] = useState(initialData?.notes ?? "");
 
-  // Topics as a tag input
+  // Topics
   const [topicInput, setTopicInput] = useState("");
   const [topics, setTopics] = useState<string[]>(
     initialData?.topicNames ?? []
   );
+  const [availableTopics, setAvailableTopics] = useState<string[]>(COMMON_TOPICS);
+
+  useEffect(() => {
+    let ignore = false;
+    fetch("/api/topics")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: { name: string }[]) => {
+        if (!ignore && Array.isArray(data)) {
+          const names = data.map((t) => t.name);
+          const combined = Array.from(new Set([...names, ...COMMON_TOPICS]));
+          setAvailableTopics(combined);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   // Test cases
   const [testCases, setTestCases] = useState<TestCaseInput[]>(
@@ -86,10 +122,10 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
   // Handlers
   // ---------------------------------------------------------------------------
 
-  function addTopic() {
-    const trimmed = topicInput.trim();
-    if (trimmed && !topics.includes(trimmed)) {
-      setTopics([...topics, trimmed]);
+  function addTopic(topicToAdd?: string) {
+    const target = (topicToAdd || topicInput).trim();
+    if (target && !topics.includes(target)) {
+      setTopics([...topics, target]);
       setTopicInput("");
     }
   }
@@ -274,22 +310,61 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
           <CardTitle>Topics</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              value={topicInput}
-              onChange={(e) => setTopicInput(e.target.value)}
-              placeholder="Add topic (e.g., Array, Hash Table)"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addTopic();
-                }
-              }}
-            />
-            <Button type="button" variant="outline" onClick={addTopic}>
-              <Plus className="h-4 w-4" />
-            </Button>
+          <div className="relative">
+            <div className="flex gap-2">
+              <Input
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                placeholder="Type to search or add topic (e.g., Array, Two Pointers)"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTopic();
+                  }
+                }}
+              />
+              <Button type="button" variant="outline" onClick={() => addTopic()}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Topic Suggestions dropdown */}
+            {topicInput.trim() && (
+              <div className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
+                {availableTopics
+                  .filter(
+                    (t) =>
+                      t.toLowerCase().includes(topicInput.toLowerCase()) &&
+                      !topics.includes(t)
+                  )
+                  .slice(0, 6)
+                  .map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      className="w-full text-left rounded-sm px-2.5 py-1.5 text-xs hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                      onClick={() => addTopic(t)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                {!topics.includes(topicInput.trim()) &&
+                  !availableTopics.some(
+                    (t) => t.toLowerCase() === topicInput.toLowerCase()
+                  ) && (
+                    <button
+                      type="button"
+                      className="w-full text-left rounded-sm px-2.5 py-1.5 text-xs font-medium text-primary hover:bg-accent cursor-pointer"
+                      onClick={() => addTopic(topicInput.trim())}
+                    >
+                      Create &ldquo;{topicInput.trim()}&rdquo;
+                    </button>
+                  )}
+              </div>
+            )}
           </div>
+
+          {/* Selected Topics */}
           {topics.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {topics.map((topic) => (
@@ -305,6 +380,27 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
               ))}
             </div>
           )}
+
+          {/* Popular topics quick-add pills */}
+          <div className="space-y-1.5 pt-2">
+            <span className="text-[11px] font-medium text-muted-foreground">
+              Popular topics (click to add):
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {COMMON_TOPICS.filter((t) => !topics.includes(t))
+                .slice(0, 8)
+                .map((t) => (
+                  <Badge
+                    key={t}
+                    variant="outline"
+                    className="cursor-pointer text-xs transition-colors hover:bg-secondary hover:text-secondary-foreground"
+                    onClick={() => addTopic(t)}
+                  >
+                    + {t}
+                  </Badge>
+                ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
 

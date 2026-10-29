@@ -1,5 +1,5 @@
 // =============================================================================
-// Problem detail page — view a single problem
+// Problem detail page — view problem, submit code, run test cases
 // =============================================================================
 
 "use client";
@@ -12,6 +12,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,11 +27,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  difficultyColor,
-  statusColor,
-  formatDate,
-} from "@/lib/utils";
+import { CodeEditor } from "@/components/code-editor";
+import { SubmissionHistory, type SubmissionItem } from "@/components/submission-history";
+import { TestCaseRunner, type TestCaseItem } from "@/components/test-case-runner";
+import { difficultyColor, statusColor, formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
   Pencil,
@@ -32,6 +38,9 @@ import {
   Calendar,
   CheckCircle2,
   Loader2,
+  Code2,
+  BookOpen,
+  Lightbulb,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -54,18 +63,8 @@ interface Problem {
   createdAt: string;
   updatedAt: string;
   topics: { topic: { id: string; name: string } }[];
-  testCases: {
-    id: string;
-    input: string;
-    expectedOutput: string;
-    explanation: string | null;
-  }[];
-  submissions: {
-    id: string;
-    language: string;
-    code: string;
-    createdAt: string;
-  }[];
+  testCases: TestCaseItem[];
+  submissions: SubmissionItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -82,10 +81,13 @@ function ProblemDetailContent({
   const [problem, setProblem] = useState<Problem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"workspace" | "overview" | "hints">("workspace");
 
   useEffect(() => {
-    async function fetchProblem() {
+    let ignore = false;
+    async function load() {
       try {
         const res = await fetch(`/api/problems/${id}`);
         if (!res.ok) {
@@ -93,15 +95,56 @@ function ProblemDetailContent({
           throw new Error(data.error || "Failed to load problem");
         }
         const data = await res.json();
-        setProblem(data);
+        if (!ignore) {
+          setProblem(data);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
+        if (!ignore) {
+          setError(err instanceof Error ? err.message : "Something went wrong");
+        }
       } finally {
-        setIsLoading(false);
+        if (!ignore) {
+          setIsLoading(false);
+        }
       }
     }
-    fetchProblem();
+    load();
+    return () => {
+      ignore = true;
+    };
   }, [id]);
+
+  async function reloadProblem() {
+    try {
+      const res = await fetch(`/api/problems/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProblem(data);
+      }
+    } catch (err) {
+      console.error("Failed to reload problem:", err);
+    }
+  }
+
+  async function handleStatusChange(newStatus: string | null) {
+    if (!newStatus || !problem) return;
+    setIsUpdatingStatus(true);
+    try {
+      const res = await fetch(`/api/problems/${problem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setProblem((prev) => (prev ? { ...prev, status: updated.status, solvedAt: updated.solvedAt } : null));
+      }
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  }
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -140,24 +183,46 @@ function ProblemDetailContent({
   const approaches = Array.isArray(problem.approaches) ? problem.approaches : [];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Back + actions */}
-      <div className="mb-6 flex items-center justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Back button and actions */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <Button asChild variant="ghost" size="sm">
           <Link href="/problems">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Problems
           </Link>
         </Button>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          {/* Status Quick Select */}
+          <Select
+            value={problem.status}
+            onValueChange={handleStatusChange}
+            disabled={isUpdatingStatus}
+          >
+            <SelectTrigger className="w-[140px] text-xs">
+              <span className="text-muted-foreground mr-1">Status:</span>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ATTEMPTED">Attempted</SelectItem>
+              <SelectItem value="SOLVED">Solved</SelectItem>
+              <SelectItem value="REVISIT">Revisit</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Button asChild variant="outline" size="sm">
             <Link href={`/problems/${id}/edit`}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
+              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
             </Link>
           </Button>
+
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -189,191 +254,223 @@ function ProblemDetailContent({
         </div>
       </div>
 
-      {/* Header */}
-      <div className="mb-8">
+      {/* Header Info */}
+      <div className="mb-6 rounded-xl border bg-card p-6 shadow-xs">
         <div className="flex flex-wrap items-center gap-3 mb-2">
-          <h1 className="text-3xl font-bold">{problem.title}</h1>
-          <Badge variant="outline" className={difficultyColor(problem.difficulty)}>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {problem.title}
+          </h1>
+          <Badge
+            variant="outline"
+            className={difficultyColor(problem.difficulty)}
+          >
             {problem.difficulty}
           </Badge>
           <Badge variant="secondary" className={statusColor(problem.status)}>
             {problem.status}
           </Badge>
           {problem.source === "LEETCODE" && (
-            <Badge variant="outline" className="text-orange-600">LeetCode</Badge>
+            <Badge variant="outline" className="text-orange-600">
+              LeetCode
+            </Badge>
           )}
         </div>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+
+        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-3.5 w-3.5" />
             Added {formatDate(problem.createdAt)}
           </span>
           {problem.solvedAt && (
-            <span className="flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <span className="flex items-center gap-1 font-medium text-green-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
               Solved {formatDate(problem.solvedAt)}
             </span>
           )}
+          <span className="font-mono text-[11px] text-muted-foreground/80">
+            ID: {problem.shortCode}
+          </span>
         </div>
-      </div>
 
-      <div className="space-y-6">
         {/* Topics */}
         {problem.topics.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-1.5">
             {problem.topics.map(({ topic }) => (
-              <Badge key={topic.id} variant="outline">
+              <Badge key={topic.id} variant="outline" className="text-xs">
                 {topic.name}
               </Badge>
             ))}
           </div>
         )}
+      </div>
 
-        {/* Description */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Description</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="whitespace-pre-wrap text-sm leading-relaxed">
-              {problem.description}
-            </div>
-          </CardContent>
-        </Card>
+      {/* View Tabs */}
+      <div className="mb-6 flex gap-2 border-b pb-3">
+        <Button
+          type="button"
+          variant={activeTab === "workspace" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setActiveTab("workspace")}
+          className="gap-1.5 text-xs"
+        >
+          <Code2 className="h-4 w-4" />
+          Code & Submissions ({problem.submissions.length})
+        </Button>
+        <Button
+          type="button"
+          variant={activeTab === "overview" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setActiveTab("overview")}
+          className="gap-1.5 text-xs"
+        >
+          <BookOpen className="h-4 w-4" />
+          Description & Tests ({problem.testCases.length})
+        </Button>
+        <Button
+          type="button"
+          variant={activeTab === "hints" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setActiveTab("hints")}
+          className="gap-1.5 text-xs"
+        >
+          <Lightbulb className="h-4 w-4" />
+          Hints & Approaches ({hints.length + approaches.length})
+        </Button>
+      </div>
 
-        {/* Constraints */}
-        {problem.constraints && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Constraints</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="whitespace-pre-wrap font-mono text-sm">
-                {problem.constraints}
-              </pre>
-            </CardContent>
-          </Card>
-        )}
+      {/* Tab 1: Code & Submissions */}
+      {activeTab === "workspace" && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Left Column: Code Editor */}
+          <div>
+            <CodeEditor
+              problemId={problem.id}
+              onSubmissionCreated={reloadProblem}
+            />
+          </div>
 
-        {/* Test Cases */}
-        {problem.testCases.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Test Cases</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {problem.testCases.map((tc, i) => (
-                <div key={tc.id} className="rounded-lg border p-4">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">
-                    Test Case {i + 1}
-                  </p>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground">Input</p>
-                      <pre className="mt-1 rounded bg-muted p-2 font-mono text-sm">
-                        {tc.input}
-                      </pre>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground">Output</p>
-                      <pre className="mt-1 rounded bg-muted p-2 font-mono text-sm">
-                        {tc.expectedOutput}
-                      </pre>
-                    </div>
-                  </div>
-                  {tc.explanation && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {tc.explanation}
-                    </p>
-                  )}
+          {/* Right Column: Submission History & Quick Test Cases */}
+          <div className="space-y-6">
+            <SubmissionHistory submissions={problem.submissions} />
+            <TestCaseRunner testCases={problem.testCases} />
+          </div>
+        </div>
+      )}
+
+      {/* Tab 2: Description & Test Cases */}
+      {activeTab === "overview" && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {/* Description */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base font-semibold">Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {problem.description}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
 
-        {/* Hints */}
-        {hints.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Hints</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="space-y-2">
-                {hints.map((hint, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 rounded-md border p-3 text-sm"
-                  >
-                    <span className="shrink-0 font-mono text-muted-foreground">
-                      {i + 1}.
-                    </span>
-                    <span>{hint as string}</span>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
-        )}
+            {/* Constraints */}
+            {problem.constraints && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold">Constraints</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-muted-foreground">
+                    {problem.constraints}
+                  </pre>
+                </CardContent>
+              </Card>
+            )}
 
-        {/* Approaches */}
-        {approaches.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Approaches</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {approaches.map((approach, i) => (
-                <div key={i}>
-                  {i > 0 && <Separator className="my-4" />}
-                  <h4 className="font-semibold">{(approach as { title: string }).title}</h4>
-                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-                    {(approach as { description: string }).description}
+            {/* Notes */}
+            {problem.notes && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold">Personal Notes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                    {problem.notes}
                   </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
-        {/* Notes */}
-        {problem.notes && (
+          {/* Right Column: Test Cases */}
+          <div>
+            <TestCaseRunner testCases={problem.testCases} />
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: Hints & Approaches */}
+      {activeTab === "hints" && (
+        <div className="space-y-6">
+          {/* Hints */}
           <Card>
             <CardHeader>
-              <CardTitle>Notes</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Hints ({hints.length})
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-wrap text-sm">{problem.notes}</p>
+              {hints.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No hints recorded yet.
+                </p>
+              ) : (
+                <ol className="space-y-2">
+                  {hints.map((hint, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2.5 rounded-lg border bg-muted/30 p-3 text-sm"
+                    >
+                      <span className="shrink-0 font-mono text-xs font-semibold text-primary">
+                        Hint {i + 1}
+                      </span>
+                      <span className="leading-relaxed">{hint as string}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </CardContent>
           </Card>
-        )}
 
-        {/* Submissions */}
-        {problem.submissions.length > 0 && (
+          {/* Approaches */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                Submissions ({problem.submissions.length})
+              <CardTitle className="text-base font-semibold">
+                Approaches ({approaches.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {problem.submissions.map((sub) => (
-                <div key={sub.id} className="rounded-lg border p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <Badge variant="outline">{sub.language}</Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(sub.createdAt)}
-                    </span>
+              {approaches.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No approaches recorded yet.
+                </p>
+              ) : (
+                approaches.map((approach, i) => (
+                  <div key={i}>
+                    {i > 0 && <Separator className="my-4" />}
+                    <h4 className="font-semibold text-sm">
+                      {(approach as { title: string }).title}
+                    </h4>
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+                      {(approach as { description: string }).description}
+                    </p>
                   </div>
-                  <pre className="overflow-x-auto rounded bg-muted p-3 font-mono text-sm">
-                    {sub.code}
-                  </pre>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -85,7 +85,11 @@ export const problemQuerySchema = z.object({
   status: ProblemStatusEnum.optional(),
   topic: z.string().optional(),
   search: z.string().optional(),
-  sortBy: z.enum(["createdAt", "updatedAt", "title", "difficulty"]).default("createdAt"),
+  from: z.string().optional(),
+  to: z.string().optional(),
+  sortBy: z
+    .enum(["createdAt", "updatedAt", "title", "difficulty", "solvedAt"])
+    .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 

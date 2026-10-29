@@ -40,8 +40,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const { page, limit, difficulty, status, topic, search, sortBy, sortOrder } =
-    parsed.data;
+  const {
+    page,
+    limit,
+    difficulty,
+    status,
+    topic,
+    search,
+    from,
+    to,
+    sortBy,
+    sortOrder,
+  } = parsed.data;
 
   // Build the where clause incrementally
   const where: Prisma.ProblemWhereInput = {
@@ -64,6 +74,22 @@ export async function GET(request: NextRequest) {
       { title: { contains: search, mode: "insensitive" } },
       { description: { contains: search, mode: "insensitive" } },
     ];
+  }
+
+  if (from || to) {
+    where.createdAt = {};
+    if (from) {
+      const fromDate = new Date(from);
+      if (!isNaN(fromDate.getTime())) {
+        where.createdAt.gte = fromDate;
+      }
+    }
+    if (to) {
+      const toDate = new Date(to);
+      if (!isNaN(toDate.getTime())) {
+        where.createdAt.lte = toDate;
+      }
+    }
   }
 
   // Execute count + paginated query in parallel
