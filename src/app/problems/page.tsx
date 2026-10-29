@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProblemCard } from "@/components/problem-card";
+import { DailyQuestionCard } from "@/components/daily-question-card";
+import { NextQuestionCard } from "@/components/next-question-card";
 import {
   Plus,
   Search,
@@ -232,6 +234,12 @@ function ProblemsPageContent() {
             <Plus className="mr-2 h-4 w-4" /> Add Problem
           </Link>
         </Button>
+      </div>
+
+      {/* RAG-Powered Learning Widgets: Daily Challenge & Recommended Next */}
+      <div className="mb-8 grid gap-6 md:grid-cols-2">
+        <DailyQuestionCard />
+        <NextQuestionCard />
       </div>
 
       {/* Filter Bar */}

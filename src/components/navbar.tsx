@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Code2, LogOut, User, Users } from "lucide-react";
+import { Code2, LogOut, User, Users, Map, BookOpen } from "lucide-react";
 
 export function Navbar() {
   const { data: session, status } = useSession();
@@ -38,6 +38,18 @@ export function Navbar() {
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Problems
+              </Link>
+              <Link
+                href="/roadmap"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Roadmap
+              </Link>
+              <Link
+                href="/catalog"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Catalog
               </Link>
               <Link
                 href="/groups"
@@ -84,6 +96,18 @@ export function Navbar() {
                   <DropdownMenuItem className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     My Problems
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/roadmap">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Map className="mr-2 h-4 w-4" />
+                    Learning Roadmap
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/catalog">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Problem Catalog
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/groups">
