@@ -22,8 +22,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, X, Loader2 } from "lucide-react";
+import { Plus, X, Loader2, Sparkles } from "lucide-react";
+import { PatternSuggestions } from "@/components/pattern-suggestions";
 import type { CreateProblemInput } from "@/lib/validators/problem";
+import type { SuggestResponse } from "@/lib/validators/suggest";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,6 +90,11 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
     initialData?.spaceComplexity ?? ""
   );
   const [notes, setNotes] = useState(initialData?.notes ?? "");
+
+  // AI Suggestions State
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestions, setSuggestions] = useState<SuggestResponse | null>(null);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
 
   // Topics
   const [topicInput, setTopicInput] = useState("");
@@ -168,6 +175,66 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
 
   function removeTestCase(index: number) {
     setTestCases(testCases.filter((_, i) => i !== index));
+  }
+
+  async function handleFetchSuggestions() {
+    if (!title.trim() || !description.trim()) {
+      setSuggestError("Please enter a title and description first to analyze patterns.");
+      return;
+    }
+
+    setIsSuggesting(true);
+    setSuggestError(null);
+
+    try {
+      const res = await fetch("/api/problems/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim(),
+          constraints: constraints.trim() || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to generate suggestions");
+      }
+
+      const data: SuggestResponse = await res.json();
+      setSuggestions(data);
+    } catch (err) {
+      setSuggestError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSuggesting(false);
+    }
+  }
+
+  function handleAcceptTopic(topic: string) {
+    if (!topics.includes(topic)) {
+      setTopics([...topics, topic]);
+    }
+  }
+
+  function handleAcceptAllTopics(newTopics: string[]) {
+    const merged = Array.from(new Set([...topics, ...newTopics]));
+    setTopics(merged);
+  }
+
+  function handleAcceptHint(hintText: string) {
+    if (!hints.includes(hintText)) {
+      setHints([...hints, hintText]);
+    }
+  }
+
+  function handleAcceptAllHints(newHints: string[]) {
+    const merged = Array.from(new Set([...hints, ...newHints]));
+    setHints(merged);
+  }
+
+  function handleAcceptApproachAsNote(approachText: string) {
+    setNotes((prev) => (prev ? `${prev}\n\n${approachText}` : approachText));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -330,8 +397,59 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
               />
             </div>
           </div>
+
+          {/* RAG Suggestion Action Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 p-3">
+            <div>
+              <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" />
+                RAG Pattern Intelligence
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Retrieve matching canonical patterns to suggest topics, approaches, and graded hints.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleFetchSuggestions}
+              disabled={isSuggesting || !title.trim() || !description.trim()}
+              className="text-xs gap-1.5"
+            >
+              {isSuggesting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Analyzing Knowledge Base...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Suggest Topics &amp; Hints
+                </>
+              )}
+            </Button>
+          </div>
+          {suggestError && (
+            <p className="text-xs text-red-600 font-medium">{suggestError}</p>
+          )}
         </CardContent>
       </Card>
+
+      {/* RAG Suggestions Interactive Review Panel */}
+      {suggestions && (
+        <PatternSuggestions
+          suggestions={suggestions}
+          currentTopics={topics}
+          currentHints={hints}
+          onAcceptTopic={handleAcceptTopic}
+          onAcceptAllTopics={handleAcceptAllTopics}
+          onAcceptHint={handleAcceptHint}
+          onAcceptAllHints={handleAcceptAllHints}
+          onAcceptApproachAsNote={handleAcceptApproachAsNote}
+          onDismiss={() => setSuggestions(null)}
+        />
+      )}
 
       {/* Topics */}
       <Card>
