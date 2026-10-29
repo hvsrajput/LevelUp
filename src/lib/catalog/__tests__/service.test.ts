@@ -6,6 +6,8 @@ describe("Catalog Service", () => {
     const res = await getCatalogProblems({ limit: 10, offset: 0 });
     expect(res.problems.length).toBeLessThanOrEqual(10);
     expect(res.total).toBeGreaterThanOrEqual(50);
+    expect(res.problems[0].url).toBeDefined();
+    expect(res.problems[0].url).toContain("https://leetcode.com/problems/");
   });
 
   it("filters catalog problems by topic", async () => {

@@ -5,12 +5,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SolveButton } from "@/components/solve-button";
 import { difficultyColor } from "@/lib/utils";
-import { Calendar, Flame, Sparkles, ArrowRight, RotateCcw } from "lucide-react";
+import { Calendar, Flame, Sparkles, RotateCcw } from "lucide-react";
 
 interface DailyQuestionData {
   dailyQuestionId: string;
@@ -22,6 +21,7 @@ interface DailyQuestionData {
     topicTags: string[];
     summary: string;
     source: "CATALOG" | "USER_PROBLEM";
+    url?: string | null;
   };
   reason: string;
   isSpacedRepetition: boolean;
@@ -128,22 +128,12 @@ export function DailyQuestionCard() {
         </div>
 
         <div className="pt-1">
-          <Button asChild size="sm" className="w-full gap-2">
-            <Link
-              href={
-                data.problem.source === "USER_PROBLEM"
-                  ? `/problems/${data.problem.id}`
-                  : `/problems/new?title=${encodeURIComponent(
-                      data.problem.title
-                    )}&difficulty=${data.problem.difficulty}&description=${encodeURIComponent(
-                      data.problem.summary
-                    )}`
-              }
-            >
-              Start Solving
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+          <SolveButton
+            url={data.problem.url}
+            label="Start solving"
+            size="sm"
+            className="w-full"
+          />
         </div>
       </CardContent>
     </Card>

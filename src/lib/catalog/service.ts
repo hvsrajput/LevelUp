@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   CURATED_CATALOG_PROBLEMS,
+  getLeetCodeProblemUrl,
   type CatalogProblemItem,
 } from "./catalog-data";
 
@@ -29,6 +30,7 @@ function toNormalizedItem(p: CatalogProblemItem, index: number): CatalogProblemI
   return {
     ...p,
     id: p.id || `catalog-${index + 1}`,
+    url: p.url ?? getLeetCodeProblemUrl(p.title),
   };
 }
 
@@ -71,16 +73,22 @@ export async function getCatalogProblems(
     ]);
 
     if (rawProblems.length > 0) {
-      let filtered = rawProblems.map((p) => ({
-        id: p.id,
-        title: p.title,
-        difficulty: p.difficulty as "EASY" | "MEDIUM" | "HARD",
-        topicTags: Array.isArray(p.topicTags)
-          ? (p.topicTags as string[])
-          : [],
-        patternTag: p.patternTag || "general",
-        summary: p.summary,
-      }));
+      let filtered = rawProblems.map((p) => {
+        const inMemoryMatch = CURATED_CATALOG_PROBLEMS.find(
+          (c) => c.title.toLowerCase() === p.title.toLowerCase()
+        );
+        return {
+          id: p.id,
+          title: p.title,
+          difficulty: p.difficulty as "EASY" | "MEDIUM" | "HARD",
+          topicTags: Array.isArray(p.topicTags)
+            ? (p.topicTags as string[])
+            : [],
+          patternTag: p.patternTag || "general",
+          summary: p.summary,
+          url: inMemoryMatch?.url ?? getLeetCodeProblemUrl(p.title),
+        };
+      });
 
       // Filter by topic in topicTags if requested
       if (topic && topic !== "all") {
@@ -150,6 +158,9 @@ export async function getCatalogProblemById(
       });
 
       if (found) {
+        const inMemoryMatch = CURATED_CATALOG_PROBLEMS.find(
+          (c) => c.title.toLowerCase() === found.title.toLowerCase()
+        );
         return {
           id: found.id,
           title: found.title,
@@ -159,6 +170,7 @@ export async function getCatalogProblemById(
             : [],
           patternTag: found.patternTag || "general",
           summary: found.summary,
+          url: inMemoryMatch?.url ?? getLeetCodeProblemUrl(found.title),
         };
       }
     } catch {

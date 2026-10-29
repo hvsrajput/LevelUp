@@ -41,6 +41,7 @@ interface CatalogItem {
   patternTag: string;
   summary: string;
   leetcodeQuestionId?: number;
+  url?: string | null;
 }
 
 const TOPICS = [

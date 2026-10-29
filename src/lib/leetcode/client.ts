@@ -30,12 +30,6 @@ function stripHtml(html: string): string {
  * Production client connecting to LeetCode's public GraphQL API
  */
 export class GraphQLLeetCodeClient implements ILeetCodeClient {
-  private sessionCookie?: string;
-
-  constructor(sessionCookie?: string) {
-    this.sessionCookie = sessionCookie;
-  }
-
   private async graphqlQuery(
     query: string,
     variables: Record<string, unknown>
@@ -47,10 +41,6 @@ export class GraphQLLeetCodeClient implements ILeetCodeClient {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     };
-
-    if (this.sessionCookie) {
-      headers["Cookie"] = `LEETCODE_SESSION=${this.sessionCookie}`;
-    }
 
     const res = await fetch(LEETCODE_GRAPHQL_ENDPOINT, {
       method: "POST",
@@ -422,7 +412,7 @@ export class MockLeetCodeClient implements ILeetCodeClient {
 /**
  * Returns the appropriate LeetCode client depending on environment
  */
-export function getLeetCodeClient(sessionCookie?: string): ILeetCodeClient {
+export function getLeetCodeClient(): ILeetCodeClient {
   if (
     process.env.NODE_ENV === "test" ||
     process.env.VITEST ||
@@ -431,5 +421,5 @@ export function getLeetCodeClient(sessionCookie?: string): ILeetCodeClient {
     return new MockLeetCodeClient();
   }
 
-  return new GraphQLLeetCodeClient(sessionCookie);
+  return new GraphQLLeetCodeClient();
 }

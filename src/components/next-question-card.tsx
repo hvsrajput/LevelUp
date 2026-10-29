@@ -5,12 +5,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SolveButton } from "@/components/solve-button";
 import { difficultyColor } from "@/lib/utils";
-import { Compass, Sparkles, ArrowRight, RotateCcw, Map } from "lucide-react";
+import { Compass, Sparkles, RotateCcw, Map } from "lucide-react";
 
 interface NextQuestionData {
   problem: {
@@ -20,6 +19,7 @@ interface NextQuestionData {
     topicTags: string[];
     summary: string;
     source: "CATALOG" | "USER_PROBLEM";
+    url?: string | null;
     isRevisit?: boolean;
   };
   reason: string;
@@ -143,22 +143,13 @@ export function NextQuestionCard() {
         </div>
 
         <div className="pt-1">
-          <Button asChild size="sm" variant="outline" className="w-full gap-2">
-            <Link
-              href={
-                data.problem.source === "USER_PROBLEM"
-                  ? `/problems/${data.problem.id}`
-                  : `/problems/new?title=${encodeURIComponent(
-                      data.problem.title
-                    )}&difficulty=${data.problem.difficulty}&description=${encodeURIComponent(
-                      data.problem.summary
-                    )}`
-              }
-            >
-              Practice This Problem
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+          <SolveButton
+            url={data.problem.url}
+            label="Practice this problem"
+            size="sm"
+            variant="outline"
+            className="w-full"
+          />
         </div>
       </CardContent>
     </Card>

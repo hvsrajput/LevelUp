@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  CONSOLE_IMPORT_SCRIPT,
+  type PreviewImportResult,
+} from "@/lib/leetcode/paste-import";
+import {
+  previewLeetCodeImportAction,
+  confirmLeetCodeImportAction,
+} from "@/actions/leetcode-import";
 import {
   Loader2,
   RefreshCw,
@@ -22,26 +31,19 @@ import {
   DownloadCloud,
   Hash,
   Clock,
-  Layers,
+  FileCode,
+  Copy,
+  Check,
+  Info,
 } from "lucide-react";
 
 interface LeetCodeSyncModalProps {
   onSyncComplete?: () => void;
 }
 
-interface BulkJobState {
-  id: string;
-  status: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
-  total: number;
-  processed: number;
-  imported: number;
-  skipped: number;
-  error?: string | null;
-}
-
 export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<"link" | "sync24h" | "bulk" | "importNumber">("link");
+  const [tab, setTab] = useState<"link" | "sync24h" | "paste" | "importNumber">("link");
 
   // Account link state
   const [linkedUsername, setLinkedUsername] = useState<string | null>(null);
@@ -66,11 +68,15 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
   } | null>(null);
   const [sync24hError, setSync24hError] = useState<string | null>(null);
 
-  // Bulk sync state
-  const [bulkJob, setBulkJob] = useState<BulkJobState | null>(null);
-  const [isStartingBulk, setIsStartingBulk] = useState(false);
-  const [bulkError, setBulkError] = useState<string | null>(null);
-  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Paste import state
+  const [pastedJson, setPastedJson] = useState("");
+  const [hasCopiedScript, setHasCopiedScript] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [preview, setPreview] = useState<PreviewImportResult | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmSuccess, setConfirmSuccess] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
 
   // Import by number state
   const [questionNumberInput, setQuestionNumberInput] = useState("");
@@ -101,25 +107,12 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
     }
   }
 
-  // Load link status when opened and cleanup timers on unmount
   function handleOpenChange(newOpen: boolean) {
     setOpen(newOpen);
     if (newOpen) {
       loadLinkStatus();
-    } else {
-      if (pollTimerRef.current) {
-        clearInterval(pollTimerRef.current);
-      }
     }
   }
-
-  useEffect(() => {
-    return () => {
-      if (pollTimerRef.current) {
-        clearInterval(pollTimerRef.current);
-      }
-    };
-  }, []);
 
   async function handleLink() {
     if (!usernameInput.trim()) {
@@ -215,53 +208,60 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
     }
   }
 
-  async function handleStartBulkSync() {
-    setIsStartingBulk(true);
-    setBulkError(null);
+  async function handleCopyScript() {
+    try {
+      await navigator.clipboard.writeText(CONSOLE_IMPORT_SCRIPT);
+      setHasCopiedScript(true);
+      setTimeout(() => setHasCopiedScript(false), 2000);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handlePreviewPaste() {
+    if (!pastedJson.trim()) {
+      setPreviewError("Please paste the JSON export before previewing.");
+      return;
+    }
+
+    setIsPreviewing(true);
+    setPreviewError(null);
+    setPreview(null);
+    setConfirmSuccess(null);
+    setConfirmError(null);
 
     try {
-      const res = await fetch("/api/leetcode/sync-bulk", { method: "POST" });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to start bulk import.");
-      }
-
-      const jobId = data.jobId;
-      setBulkJob({
-        id: jobId,
-        status: "RUNNING",
-        total: 0,
-        processed: 0,
-        imported: 0,
-        skipped: 0,
-      });
-
-      // Start polling status
-      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-      pollTimerRef.current = setInterval(async () => {
-        try {
-          const pollRes = await fetch(`/api/leetcode/sync-bulk/${jobId}`);
-          if (pollRes.ok) {
-            const jobData: BulkJobState = await pollRes.json();
-            setBulkJob(jobData);
-
-            if (jobData.status === "COMPLETED" || jobData.status === "FAILED") {
-              if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-              if (jobData.status === "COMPLETED" && onSyncComplete) {
-                onSyncComplete();
-              }
-            }
-          }
-        } catch (e) {
-          console.error("Error polling bulk job status:", e);
-        }
-      }, 1500);
+      const res = await previewLeetCodeImportAction(pastedJson.trim());
+      setPreview(res);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An error occurred.";
-      setBulkError(message);
+      const msg = err instanceof Error ? err.message : "Failed to parse payload.";
+      setPreviewError(msg);
     } finally {
-      setIsStartingBulk(false);
+      setIsPreviewing(false);
+    }
+  }
+
+  async function handleConfirmPaste() {
+    if (!pastedJson.trim()) return;
+
+    setIsConfirming(true);
+    setConfirmError(null);
+
+    try {
+      const res = await confirmLeetCodeImportAction(pastedJson.trim());
+      setConfirmSuccess(
+        `Successfully imported ${res.importedCount} problem${
+          res.importedCount === 1 ? "" : "s"
+        }!`
+      );
+      if (onSyncComplete) {
+        onSyncComplete();
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to confirm import.";
+      setConfirmError(msg);
+    } finally {
+      setIsConfirming(false);
     }
   }
 
@@ -309,12 +309,15 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400">
+        <Button
+          variant="outline"
+          className="border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400"
+        >
           <DownloadCloud className="mr-2 h-4 w-4" /> LeetCode Sync
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-500/10 text-amber-500 font-bold text-sm">
@@ -353,14 +356,14 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
           </button>
           <button
             type="button"
-            onClick={() => setTab("bulk")}
+            onClick={() => setTab("paste")}
             className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-colors ${
-              tab === "bulk"
+              tab === "paste"
                 ? "border-amber-500 text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Layers className="h-3.5 w-3.5" /> Bulk Import
+            <FileCode className="h-3.5 w-3.5" /> Paste Import
           </button>
           <button
             type="button"
@@ -555,120 +558,136 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
           </div>
         )}
 
-        {/* Tab 3: Bulk Import */}
-        {tab === "bulk" && (
-          <div className="space-y-4 py-2">
-            {!linkedUsername ? (
-              <div className="rounded-lg border border-dashed p-6 text-center">
-                <AlertCircle className="mx-auto h-8 w-8 text-amber-500 mb-2" />
-                <p className="text-sm font-medium">LeetCode Account Not Linked</p>
-                <p className="text-xs text-muted-foreground mt-1 mb-4">
-                  Link your LeetCode username in the Account tab first.
-                </p>
-                <Button size="sm" onClick={() => setTab("link")}>
-                  Go to Account Tab
+        {/* Tab 3: Paste-Based Import */}
+        {tab === "paste" && (
+          <div className="space-y-3.5 py-2">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Export and Paste Solved Problems</p>
+              <p className="text-xs text-muted-foreground">
+                Run this lightweight script in your DevTools console while logged into leetcode.com.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-muted-foreground flex items-center gap-1">
+                  <FileCode className="h-3.5 w-3.5 text-primary" /> Console Script
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyScript}
+                  className="h-6 text-[11px] gap-1"
+                >
+                  {hasCopiedScript ? (
+                    <>
+                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" /> Copy Script
+                    </>
+                  )}
                 </Button>
               </div>
-            ) : (
-              <>
-                <div className="space-y-1">
-                  <p className="text-sm">
-                    Import all accepted problems from your public profile in the background.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Includes rate limiting with exponential backoff to respect LeetCode&apos;s API.
-                  </p>
-                </div>
 
-                {!bulkJob || bulkJob.status === "COMPLETED" || bulkJob.status === "FAILED" ? (
-                  <Button
-                    onClick={handleStartBulkSync}
-                    disabled={isStartingBulk}
-                    className="w-full"
-                  >
-                    {isStartingBulk ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Starting...
-                      </>
-                    ) : (
-                      <>
-                        <DownloadCloud className="mr-2 h-4 w-4" /> Start Bulk Import
-                      </>
-                    )}
-                  </Button>
-                ) : null}
+              <div className="rounded-md border bg-muted/60 p-2 font-mono text-[10px] text-muted-foreground overflow-x-auto max-h-20">
+                <pre className="whitespace-pre">{CONSOLE_IMPORT_SCRIPT}</pre>
+              </div>
 
-                {bulkError && (
-                  <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
-                    <span>{bulkError}</span>
-                  </div>
-                )}
+              <div className="flex items-start gap-1.5 rounded-md bg-muted/40 p-2 text-[11px] text-muted-foreground">
+                <Info className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
+                <span>
+                  It runs in your own browser on <strong>leetcode.com</strong> and sends nothing to this app until you paste the result.
+                </span>
+              </div>
+            </div>
 
-                {bulkJob && (
-                  <div className="rounded-lg border bg-muted/30 p-3 space-y-3 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">Job Status</span>
-                      <Badge
-                        variant="outline"
-                        className={
-                          bulkJob.status === "COMPLETED"
-                            ? "border-emerald-500/40 text-emerald-600 bg-emerald-500/10"
-                            : bulkJob.status === "FAILED"
-                            ? "border-destructive/40 text-destructive bg-destructive/10"
-                            : "border-amber-500/40 text-amber-600 bg-amber-500/10 animate-pulse"
-                        }
-                      >
-                        {bulkJob.status}
-                      </Badge>
-                    </div>
+            <div className="space-y-1.5">
+              <label htmlFor="modal-paste-area" className="text-xs font-semibold text-muted-foreground">
+                Paste JSON Output
+              </label>
+              <Textarea
+                id="modal-paste-area"
+                placeholder={`{\n  "version": 1,\n  "problems": [...] \n}`}
+                rows={4}
+                value={pastedJson}
+                onChange={(e) => {
+                  setPastedJson(e.target.value);
+                  setPreview(null);
+                  setPreviewError(null);
+                  setConfirmSuccess(null);
+                }}
+                className="font-mono text-xs"
+              />
+            </div>
 
-                    {/* Progress Bar */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-muted-foreground text-[11px]">
-                        <span>
-                          {bulkJob.status === "RUNNING"
-                            ? `Importing... (${bulkJob.processed} / ${bulkJob.total || "?"})`
-                            : bulkJob.status === "COMPLETED"
-                            ? "Complete"
-                            : "Failed"}
-                        </span>
-                        <span>
-                          {bulkJob.total > 0
-                            ? `${Math.round((bulkJob.processed / bulkJob.total) * 100)}%`
-                            : "0%"}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                        <div
-                          className="h-full bg-amber-500 transition-all duration-300"
-                          style={{
-                            width: `${
-                              bulkJob.total > 0
-                                ? Math.min(100, Math.round((bulkJob.processed / bulkJob.total) * 100))
-                                : 5
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-muted-foreground pt-1">
-                      <div>
-                        Imported: <span className="font-semibold text-foreground">{bulkJob.imported}</span>
-                      </div>
-                      <div>
-                        Skipped/Cached: <span className="font-semibold text-foreground">{bulkJob.skipped}</span>
-                      </div>
-                    </div>
-
-                    {bulkJob.error && (
-                      <p className="text-destructive font-medium text-[11px]">{bulkJob.error}</p>
-                    )}
-                  </div>
-                )}
-              </>
+            {previewError && (
+              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{previewError}</span>
+              </div>
             )}
+
+            {preview && (
+              <div className="rounded-lg border bg-muted/30 p-2.5 space-y-2 text-xs">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded border bg-emerald-500/10 p-1.5">
+                    <div className="font-bold text-emerald-600">{preview.newCount}</div>
+                    <div className="text-[10px] text-muted-foreground">New</div>
+                  </div>
+                  <div className="rounded border bg-muted/50 p-1.5">
+                    <div className="font-bold text-foreground">{preview.alreadyImportedCount}</div>
+                    <div className="text-[10px] text-muted-foreground">Tracked</div>
+                  </div>
+                  <div className="rounded border bg-amber-500/10 p-1.5">
+                    <div className="font-bold text-amber-600">{preview.invalidCount}</div>
+                    <div className="text-[10px] text-muted-foreground">Invalid</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {confirmError && (
+              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{confirmError}</span>
+              </div>
+            )}
+
+            {confirmSuccess && (
+              <div className="flex items-center gap-2 rounded-md bg-emerald-500/10 p-2 text-xs text-emerald-700 dark:text-emerald-300">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>{confirmSuccess}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handlePreviewPaste}
+                disabled={isPreviewing || !pastedJson.trim()}
+              >
+                {isPreviewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Preview"}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleConfirmPaste}
+                disabled={isConfirming || !preview || preview.newCount === 0 || confirmSuccess !== null}
+              >
+                {isConfirming ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Importing...
+                  </>
+                ) : (
+                  `Confirm (${preview ? preview.newCount : 0})`
+                )}
+              </Button>
+            </div>
           </div>
         )}
 

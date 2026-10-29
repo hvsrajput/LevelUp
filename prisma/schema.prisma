@@ -118,8 +118,8 @@ model Problem {
   source      ProblemSource @default(MANUAL)
   status      ProblemStatus @default(ATTEMPTED)
 
-  // LeetCode columns — nullable, present from day one so import needs no migration
-  leetcodeQuestionId Int?    @unique
+  // LeetCode columns — nullable
+  leetcodeQuestionId Int?
   titleSlug          String?
 
   constraints String? @db.Text
@@ -151,6 +151,7 @@ model Problem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([userId, leetcodeQuestionId])
   @@index([userId])
   @@index([difficulty])
   @@index([status])

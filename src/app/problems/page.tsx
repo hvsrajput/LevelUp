@@ -21,6 +21,7 @@ import { ProblemCard } from "@/components/problem-card";
 import { DailyQuestionCard } from "@/components/daily-question-card";
 import { NextQuestionCard } from "@/components/next-question-card";
 import { LeetCodeSyncModal } from "@/components/leetcode/leetcode-sync-modal";
+import { LeetCodeImportDialog } from "@/components/leetcode/leetcode-import-dialog";
 import {
   Plus,
   Search,
@@ -232,7 +233,8 @@ function ProblemsPageContent() {
             {pagination.total} problem{pagination.total !== 1 ? "s" : ""} tracked
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <LeetCodeImportDialog onImportComplete={() => setRefreshKey((k) => k + 1)} />
           <LeetCodeSyncModal onSyncComplete={() => setRefreshKey((k) => k + 1)} />
           <Button asChild>
             <Link href="/problems/new">

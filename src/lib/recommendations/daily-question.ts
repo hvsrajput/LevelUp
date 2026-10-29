@@ -3,7 +3,10 @@
 // =============================================================================
 
 import { prisma } from "@/lib/prisma";
-import { CURATED_CATALOG_PROBLEMS } from "@/lib/catalog/catalog-data";
+import {
+  CURATED_CATALOG_PROBLEMS,
+  getLeetCodeProblemUrl,
+} from "@/lib/catalog/catalog-data";
 
 export interface DailyQuestionResult {
   dailyQuestionId: string;
@@ -15,6 +18,7 @@ export interface DailyQuestionResult {
     topicTags: string[];
     summary: string;
     source: "CATALOG" | "USER_PROBLEM";
+    url?: string | null;
   };
   reason: string;
   isSpacedRepetition: boolean;
@@ -61,6 +65,7 @@ export async function getOrCreateDailyQuestion(
           topicTags: cat.topicTags,
           summary: cat.summary,
           source: "CATALOG",
+          url: cat.url ?? getLeetCodeProblemUrl(cat.title),
         },
         reason: existingDaily.reason,
         isSpacedRepetition: existingDaily.reason.includes("Spaced repetition"),
@@ -85,6 +90,9 @@ export async function getOrCreateDailyQuestion(
             topicTags: userProb.topics.map((t) => t.topic.name),
             summary: userProb.description.slice(0, 200) + "...",
             source: "USER_PROBLEM",
+            url: userProb.titleSlug
+              ? `https://leetcode.com/problems/${userProb.titleSlug}/`
+              : null,
           },
           reason: existingDaily.reason,
           isSpacedRepetition: existingDaily.reason.includes("Spaced repetition"),
@@ -163,6 +171,9 @@ export async function getOrCreateDailyQuestion(
         topicTags: spacedCandidate.topics.map((t) => t.topic.name),
         summary: spacedCandidate.description.slice(0, 200) + "...",
         source: "USER_PROBLEM",
+        url: spacedCandidate.titleSlug
+          ? `https://leetcode.com/problems/${spacedCandidate.titleSlug}/`
+          : null,
       },
       reason,
       isSpacedRepetition: true,
@@ -245,6 +256,7 @@ export async function getOrCreateDailyQuestion(
       topicTags: candidate.topicTags,
       summary: candidate.summary,
       source: "CATALOG",
+      url: candidate.url ?? getLeetCodeProblemUrl(candidate.title),
     },
     reason,
     isSpacedRepetition: false,

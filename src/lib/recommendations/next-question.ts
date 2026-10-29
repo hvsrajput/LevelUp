@@ -3,7 +3,10 @@
 // =============================================================================
 
 import { prisma } from "@/lib/prisma";
-import { CURATED_CATALOG_PROBLEMS } from "@/lib/catalog/catalog-data";
+import {
+  CURATED_CATALOG_PROBLEMS,
+  getLeetCodeProblemUrl,
+} from "@/lib/catalog/catalog-data";
 
 export interface NextQuestionResult {
   problem: {
@@ -13,6 +16,7 @@ export interface NextQuestionResult {
     topicTags: string[];
     summary: string;
     source: "CATALOG" | "USER_PROBLEM";
+    url?: string | null;
     isRevisit?: boolean;
   };
   reason: string;
@@ -72,6 +76,9 @@ export async function getNextRecommendedQuestion(
         topicTags: topicNames,
         summary: target.description.slice(0, 200) + "...",
         source: "USER_PROBLEM",
+        url: target.titleSlug
+          ? `https://leetcode.com/problems/${target.titleSlug}/`
+          : null,
         isRevisit: true,
       },
       reason: `You marked "${target.title}" for Revisit. Revisiting challenging problems after a short interval reinforces algorithmic intuition and cements optimal approaches.`,
@@ -110,6 +117,7 @@ export async function getNextRecommendedQuestion(
               topicTags: catalogMatch.topicTags,
               summary: catalogMatch.summary,
               source: "CATALOG",
+              url: catalogMatch.url ?? getLeetCodeProblemUrl(catalogMatch.title),
             },
             reason: `Matches Week ${nextIncompleteItem.weekNumber} of your roadmap ("${nextIncompleteItem.topicName}"). Working on "${catalogMatch.title}" develops your mastery of ${nextIncompleteItem.concept}.`,
             retrievedContext: {
@@ -165,6 +173,7 @@ export async function getNextRecommendedQuestion(
           topicTags: candidate.topicTags,
           summary: candidate.summary,
           source: "CATALOG",
+          url: candidate.url ?? getLeetCodeProblemUrl(candidate.title),
         },
         reason:
           currentCount === 0
@@ -189,6 +198,7 @@ export async function getNextRecommendedQuestion(
       topicTags: fallback.topicTags,
       summary: fallback.summary,
       source: "CATALOG",
+      url: fallback.url ?? getLeetCodeProblemUrl(fallback.title),
     },
     reason: `A foundational problem to practice frequency counting and Hash Set state lookups in linear time.`,
     retrievedContext: {

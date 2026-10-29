@@ -10,9 +10,18 @@ export interface CatalogProblemItem {
   patternTag: string;
   summary: string;
   leetcodeQuestionId?: number;
+  url?: string | null;
 }
 
-export const CURATED_CATALOG_PROBLEMS: CatalogProblemItem[] = [
+export function getLeetCodeProblemUrl(title: string): string {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+  return `https://leetcode.com/problems/${slug}/`;
+}
+
+const RAW_CURATED_PROBLEMS: CatalogProblemItem[] = [
   // --- Arrays & Hashing ---
   {
     title: "Contains Duplicate",
@@ -565,3 +574,10 @@ export const CURATED_CATALOG_PROBLEMS: CatalogProblemItem[] = [
     leetcodeQuestionId: 435,
   },
 ];
+
+export const CURATED_CATALOG_PROBLEMS: CatalogProblemItem[] = RAW_CURATED_PROBLEMS.map(
+  (p) => ({
+    ...p,
+    url: p.url ?? getLeetCodeProblemUrl(p.title),
+  })
+);
