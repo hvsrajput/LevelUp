@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Code2, LogOut, User } from "lucide-react";
+import { Code2, LogOut, User, Users } from "lucide-react";
 
 export function Navbar() {
   const { data: session, status } = useSession();
@@ -32,12 +32,20 @@ export function Navbar() {
         {/* Navigation Links */}
         <div className="hidden items-center gap-6 md:flex">
           {session && (
-            <Link
-              href="/problems"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Problems
-            </Link>
+            <>
+              <Link
+                href="/problems"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Problems
+              </Link>
+              <Link
+                href="/groups"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Groups
+              </Link>
+            </>
           )}
         </div>
 
@@ -76,6 +84,12 @@ export function Navbar() {
                   <DropdownMenuItem className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     My Problems
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/groups">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    Study Groups
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
