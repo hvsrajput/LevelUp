@@ -46,6 +46,7 @@ flowchart TD
     RAG_Engine["RAG Grounding & Cosine Retrieval Engine"]
     Roadmap_Engine["Curriculum Builder (Pedagogy Rules)"]
     Spaced_Repetition["Spaced Repetition & Streak Calculator"]
+    LeetCode_Engine["LeetCode Sync & Job Runner (Rate-Limited)"]
   end
 
   subgraph DatabaseLayer["Data Persistence (PostgreSQL / Neon)"]
@@ -57,12 +58,17 @@ flowchart TD
     DB_Catalog[("Seeded Problem Catalog")]
   end
 
+  subgraph ExternalServices["External APIs"]
+    LeetCode_API["LeetCode GraphQL Service"]
+  end
+
   Client --> AuthSecurity
   AuthSecurity --> ZodValidation
   ZodValidation --> APIRoutes
   APIRoutes --> CoreEngines
   CoreEngines --> PrismaORM
   APIRoutes --> PrismaORM
+  LeetCode_Engine -.-> LeetCode_API
   PrismaORM --> DatabaseLayer
 ```
 
@@ -107,6 +113,24 @@ flowchart TD
   - Automated GitHub Actions CI workflow running lint, typecheck, tests, and production build.
   - 100% route integration test coverage across all major endpoints.
   - Vercel deployment configuration with automated `prisma generate` postinstall hooks.
+- [x] **Phase 7: LeetCode Integration**
+  - Isolated client architecture with `ILeetCodeClient` interface and deterministic `MockLeetCodeClient` for offline/test environments.
+  - AES-256-GCM authenticated encryption for sensitive credentials (`encryptCredential` / `decryptCredential`).
+  - Single problem import by official LeetCode question number (e.g. #1 Two Sum, #200 Number of Islands).
+  - 24-hour sync for accepted submissions strictly deduplicated by `leetcodeQuestionId`.
+  - Asynchronous background bulk import job manager with exponential backoff retries and rate limiting.
+  - Interactive multi-tab sync modal with real-time job progress polling.
+
+---
+
+## ⚠️ LeetCode Integration & Terms of Service Notice
+
+> **Important**: LeetCode does not provide an official, sanctioned public REST API. LevelUp interfaces with public GraphQL queries (`https://leetcode.com/graphql`) strictly for personal problem tracking and synchronization of user submissions.
+> 
+> - **Zero judge/code execution**: LevelUp is a personal tracker and learning companion, not a competitive programming judge.
+> - **Rate limiting & backoff**: Bulk operations are intentionally throttled and implement exponential backoff to avoid overloading external servers.
+> - **Credential security**: Any optional session tokens or cookies are encrypted at rest using AES-256-GCM.
+> - **Mock mode**: Offline development and test suites run entirely against `MockLeetCodeClient` without making external network calls.
 
 ---
 

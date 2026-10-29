@@ -20,6 +20,7 @@ import {
 import { ProblemCard } from "@/components/problem-card";
 import { DailyQuestionCard } from "@/components/daily-question-card";
 import { NextQuestionCard } from "@/components/next-question-card";
+import { LeetCodeSyncModal } from "@/components/leetcode/leetcode-sync-modal";
 import {
   Plus,
   Search,
@@ -100,6 +101,7 @@ function ProblemsPageContent() {
   const [topic, setTopic] = useState<string>(initialTopic);
   const [timeframe, setTimeframe] = useState<string>(initialTimeframe);
   const [sortOption, setSortOption] = useState<string>(initialSortBy);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Fetch topics list once
   useEffect(() => {
@@ -186,6 +188,7 @@ function ProblemsPageContent() {
     topic,
     timeframe,
     sortOption,
+    refreshKey,
     router,
   ]);
 
@@ -229,11 +232,14 @@ function ProblemsPageContent() {
             {pagination.total} problem{pagination.total !== 1 ? "s" : ""} tracked
           </p>
         </div>
-        <Button asChild>
-          <Link href="/problems/new">
-            <Plus className="mr-2 h-4 w-4" /> Add Problem
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <LeetCodeSyncModal onSyncComplete={() => setRefreshKey((k) => k + 1)} />
+          <Button asChild>
+            <Link href="/problems/new">
+              <Plus className="mr-2 h-4 w-4" /> Add Problem
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* RAG-Powered Learning Widgets: Daily Challenge & Recommended Next */}
