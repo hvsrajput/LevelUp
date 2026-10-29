@@ -28,8 +28,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CodeEditor } from "@/components/code-editor";
+import { CodeViewer } from "@/components/code-viewer";
 import { SubmissionHistory, type SubmissionItem } from "@/components/submission-history";
-import { TestCaseRunner, type TestCaseItem } from "@/components/test-case-runner";
+import { ExamplesViewer, type TestCaseItem } from "@/components/test-case-runner";
 import { difficultyColor, statusColor, formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -56,6 +57,8 @@ interface Problem {
   source: string;
   status: string;
   constraints: string | null;
+  timeComplexity: string | null;
+  spaceComplexity: string | null;
   hints: string[];
   approaches: { title: string; description: string }[];
   notes: string | null;
@@ -292,6 +295,28 @@ function ProblemDetailContent({
           </span>
         </div>
 
+        {/* Complexity Pills */}
+        {(problem.timeComplexity || problem.spaceComplexity) && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {problem.timeComplexity && (
+              <Badge
+                variant="outline"
+                className="font-mono text-xs border-blue-200 bg-blue-50/70 text-blue-800"
+              >
+                Time: {problem.timeComplexity}
+              </Badge>
+            )}
+            {problem.spaceComplexity && (
+              <Badge
+                variant="outline"
+                className="font-mono text-xs border-purple-200 bg-purple-50/70 text-purple-800"
+              >
+                Space: {problem.spaceComplexity}
+              </Badge>
+            )}
+          </div>
+        )}
+
         {/* Topics */}
         {problem.topics.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
@@ -314,7 +339,7 @@ function ProblemDetailContent({
           className="gap-1.5 text-xs"
         >
           <Code2 className="h-4 w-4" />
-          Code & Submissions ({problem.submissions.length})
+          Solutions &amp; Code ({problem.submissions.length})
         </Button>
         <Button
           type="button"
@@ -324,7 +349,7 @@ function ProblemDetailContent({
           className="gap-1.5 text-xs"
         >
           <BookOpen className="h-4 w-4" />
-          Description & Tests ({problem.testCases.length})
+          Description &amp; Examples ({problem.testCases.length})
         </Button>
         <Button
           type="button"
@@ -334,30 +359,41 @@ function ProblemDetailContent({
           className="gap-1.5 text-xs"
         >
           <Lightbulb className="h-4 w-4" />
-          Hints & Approaches ({hints.length + approaches.length})
+          Hints &amp; Approaches ({hints.length + approaches.length})
         </Button>
       </div>
 
-      {/* Tab 1: Code & Submissions */}
+      {/* Tab 1: Solutions & Code */}
       {activeTab === "workspace" && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Left Column: Code Editor */}
-          <div>
+          {/* Left Column: Solution Recording Form */}
+          <div className="space-y-6">
             <CodeEditor
               problemId={problem.id}
               onSubmissionCreated={reloadProblem}
             />
           </div>
 
-          {/* Right Column: Submission History & Quick Test Cases */}
+          {/* Right Column: Read-Only Solution Viewer & History */}
           <div className="space-y-6">
+            {problem.submissions.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">Latest Solution Code</h3>
+                <CodeViewer
+                  code={problem.submissions[0].code}
+                  language={problem.submissions[0].language}
+                  runtime={problem.submissions[0].runtime}
+                  memory={problem.submissions[0].memory}
+                  notes={problem.submissions[0].notes}
+                />
+              </div>
+            )}
             <SubmissionHistory submissions={problem.submissions} />
-            <TestCaseRunner testCases={problem.testCases} />
           </div>
         </div>
       )}
 
-      {/* Tab 2: Description & Test Cases */}
+      {/* Tab 2: Description & Examples */}
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
@@ -387,6 +423,29 @@ function ProblemDetailContent({
               </Card>
             )}
 
+            {/* Target Complexity */}
+            {(problem.timeComplexity || problem.spaceComplexity) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold">Target Complexity</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {problem.timeComplexity && (
+                    <div className="rounded-md border p-3">
+                      <span className="text-xs font-medium text-muted-foreground">Time Complexity</span>
+                      <p className="mt-1 font-mono text-sm font-semibold text-blue-700">{problem.timeComplexity}</p>
+                    </div>
+                  )}
+                  {problem.spaceComplexity && (
+                    <div className="rounded-md border p-3">
+                      <span className="text-xs font-medium text-muted-foreground">Space Complexity</span>
+                      <p className="mt-1 font-mono text-sm font-semibold text-purple-700">{problem.spaceComplexity}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Notes */}
             {problem.notes && (
               <Card>
@@ -402,9 +461,9 @@ function ProblemDetailContent({
             )}
           </div>
 
-          {/* Right Column: Test Cases */}
+          {/* Right Column: Examples & Edge Cases */}
           <div>
-            <TestCaseRunner testCases={problem.testCases} />
+            <ExamplesViewer testCases={problem.testCases} />
           </div>
         </div>
       )}

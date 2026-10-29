@@ -39,6 +39,8 @@ function EditProblemContent({
           status: problem.status,
           source: problem.source,
           constraints: problem.constraints,
+          timeComplexity: problem.timeComplexity,
+          spaceComplexity: problem.spaceComplexity,
           hints: Array.isArray(problem.hints) ? problem.hints : [],
           approaches: Array.isArray(problem.approaches) ? problem.approaches : [],
           notes: problem.notes,

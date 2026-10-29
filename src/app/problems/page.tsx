@@ -39,6 +39,8 @@ interface Problem {
   status: string;
   source: string;
   createdAt: string;
+  timeComplexity?: string | null;
+  spaceComplexity?: string | null;
   topics: { topic: { name: string } }[];
   _count?: { submissions: number };
 }

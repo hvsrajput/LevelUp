@@ -81,6 +81,12 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
   const [constraints, setConstraints] = useState(
     initialData?.constraints ?? ""
   );
+  const [timeComplexity, setTimeComplexity] = useState(
+    initialData?.timeComplexity ?? ""
+  );
+  const [spaceComplexity, setSpaceComplexity] = useState(
+    initialData?.spaceComplexity ?? ""
+  );
   const [notes, setNotes] = useState(initialData?.notes ?? "");
 
   // Topics
@@ -176,6 +182,8 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
       status: status as "ATTEMPTED" | "SOLVED" | "REVISIT",
       source: "MANUAL",
       constraints: constraints || null,
+      timeComplexity: timeComplexity || null,
+      spaceComplexity: spaceComplexity || null,
       notes: notes || null,
       hints,
       approaches: [],
@@ -301,6 +309,27 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
               rows={3}
             />
           </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="timeComplexity">Time Complexity (optional)</Label>
+              <Input
+                id="timeComplexity"
+                value={timeComplexity}
+                onChange={(e) => setTimeComplexity(e.target.value)}
+                placeholder="e.g. O(n) or O(log n)"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="spaceComplexity">Space Complexity (optional)</Label>
+              <Input
+                id="spaceComplexity"
+                value={spaceComplexity}
+                onChange={(e) => setSpaceComplexity(e.target.value)}
+                placeholder="e.g. O(1) or O(n)"
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -404,18 +433,18 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
         </CardContent>
       </Card>
 
-      {/* Test Cases */}
+      {/* Examples & edge cases */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Test Cases</CardTitle>
+          <CardTitle>Examples &amp; edge cases</CardTitle>
           <Button type="button" variant="outline" size="sm" onClick={addTestCase}>
-            <Plus className="mr-1 h-4 w-4" /> Add Test Case
+            <Plus className="mr-1 h-4 w-4" /> Add Example / Edge Case
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {testCases.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No test cases yet. Click &ldquo;Add Test Case&rdquo; to add one.
+              No examples or edge cases yet. Click &ldquo;Add Example / Edge Case&rdquo; to add one.
             </p>
           ) : (
             testCases.map((tc, index) => (
@@ -455,13 +484,13 @@ export function ProblemForm({ initialData, isEdit = false }: ProblemFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Explanation (optional)</Label>
+                  <Label>Note (optional)</Label>
                   <Input
                     value={tc.explanation ?? ""}
                     onChange={(e) =>
                       updateTestCase(index, "explanation", e.target.value)
                     }
-                    placeholder="Because nums[0] + nums[1] == 9"
+                    placeholder="e.g. Handles negative numbers or empty collection"
                   />
                 </div>
               </div>

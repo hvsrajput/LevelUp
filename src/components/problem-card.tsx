@@ -17,6 +17,7 @@ interface ProblemCardProps {
     status: string;
     source: string;
     createdAt: string;
+    timeComplexity?: string | null;
     topics: { topic: { name: string } }[];
     _count?: { submissions: number };
   };
@@ -47,6 +48,11 @@ export function ProblemCard({ problem }: ProblemCardProps) {
             {problem.source === "LEETCODE" && (
               <Badge variant="outline" className="text-orange-600">
                 LeetCode
+              </Badge>
+            )}
+            {problem.timeComplexity && (
+              <Badge variant="outline" className="font-mono text-[11px] text-blue-700">
+                {problem.timeComplexity}
               </Badge>
             )}
             {problem.topics.slice(0, 3).map(({ topic }) => (

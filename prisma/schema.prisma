@@ -124,6 +124,10 @@ model Problem {
 
   constraints String? @db.Text
 
+  // Complexity tracking
+  timeComplexity  String?
+  spaceComplexity String?
+
   // Ordered lists stored as JSON (not queried independently)
   hints      Json @default("[]") // string[]
   approaches Json @default("[]") // { title: string, description: string }[]

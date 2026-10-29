@@ -46,13 +46,15 @@ describe("createProblemSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("validates problem with topics and test cases", () => {
+  it("validates problem with topics, complexity, and examples", () => {
     const input = {
       title: "Two Sum",
       description: "Given an array of integers nums and an integer target...",
       difficulty: "EASY" as const,
       status: "SOLVED" as const,
       constraints: "2 <= nums.length <= 10^4",
+      timeComplexity: "O(n)",
+      spaceComplexity: "O(n)",
       topicNames: ["Array", "Hash Table"],
       testCases: [
         {
@@ -70,6 +72,8 @@ describe("createProblemSchema", () => {
       expect(result.data.topicNames).toHaveLength(2);
       expect(result.data.testCases).toHaveLength(1);
       expect(result.data.hints).toHaveLength(1);
+      expect(result.data.timeComplexity).toBe("O(n)");
+      expect(result.data.spaceComplexity).toBe("O(n)");
     }
   });
 });

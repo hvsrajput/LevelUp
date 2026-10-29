@@ -54,6 +54,8 @@ export const createProblemSchema = z.object({
   titleSlug: z.string().nullable().optional(),
 
   constraints: z.string().max(5000).nullable().optional(),
+  timeComplexity: z.string().max(100).nullable().optional(),
+  spaceComplexity: z.string().max(100).nullable().optional(),
   hints: z.array(z.string()).default([]),
   approaches: z.array(approachSchema).default([]),
   notes: z.string().max(10000).nullable().optional(),

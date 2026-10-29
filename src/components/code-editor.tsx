@@ -171,7 +171,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base font-semibold">Code Workspace</CardTitle>
+        <CardTitle className="text-base font-semibold">Record Solution</CardTitle>
         <div className="flex items-center gap-2">
           <Select value={language} onValueChange={handleLanguageChange}>
             <SelectTrigger className="w-[140px] text-xs">

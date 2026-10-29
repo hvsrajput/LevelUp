@@ -8,8 +8,9 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CodeViewer } from "@/components/code-viewer";
 import { formatDate } from "@/lib/utils";
-import { Copy, Check, ChevronDown, ChevronUp, Code2, Clock, Cpu } from "lucide-react";
+import { ChevronDown, ChevronUp, Code2, Clock, Cpu } from "lucide-react";
 
 export interface SubmissionItem {
   id: string;
@@ -26,7 +27,6 @@ interface SubmissionHistoryProps {
 }
 
 export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({
     // Expand the most recent submission by default if any exist
     ...(submissions.length > 0 ? { [submissions[0].id]: true } : {}),
@@ -34,12 +34,6 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
 
   function toggleExpand(id: string) {
     setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
-  }
-
-  async function handleCopy(id: string, code: string) {
-    await navigator.clipboard.writeText(code);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
   }
 
   if (submissions.length === 0) {
@@ -105,19 +99,6 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCopy(sub.id, sub.code)}
-                    title="Copy code"
-                  >
-                    {copiedId === sub.id ? (
-                      <Check className="h-3.5 w-3.5 text-green-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
                     onClick={() => toggleExpand(sub.id)}
                     title={isExpanded ? "Collapse" : "Expand"}
                   >
@@ -130,18 +111,15 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
                 </div>
               </div>
 
-              {sub.notes && (
-                <div className="border-t bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">Notes: </span>
-                  {sub.notes}
-                </div>
-              )}
-
               {isExpanded && (
-                <div className="border-t p-3">
-                  <pre className="max-h-96 overflow-auto rounded bg-muted/70 p-3 font-mono text-xs leading-relaxed">
-                    <code>{sub.code}</code>
-                  </pre>
+                <div className="border-t p-2">
+                  <CodeViewer
+                    code={sub.code}
+                    language={sub.language}
+                    runtime={sub.runtime}
+                    memory={sub.memory}
+                    notes={sub.notes}
+                  />
                 </div>
               )}
             </div>
