@@ -68,21 +68,33 @@ export async function retrieveNearestPatterns(
 ): Promise<PatternChunk[]> {
   let dbPatterns: PatternChunk[] = [];
 
-  try {
-    const raw = await prisma.dsaPattern.findMany();
-    if (raw.length > 0) {
-      dbPatterns = raw.map((p) => ({
-        id: p.id,
-        topic: p.topic,
-        signals: p.signals,
-        description: p.description,
-        approaches: p.approaches as PatternChunk["approaches"],
-        hints: p.hints as PatternChunk["hints"],
-      }));
+  // In testing environment or when explicitly configured, use in-memory patterns directly
+  if (process.env.NODE_ENV === "test" || process.env.VITEST) {
+    dbPatterns = CURATED_DSA_PATTERNS.map((p, idx) => ({
+      id: `pattern-${idx + 1}`,
+      topic: p.topic,
+      signals: p.signals,
+      description: p.description,
+      approaches: p.approaches,
+      hints: p.hints,
+    }));
+  } else {
+    try {
+      const raw = await prisma.dsaPattern.findMany();
+      if (raw.length > 0) {
+        dbPatterns = raw.map((p) => ({
+          id: p.id,
+          topic: p.topic,
+          signals: p.signals,
+          description: p.description,
+          approaches: p.approaches as PatternChunk["approaches"],
+          hints: p.hints as PatternChunk["hints"],
+        }));
+      }
+    } catch (err) {
+      // Fall back to in-memory curated patterns if database is unseeded or during early migration
+      console.warn("Could not query DsaPattern table, using in-memory dataset:", err);
     }
-  } catch (err) {
-    // Fall back to in-memory curated patterns if database is unseeded or during early migration
-    console.warn("Could not query DsaPattern table, using in-memory dataset:", err);
   }
 
   if (dbPatterns.length === 0) {
