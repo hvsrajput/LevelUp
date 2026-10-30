@@ -5,7 +5,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { calculateUserStreak } from "@/lib/groups/utils";
+import { computeStreak } from "@/lib/streak";
+import { getTodayInTimezone, sanitizeTimezone } from "@/lib/date";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -49,6 +50,7 @@ export async function GET(req: Request, context: RouteContext) {
                 name: true,
                 email: true,
                 image: true,
+                timezone: true,
               },
             },
           },
@@ -76,6 +78,7 @@ export async function GET(req: Request, context: RouteContext) {
         difficulty: true,
         userId: true,
         solvedAt: true,
+        solvedDay: true,
         updatedAt: true,
       },
       orderBy: {
@@ -109,8 +112,12 @@ export async function GET(req: Request, context: RouteContext) {
     // 5. Calculate member stats: solved count, current streak, longest streak
     const memberStats = group.members.map((m) => {
       const userSolves = solvedProblems.filter((p) => p.userId === m.userId);
-      const dates = userSolves.map((p) => p.solvedAt ?? p.updatedAt);
-      const streaks = calculateUserStreak(dates);
+      const userTz = sanitizeTimezone(m.user.timezone);
+      const userToday = getTodayInTimezone(userTz);
+      const days = userSolves
+        .map((p) => p.solvedDay || (p.solvedAt ? getTodayInTimezone(userTz, p.solvedAt) : null))
+        .filter(Boolean) as string[];
+      const streaks = computeStreak(days, userToday);
 
       return {
         id: m.id,
@@ -119,8 +126,8 @@ export async function GET(req: Request, context: RouteContext) {
         joinedAt: m.joinedAt,
         user: m.user,
         solvedCount: userSolves.length,
-        currentStreak: streaks.currentStreak,
-        longestStreak: streaks.longestStreak,
+        currentStreak: streaks.current,
+        longestStreak: streaks.longest,
       };
     });
 

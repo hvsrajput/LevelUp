@@ -231,6 +231,7 @@ export async function confirmLeetCodeImport(
     source: "LEETCODE" as const,
     status: "SOLVED" as const,
     solvedAt: null,
+    solvedDay: null,
     leetcodeQuestionId: p.id,
     titleSlug: p.slug,
   }));

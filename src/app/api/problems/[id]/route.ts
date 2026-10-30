@@ -8,6 +8,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateProblemSchema } from "@/lib/validators/problem";
+import { safeRevalidatePath } from "@/lib/server-utils";
+import { getTodayInTimezone, sanitizeTimezone } from "@/lib/date";
 
 // Next.js 16: RouteContext is globally available after `next typegen`
 type Ctx = RouteContext<"/api/problems/[id]">;
@@ -156,22 +158,56 @@ export async function PUT(request: Request, ctx: Ctx) {
       }
     }
 
-    // Auto-set solvedAt when status changes to SOLVED
-    const solvedAt =
-      updateData.solvedAt !== undefined
-        ? updateData.solvedAt
-          ? new Date(updateData.solvedAt)
-          : null
-        : updateData.status === "SOLVED" && result.problem.status !== "SOLVED"
-        ? new Date()
-        : undefined;
+    // Fetch user's timezone to compute solvedDay accurately (defensive check for test mocks)
+    const user = tx.user?.findUnique
+      ? await tx.user.findUnique({
+          where: { id: session.user.id },
+          select: { timezone: true },
+        })
+      : null;
+    const userTimezone = sanitizeTimezone(user?.timezone);
+
+    // Compute solvedAt and solvedDay status transitions:
+    // When a problem becomes SOLVED: set solvedAt = now and solvedDay.
+    // When it leaves SOLVED: clear both. Never allow solvedAt in the future.
+    let solvedAtToSet: Date | null | undefined = undefined;
+    let solvedDayToSet: string | null | undefined = undefined;
+
+    const newStatus = updateData.status ?? result.problem.status;
+    const isBecomingOrRemainingSolved = newStatus === "SOLVED";
+
+    if (updateData.status !== undefined && updateData.status !== "SOLVED") {
+      // Left SOLVED: clear both
+      solvedAtToSet = null;
+      solvedDayToSet = null;
+    } else if (isBecomingOrRemainingSolved) {
+      if (updateData.solvedAt !== undefined) {
+        if (updateData.solvedAt) {
+          const target = new Date(updateData.solvedAt);
+          if (target.getTime() > Date.now() + 60_000) {
+            throw new Error("solvedAt cannot be in the future");
+          }
+          solvedAtToSet = target;
+          solvedDayToSet = getTodayInTimezone(userTimezone, target);
+        } else {
+          solvedAtToSet = null;
+          solvedDayToSet = null;
+        }
+      } else if (result.problem.status !== "SOLVED") {
+        // Newly marked SOLVED
+        const now = new Date();
+        solvedAtToSet = now;
+        solvedDayToSet = getTodayInTimezone(userTimezone, now);
+      }
+    }
 
     // Update the problem itself
     return tx.problem.update({
       where: { id },
       data: {
         ...updateData,
-        ...(solvedAt !== undefined ? { solvedAt } : {}),
+        ...(solvedAtToSet !== undefined ? { solvedAt: solvedAtToSet } : {}),
+        ...(solvedDayToSet !== undefined ? { solvedDay: solvedDayToSet } : {}),
       },
       include: {
         topics: { include: { topic: true } },
@@ -179,6 +215,9 @@ export async function PUT(request: Request, ctx: Ctx) {
       },
     });
   });
+
+  safeRevalidatePath("/problems");
+  safeRevalidatePath("/roadmap");
 
   return NextResponse.json(updated);
 }
@@ -201,6 +240,9 @@ export async function DELETE(_request: Request, ctx: Ctx) {
 
   // Cascade deletes handle test cases, submissions, topic links
   await prisma.problem.delete({ where: { id } });
+
+  safeRevalidatePath("/problems");
+  safeRevalidatePath("/roadmap");
 
   return NextResponse.json({ success: true });
 }

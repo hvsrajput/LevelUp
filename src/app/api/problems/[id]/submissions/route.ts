@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSubmissionSchema } from "@/lib/validators/submission";
+import { safeRevalidatePath } from "@/lib/server-utils";
+import { getTodayInTimezone, sanitizeTimezone } from "@/lib/date";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -98,20 +100,37 @@ export async function POST(request: Request, ctx: Ctx) {
     });
 
     if (markStatus) {
+      const user = tx.user?.findUnique
+        ? await tx.user.findUnique({
+            where: { id: session.user.id },
+            select: { timezone: true },
+          })
+        : null;
+      const userTimezone = sanitizeTimezone(user?.timezone);
+
+      let solvedAt: Date | null = null;
+      let solvedDay: string | null = null;
+
+      if (markStatus === "SOLVED") {
+        solvedAt = problem.solvedAt || new Date();
+        solvedDay = getTodayInTimezone(userTimezone, solvedAt);
+      }
+
       await tx.problem.update({
         where: { id: problem.id },
         data: {
           status: markStatus,
-          solvedAt:
-            markStatus === "SOLVED"
-              ? problem.solvedAt || new Date()
-              : problem.solvedAt,
+          solvedAt,
+          solvedDay,
         },
       });
     }
 
     return sub;
   });
+
+  safeRevalidatePath("/problems");
+  safeRevalidatePath("/roadmap");
 
   return NextResponse.json(submission, { status: 201 });
 }

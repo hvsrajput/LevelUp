@@ -37,6 +37,9 @@ model User {
   // LeetCode integration (Phase 7)
   leetcodeUsername String? @unique
 
+  // User preferences & timezones
+  timezone String @default("Asia/Kolkata")
+
   accounts Account[]
   sessions Session[]
 
@@ -134,6 +137,7 @@ model Problem {
 
   notes    String?   @db.Text
   solvedAt DateTime?
+  solvedDay String? // format YYYY-MM-DD in user's timezone
 
   // pgvector embedding for RAG (Phase 3) — 1536 dims for OpenAI ada-002
   // Using Unsupported type since Prisma doesn't natively support vector yet
@@ -153,6 +157,7 @@ model Problem {
 
   @@unique([userId, leetcodeQuestionId])
   @@index([userId])
+  @@index([userId, solvedDay])
   @@index([difficulty])
   @@index([status])
   @@index([source])
@@ -330,19 +335,22 @@ model Roadmap {
 }
 
 model RoadmapItem {
-  id          String  @id @default(cuid())
-  weekNumber  Int
-  topicName   String
-  concept     String
-  problemIds  Json    @default("[]") // string[] — references to Problem or CatalogProblem
-  isCompleted Boolean @default(false)
-  order       Int     // ordering within the week
+  id            String  @id @default(cuid())
+  weekNumber    Int
+  dayNumber     Int     @default(1) // 1..7 for day within the week
+  scheduledDate String? // YYYY-MM-DD calendar date in user's timezone
+  topicName     String
+  concept       String
+  problemIds    Json    @default("[]") // string[] — references to Problem or CatalogProblem
+  isCompleted   Boolean @default(false)
+  order         Int     // ordering within the week
 
   roadmapId String
   roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
 
   @@index([roadmapId])
   @@index([roadmapId, weekNumber])
+  @@index([roadmapId, scheduledDate])
 }
 
 // =============================================================================

@@ -20,6 +20,7 @@ import {
 import { ProblemCard } from "@/components/problem-card";
 import { DailyQuestionCard } from "@/components/daily-question-card";
 import { NextQuestionCard } from "@/components/next-question-card";
+import { StreakCard } from "@/components/streak-card";
 import { LeetCodeSyncModal } from "@/components/leetcode/leetcode-sync-modal";
 import { LeetCodeImportDialog } from "@/components/leetcode/leetcode-import-dialog";
 import {
@@ -242,6 +243,11 @@ function ProblemsPageContent() {
             </Link>
           </Button>
         </div>
+      </div>
+
+      {/* Daily Streak Card & 12-Week Practice Heatmap */}
+      <div className="mb-6">
+        <StreakCard />
       </div>
 
       {/* RAG-Powered Learning Widgets: Daily Challenge & Recommended Next */}

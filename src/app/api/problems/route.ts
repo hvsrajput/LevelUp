@@ -11,6 +11,8 @@ import {
   problemQuerySchema,
 } from "@/lib/validators/problem";
 import { generateShortCode } from "@/lib/utils";
+import { safeRevalidatePath } from "@/lib/server-utils";
+import { getTodayInTimezone, sanitizeTimezone } from "@/lib/date";
 import type { Prisma } from "@prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -157,6 +159,32 @@ export async function POST(request: Request) {
 
   const { topicNames, testCases, ...problemData } = parsed.data;
 
+  // Fetch user's timezone to compute solvedDay accurately (defensive check for test mocks)
+  const user = prisma.user?.findUnique
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { timezone: true },
+      })
+    : null;
+  const userTimezone = sanitizeTimezone(user?.timezone);
+
+  // Compute solvedAt and solvedDay
+  let solvedAt: Date | null = null;
+  let solvedDay: string | null = null;
+
+  if (problemData.status === "SOLVED" && problemData.source !== "LEETCODE") {
+    const now = new Date();
+    const targetDate = problemData.solvedAt ? new Date(problemData.solvedAt) : now;
+    if (targetDate.getTime() > now.getTime() + 60_000) {
+      return NextResponse.json(
+        { error: "solvedAt cannot be in the future" },
+        { status: 400 }
+      );
+    }
+    solvedAt = targetDate;
+    solvedDay = getTodayInTimezone(userTimezone, targetDate);
+  }
+
   // Use a transaction to ensure atomicity: problem + topics + test cases
   const problem = await prisma.$transaction(async (tx) => {
     // 1. Upsert topics (create if they don't exist)
@@ -178,11 +206,8 @@ export async function POST(request: Request) {
       data: {
         ...problemData,
         shortCode: generateShortCode(),
-        solvedAt: problemData.solvedAt
-          ? new Date(problemData.solvedAt)
-          : problemData.status === "SOLVED"
-          ? new Date()
-          : null,
+        solvedAt,
+        solvedDay,
         userId: session.user.id,
 
         // 3. Connect topics via the join table
@@ -209,6 +234,9 @@ export async function POST(request: Request) {
 
     return created;
   });
+
+  safeRevalidatePath("/problems");
+  safeRevalidatePath("/roadmap");
 
   return NextResponse.json(problem, { status: 201 });
 }

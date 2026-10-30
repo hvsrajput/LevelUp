@@ -12,6 +12,15 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: vi.fn(),
       create: vi.fn(),
     },
+    roadmapItem: {
+      updateMany: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
+    },
+    problem: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
@@ -51,6 +60,8 @@ describe("Roadmap API Route Handlers", () => {
           {
             id: "item-1",
             weekNumber: 1,
+            dayNumber: 1,
+            scheduledDate: "2026-10-30",
             topicName: "Arrays",
             concept: "Two Sum",
             problemIds: ["Two Sum"],
@@ -59,6 +70,15 @@ describe("Roadmap API Route Handlers", () => {
           },
         ],
       });
+      (prismaMock.problem.findMany as any).mockResolvedValueOnce([
+        {
+          id: "p1",
+          title: "Two Sum",
+          difficulty: "EASY",
+          status: "SOLVED",
+          solvedDay: "2026-10-30",
+        },
+      ]);
 
       const res = await GET();
       expect(res.status).toBe(200);
