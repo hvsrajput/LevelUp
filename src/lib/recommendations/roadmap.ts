@@ -18,6 +18,8 @@ import {
   DEFAULT_TIMEZONE,
 } from "@/lib/date";
 import { computeStreak, type StreakResult } from "@/lib/streak";
+import type { RoadmapDraft } from "@/lib/custom-roadmap/types";
+import { titleToSlug } from "@/lib/custom-roadmap/parser";
 
 export interface GenerateRoadmapOptions {
   userId: string;
@@ -39,7 +41,7 @@ export interface RoadmapProblemStatus {
   title: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
   isSolved: boolean;
-  url: string;
+  url?: string | null;
   userProblemId?: string;
 }
 
@@ -77,6 +79,8 @@ export interface UserRoadmapData {
     goal: string;
     level: string;
     timeline: string;
+    source: "GENERATED" | "CUSTOM";
+    customDraft?: RoadmapDraft | null;
     limitedTopicsNote: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -865,10 +869,17 @@ export async function generateAndPersistRoadmap(options: GenerateRoadmapOptions)
     level,
   });
 
-  // 5. Delete previous active roadmap
-  await prisma.roadmap.deleteMany({
-    where: { userId },
-  });
+  // 5. Deactivate previous active roadmap (do not delete)
+  if (prisma.roadmap?.updateMany) {
+    await prisma.roadmap.updateMany({
+      where: { userId, isActive: true },
+      data: { isActive: false },
+    });
+  } else if (prisma.roadmap?.deleteMany) {
+    await prisma.roadmap.deleteMany({
+      where: { userId },
+    });
+  }
 
   // 6. Create roadmap header record
   const created = await prisma.roadmap.create({
@@ -879,6 +890,8 @@ export async function generateAndPersistRoadmap(options: GenerateRoadmapOptions)
       level,
       timeline,
       limitedTopicsNote,
+      source: "GENERATED",
+      isActive: true,
     },
   });
 
@@ -929,7 +942,7 @@ export async function getUserRoadmapWithProgress(userId: string): Promise<UserRo
   const today = getTodayInTimezone(timezone);
 
   const roadmap = await prisma.roadmap.findFirst({
-    where: { userId },
+    where: { userId, isActive: true },
     include: {
       items: {
         orderBy: [{ weekNumber: "asc" }, { order: "asc" }],
@@ -952,15 +965,22 @@ export async function getUserRoadmapWithProgress(userId: string): Promise<UserRo
           title: true,
           solvedDay: true,
           difficulty: true,
+          titleSlug: true,
+          leetcodeQuestionId: true,
         },
       })
     : [];
   const solvedProblems = Array.isArray(rawSolved) ? rawSolved : [];
 
-  const solvedMap = new Map<string, string>(); // lowercase title -> problem ID
+  const solvedMap = new Map<string, { id: string; difficulty: string; url: string | null }>();
   const distinctUserSolveDays: string[] = [];
   for (const p of solvedProblems) {
-    solvedMap.set(p.title.toLowerCase().trim(), p.id);
+    const url = p.titleSlug
+      ? `https://leetcode.com/problems/${p.titleSlug}/`
+      : p.leetcodeQuestionId
+      ? `https://leetcode.com/problems/${titleToSlug(p.title)}/`
+      : null;
+    solvedMap.set(p.title.toLowerCase().trim(), { id: p.id, difficulty: p.difficulty, url });
     if (p.solvedDay) {
       distinctUserSolveDays.push(p.solvedDay);
     }
@@ -978,15 +998,30 @@ export async function getUserRoadmapWithProgress(userId: string): Promise<UserRo
 
     const problems: RoadmapProblemStatus[] = problemTitles.map((title) => {
       const lower = title.toLowerCase().trim();
-      const isSolved = solvedMap.has(lower);
-      const info = getProblemInfo(title);
+      const userSolved = solvedMap.get(lower);
+      const isSolved = Boolean(userSolved);
+      const catHit = catalogMap.get(lower);
+
+      let difficulty: "EASY" | "MEDIUM" | "HARD" = "MEDIUM";
+      let url: string | null = null;
+
+      if (catHit) {
+        difficulty = catHit.difficulty;
+        url = catHit.url;
+      } else if (userSolved) {
+        difficulty = (userSolved.difficulty as "EASY" | "MEDIUM" | "HARD") || "MEDIUM";
+        url = userSolved.url;
+      } else {
+        difficulty = "MEDIUM";
+        url = null;
+      }
 
       return {
         title,
-        difficulty: info.difficulty,
+        difficulty,
         isSolved,
-        url: info.url,
-        userProblemId: solvedMap.get(lower),
+        url,
+        userProblemId: userSolved?.id,
       };
     });
 
@@ -1109,6 +1144,8 @@ export async function getUserRoadmapWithProgress(userId: string): Promise<UserRo
       goal: roadmap.goal,
       level: roadmap.level,
       timeline: roadmap.timeline,
+      source: roadmap.source || "GENERATED",
+      customDraft: (roadmap.customDraft as unknown as RoadmapDraft) ?? null,
       limitedTopicsNote: roadmap.limitedTopicsNote ?? null,
       createdAt: roadmap.createdAt,
       updatedAt: roadmap.updatedAt,
@@ -1172,6 +1209,70 @@ export async function rescheduleRemainingRoadmapItems(
       });
     })
   );
+
+  return getUserRoadmapWithProgress(userId);
+}
+
+/**
+ * Persists a user-authored custom roadmap.
+ * Deactivates any existing active roadmap without deleting it.
+ */
+export async function saveCustomRoadmap(options: {
+  userId: string;
+  draft: RoadmapDraft;
+}): Promise<UserRoadmapData | null> {
+  const { userId, draft } = options;
+
+  // 1. Deactivate previous active roadmap (do not delete)
+  if (prisma.roadmap?.updateMany) {
+    await prisma.roadmap.updateMany({
+      where: { userId, isActive: true },
+      data: { isActive: false },
+    });
+  }
+
+  // 2. Create roadmap header
+  const timeline = `${draft.weeks.length} week${draft.weeks.length > 1 ? "s" : ""}`;
+  const created = await prisma.roadmap.create({
+    data: {
+      userId,
+      title: draft.title || "Custom Roadmap",
+      goal: "Custom DSA Curriculum",
+      level: "custom",
+      timeline,
+      source: "CUSTOM",
+      isActive: true,
+      customDraft: draft as unknown as import("@prisma/client").Prisma.InputJsonValue,
+    },
+  });
+
+  // 3. Prepare items
+  const itemsToCreate = [];
+  let globalOrder = 0;
+
+  for (const week of draft.weeks) {
+    for (const day of week.days) {
+      globalOrder++;
+      const problemTitles = day.questions.map((q) => q.title);
+      itemsToCreate.push({
+        roadmapId: created.id,
+        weekNumber: week.weekNumber,
+        dayNumber: day.dayNumber,
+        dayIndex: day.dayNumber,
+        topicName: week.title || `Week ${week.weekNumber}`,
+        concept: day.title || `Day ${day.dayNumber}`,
+        problemIds: problemTitles,
+        isCompleted: false,
+        order: globalOrder,
+      });
+    }
+  }
+
+  if (prisma.roadmapItem?.createMany) {
+    await prisma.roadmapItem.createMany({
+      data: itemsToCreate,
+    });
+  }
 
   return getUserRoadmapWithProgress(userId);
 }

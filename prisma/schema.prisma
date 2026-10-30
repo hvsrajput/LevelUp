@@ -316,13 +316,21 @@ model CatalogProblem {
 // Roadmap (Phase 5)
 // =============================================================================
 
+enum RoadmapSource {
+  GENERATED
+  CUSTOM
+}
+
 model Roadmap {
-  id       String @id @default(cuid())
-  title    String
-  goal     String // "Full DSA", "Graphs", "DP", etc.
-  level    String // "beginner", "intermediate", "advanced"
-  timeline String // "4 weeks", "8 weeks", etc.
-  limitedTopicsNote String? // note if catalog lacked problems for topics
+  id                String        @id @default(cuid())
+  title             String
+  goal              String        // "Full DSA", "Graphs", "DP", etc.
+  level             String        // "beginner", "intermediate", "advanced"
+  timeline          String        // "4 weeks", "8 weeks", etc.
+  limitedTopicsNote String?       // note if catalog lacked problems for topics
+  source            RoadmapSource @default(GENERATED)
+  isActive          Boolean       @default(true)
+  customDraft       Json?
 
   items RoadmapItem[]
 
@@ -333,6 +341,7 @@ model Roadmap {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([userId, isActive])
 }
 
 model RoadmapItem {

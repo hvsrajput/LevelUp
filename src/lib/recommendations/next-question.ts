@@ -55,7 +55,7 @@ export async function getNextRecommendedQuestion(
 
   // 2. Fetch user's active roadmap
   const activeRoadmap = await prisma.roadmap.findFirst({
-    where: { userId },
+    where: { userId, isActive: true },
     include: {
       items: {
         orderBy: [{ weekNumber: "asc" }, { order: "asc" }],

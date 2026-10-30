@@ -48,14 +48,18 @@ import {
   ArrowRight,
   Sparkles,
   CalendarDays,
+  FileEdit,
 } from "lucide-react";
 import { formatDateDisplay } from "@/lib/date";
 import type { UserRoadmapData } from "@/lib/recommendations/roadmap";
+import type { RoadmapDraft } from "@/lib/custom-roadmap/types";
+import { CustomRoadmapBuilder } from "@/components/custom-roadmap-builder";
 
 export default function RoadmapPage() {
   const [data, setData] = useState<UserRoadmapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [customBuilderOpen, setCustomBuilderOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isRescheduling, setIsRescheduling] = useState(false);
 
@@ -153,29 +157,40 @@ export default function RoadmapPage() {
           </p>
         </div>
 
-        {/* Generate / Regenerate Modal */}
-        <Dialog
-          open={dialogOpen}
-          onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (open) setFormError(null);
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button className="gap-2 rounded-[14px] font-semibold shadow-sm">
-              {data ? (
-                <>
-                  <RefreshCw className="h-4 w-4" />
-                  Regenerate Roadmap
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Create My Roadmap
-                </>
-              )}
+        {/* Header Actions */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {data?.roadmap.source === "CUSTOM" ? (
+            <Button
+              variant="outline"
+              onClick={() => setCustomBuilderOpen(true)}
+              className="gap-2 rounded-[14px] font-semibold shadow-sm"
+            >
+              <FileEdit className="h-4 w-4" />
+              Edit Roadmap
             </Button>
-          </DialogTrigger>
+          ) : (
+            <Dialog
+              open={dialogOpen}
+              onOpenChange={(open) => {
+                setDialogOpen(open);
+                if (open) setFormError(null);
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button className="gap-2 rounded-[14px] font-semibold shadow-sm">
+                  {data ? (
+                    <>
+                      <RefreshCw className="h-4 w-4" />
+                      Regenerate Roadmap
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Generate with AI
+                    </>
+                  )}
+                </Button>
+              </DialogTrigger>
           <DialogContent className="rounded-[24px] p-6 max-w-lg">
             <form onSubmit={handleGenerate}>
               <DialogHeader>
@@ -296,6 +311,18 @@ export default function RoadmapPage() {
             </form>
           </DialogContent>
         </Dialog>
+      )}
+
+          {/* Create your own roadmap */}
+          <Button
+            variant={data?.roadmap.source === "CUSTOM" ? "default" : "outline"}
+            onClick={() => setCustomBuilderOpen(true)}
+            className="gap-2 rounded-[14px] font-semibold shadow-sm"
+          >
+            <Plus className="h-4 w-4" />
+            Create your own roadmap
+          </Button>
+        </div>
       </div>
 
       {/* Main Roadmap Content */}
@@ -308,13 +335,23 @@ export default function RoadmapPage() {
             <div className="space-y-1">
               <h3 className="text-xl font-bold text-foreground">No active roadmap</h3>
               <p className="text-sm font-medium text-secondary max-w-sm mx-auto">
-                Generate an ordered curriculum with questions scheduled for every day of every week to guide your preparation.
+                Generate an ordered curriculum with questions scheduled for every day of every week to guide your preparation, or design your own custom multi-week syllabus.
               </p>
             </div>
-            <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-[14px] font-semibold">
-              <Plus className="h-4 w-4" />
-              Generate My Roadmap
-            </Button>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-[14px] font-semibold">
+                <Sparkles className="h-4 w-4" />
+                Generate with AI
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setCustomBuilderOpen(true)}
+                className="gap-2 rounded-[14px] font-semibold"
+              >
+                <Plus className="h-4 w-4" />
+                Create your own roadmap
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -333,7 +370,19 @@ export default function RoadmapPage() {
             <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft md:col-span-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Syllabus Progress</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">
+                      Syllabus Progress
+                    </h3>
+                    {data.roadmap.source === "CUSTOM" && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1.5 py-0 border-indigo-500/40 text-indigo-600 bg-indigo-500/10 font-bold"
+                      >
+                        Custom
+                      </Badge>
+                    )}
+                  </div>
                   <div className="mt-1.5 flex items-baseline gap-2">
                     <span className="text-3xl font-extrabold text-foreground">
                       {data.progress.percentage}%
@@ -907,6 +956,21 @@ export default function RoadmapPage() {
           </div>
         </div>
       )}
+
+      {/* Custom Roadmap Builder Modal */}
+      <CustomRoadmapBuilder
+        open={customBuilderOpen}
+        onOpenChange={setCustomBuilderOpen}
+        onRoadmapSaved={(newRoadmap) => {
+          setData(newRoadmap);
+        }}
+        initialDraft={
+          data?.roadmap.source === "CUSTOM"
+            ? (data.roadmap.customDraft as RoadmapDraft)
+            : null
+        }
+        existingActiveRoadmap={Boolean(data?.roadmap.id)}
+      />
     </div>
   );
 }
