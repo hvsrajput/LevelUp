@@ -10,7 +10,6 @@ import {
   addDays,
   diffDays,
   getTodayInTimezone,
-  getLastNDays,
   sanitizeTimezone,
   DEFAULT_TIMEZONE,
 } from "@/lib/date";
@@ -23,15 +22,8 @@ export interface StreakResult {
   lastSolveDay: string | null;
 }
 
-export interface DayHeatmapItem {
-  date: string;
-  count: number;
-  titles: string[];
-}
-
 export interface StreakSummary {
   streak: StreakResult;
-  heatmap: DayHeatmapItem[];
   timezone: string;
   today: string;
 }
@@ -119,63 +111,46 @@ export function computeStreak(days: string[], today: string): StreakResult {
 }
 
 /**
- * Server function: loads distinct solve days for a user, computes their streaks
- * in their configured timezone, and builds the last 84 days (12 weeks) heatmap.
+ * Server function: loads distinct solve days for a user and computes their streaks
+ * in their configured timezone.
  */
 export async function getStreakSummary(userId: string): Promise<StreakSummary> {
   // 1. Fetch user's timezone
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { timezone: true },
-  });
+  const user = prisma.user?.findUnique
+    ? await prisma.user.findUnique({
+        where: { id: userId },
+        select: { timezone: true },
+      })
+    : null;
 
   const timezone = sanitizeTimezone(user?.timezone || DEFAULT_TIMEZONE);
   const today = getTodayInTimezone(timezone);
 
-  // 2. Fetch all solved problems with a non-null solvedDay for this user
-  // (LeetCode paste imports have solvedDay = null, so they are automatically excluded)
-  const problems = await prisma.problem.findMany({
-    where: {
-      userId,
-      status: "SOLVED",
-      solvedDay: { not: null },
-    },
-    select: {
-      solvedDay: true,
-      title: true,
-    },
-    orderBy: {
-      solvedDay: "asc",
-    },
-  });
+  // 2. Fetch distinct solved days (single query)
+  const rawProblems = prisma.problem?.findMany
+    ? await prisma.problem.findMany({
+        where: {
+          userId,
+          status: "SOLVED",
+          solvedDay: { not: null },
+        },
+        select: {
+          solvedDay: true,
+        },
+        distinct: ["solvedDay"],
+      })
+    : [];
 
-  // Group problems by solvedDay
-  const dayMap = new Map<string, { count: number; titles: string[] }>();
-  for (const p of problems) {
-    if (!p.solvedDay) continue;
-    const existing = dayMap.get(p.solvedDay) || { count: 0, titles: [] };
-    existing.count += 1;
-    existing.titles.push(p.title);
-    dayMap.set(p.solvedDay, existing);
-  }
+  const distinctDays = Array.isArray(rawProblems)
+    ? rawProblems
+        .map((p) => p.solvedDay)
+        .filter((d): d is string => Boolean(d))
+    : [];
 
-  const distinctDays = Array.from(dayMap.keys());
   const streak = computeStreak(distinctDays, today);
-
-  // 3. Build last 84 days (12 weeks × 7 days) heatmap
-  const last84Days = getLastNDays(today, 84);
-  const heatmap: DayHeatmapItem[] = last84Days.map((date) => {
-    const data = dayMap.get(date);
-    return {
-      date,
-      count: data ? data.count : 0,
-      titles: data ? data.titles : [],
-    };
-  });
 
   return {
     streak,
-    heatmap,
     timezone,
     today,
   };
