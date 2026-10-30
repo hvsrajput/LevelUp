@@ -322,6 +322,7 @@ model Roadmap {
   goal     String // "Full DSA", "Graphs", "DP", etc.
   level    String // "beginner", "intermediate", "advanced"
   timeline String // "4 weeks", "8 weeks", etc.
+  limitedTopicsNote String? // note if catalog lacked problems for topics
 
   items RoadmapItem[]
 
@@ -338,6 +339,7 @@ model RoadmapItem {
   id            String  @id @default(cuid())
   weekNumber    Int
   dayNumber     Int     @default(1) // 1..7 for day within the week
+  dayIndex      Int?    // 1..7 for day within the week in 7-day roadmaps
   scheduledDate String? // YYYY-MM-DD calendar date in user's timezone
   topicName     String
   concept       String
@@ -351,6 +353,7 @@ model RoadmapItem {
   @@index([roadmapId])
   @@index([roadmapId, weekNumber])
   @@index([roadmapId, scheduledDate])
+  @@index([roadmapId, weekNumber, dayIndex])
 }
 
 // =============================================================================

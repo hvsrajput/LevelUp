@@ -169,12 +169,12 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base font-semibold">Record Solution</CardTitle>
+    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 pt-6 px-6">
+        <CardTitle className="text-base font-bold text-foreground">Record Solution</CardTitle>
         <div className="flex items-center gap-2">
           <Select value={language} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="w-[140px] text-xs">
+            <SelectTrigger className="w-[140px] text-xs h-9 bg-tint border-transparent rounded-[14px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -191,32 +191,33 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
             size="sm"
             onClick={() => setCode(STARTER_CODE[language] || "")}
             title="Reset to starter template"
+            className="rounded-[10px] text-secondary hover:text-foreground"
           >
             <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pb-6 px-6">
         {error && (
-          <div className="rounded-md bg-red-50 p-3 text-xs text-red-700">
+          <div className="rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
             {error}
           </div>
         )}
         {successMsg && (
-          <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-xs text-green-700">
+          <div className="flex items-center gap-2 rounded-[14px] bg-[#D6EEC6] p-3 text-xs font-semibold text-[#2D6A1E]">
             <CheckCircle2 className="h-4 w-4" />
             {successMsg}
           </div>
         )}
 
         {/* Code Editor */}
-        <div className="relative rounded-lg border bg-muted/40 focus-within:ring-2 focus-within:ring-primary/40">
+        <div className="relative rounded-[16px] border border-[#223528] bg-[#14221A] overflow-hidden focus-within:ring-2 focus-within:ring-accent-orange/40">
           <Textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={14}
-            className="border-0 bg-transparent font-mono text-xs leading-relaxed focus-visible:ring-0 resize-y"
+            className="border-0 bg-transparent font-mono text-xs text-[#E8F0DF] placeholder:text-[#5B6B58] leading-relaxed focus-visible:ring-0 resize-y p-4"
             placeholder="Write your solution here..."
             spellCheck={false}
           />
@@ -224,8 +225,8 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
 
         {/* Submission Metadata */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="space-y-1">
-            <Label htmlFor="runtime" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="runtime" className="text-xs font-semibold text-secondary">
               Runtime (optional)
             </Label>
             <Input
@@ -233,11 +234,11 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
               placeholder="e.g. 48ms"
               value={runtime}
               onChange={(e) => setRuntime(e.target.value)}
-              className="text-xs"
+              className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
             />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="memory" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="memory" className="text-xs font-semibold text-secondary">
               Memory (optional)
             </Label>
             <Input
@@ -245,11 +246,11 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
               placeholder="e.g. 17.2MB"
               value={memory}
               onChange={(e) => setMemory(e.target.value)}
-              className="text-xs"
+              className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
             />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="status" className="text-xs">
+          <div className="space-y-1.5">
+            <Label htmlFor="status" className="text-xs font-semibold text-secondary">
               Update Status
             </Label>
             <Select
@@ -258,7 +259,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
                 if (v) setMarkStatus(v as "ATTEMPTED" | "SOLVED" | "REVISIT");
               }}
             >
-              <SelectTrigger className="text-xs">
+              <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -270,8 +271,8 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
           </div>
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="sub-notes" className="text-xs">
+        <div className="space-y-1.5">
+          <Label htmlFor="sub-notes" className="text-xs font-semibold text-secondary">
             Submission Notes
           </Label>
           <Input
@@ -279,16 +280,17 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
             placeholder="Key insights, time/space complexity O(n), edge cases..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="text-xs"
+            className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-1">
           <Button
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
             size="sm"
+            className="rounded-[14px] font-semibold"
           >
             {isSubmitting ? (
               <>

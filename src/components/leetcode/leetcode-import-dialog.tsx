@@ -125,21 +125,21 @@ export function LeetCodeImportDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400"
+          className="rounded-[14px] bg-card border-border/70 hover:bg-tint font-semibold text-xs text-foreground h-10"
         >
-          <Upload className="mr-2 h-4 w-4" /> Import from LeetCode
+          <Upload className="mr-2 h-4 w-4 text-accent-orange" /> Import from LeetCode
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-[24px] p-6">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-500/10 text-amber-500 font-bold text-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange font-bold text-sm">
               LC
             </span>
-            <DialogTitle>Import from LeetCode</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-foreground">Import from LeetCode</DialogTitle>
           </div>
-          <DialogDescription>
+          <DialogDescription className="text-xs text-secondary mt-1">
             Import your solved problems by copying and pasting a client-side JSON export directly from your browser.
           </DialogDescription>
         </DialogHeader>
@@ -148,20 +148,20 @@ export function LeetCodeImportDialog({
           {/* Step 1: Script */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <FileCode className="h-3.5 w-3.5 text-primary" />
-                1. Copy & Run Console Script on leetcode.com
+              <span className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <FileCode className="h-3.5 w-3.5 text-accent-orange" />
+                1. Copy &amp; Run Console Script on leetcode.com
               </span>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleCopyScript}
-                className="h-7 text-xs gap-1.5"
+                className="h-7 text-xs gap-1.5 rounded-[10px] bg-card border-border/70"
               >
                 {hasCopiedScript ? (
                   <>
-                    <Check className="h-3 w-3 text-emerald-500" /> Copied!
+                    <Check className="h-3 w-3 text-[#2D6A1E]" /> Copied!
                   </>
                 ) : (
                   <>
@@ -171,12 +171,12 @@ export function LeetCodeImportDialog({
               </Button>
             </div>
 
-            <div className="relative rounded-md border bg-muted/60 p-2.5 font-mono text-[11px] text-muted-foreground overflow-x-auto max-h-24">
+            <div className="relative rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[11px] overflow-x-auto max-h-24">
               <pre className="whitespace-pre">{CONSOLE_IMPORT_SCRIPT}</pre>
             </div>
 
-            <div className="flex items-start gap-1.5 rounded-md bg-muted/40 p-2 text-[11px] text-muted-foreground">
-              <Info className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
+            <div className="flex items-start gap-2 rounded-[14px] bg-tint p-3 text-[11px] text-secondary leading-relaxed">
+              <Info className="h-4 w-4 shrink-0 text-accent-orange mt-0.5" />
               <span>
                 It runs in your own browser on <strong>leetcode.com</strong> (press F12 &rarr; Console) and sends nothing to this app until you paste the result below.
               </span>
@@ -187,7 +187,7 @@ export function LeetCodeImportDialog({
           <div className="space-y-2">
             <label
               htmlFor="pasted-leetcode-json"
-              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              className="text-xs font-bold uppercase tracking-wider text-secondary"
             >
               2. Paste Exported JSON
             </label>
@@ -202,12 +202,12 @@ export function LeetCodeImportDialog({
                 setPreviewError(null);
                 setConfirmSuccess(null);
               }}
-              className="font-mono text-xs"
+              className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3.5"
             />
           </div>
 
           {previewError && (
-            <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
+            <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{previewError}</span>
             </div>
@@ -215,46 +215,46 @@ export function LeetCodeImportDialog({
 
           {/* Preview Results */}
           {preview && (
-            <div className="rounded-lg border bg-muted/30 p-3.5 space-y-3 text-xs">
-              <div className="flex items-center justify-between font-medium">
+            <div className="rounded-[16px] bg-tint p-4 space-y-3 text-xs">
+              <div className="flex items-center justify-between font-bold text-foreground">
                 <span>Preview Validation Summary:</span>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-secondary text-[11px] font-medium">
                   {preview.totalValid} valid problem{preview.totalValid === 1 ? "" : "s"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-md border bg-emerald-500/10 border-emerald-500/20 p-2 text-center">
-                  <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="rounded-[12px] bg-card border border-border/70 p-2.5 text-center shadow-soft-sm">
+                  <div className="text-base font-bold text-[#2D6A1E]">
                     {preview.newCount}
                   </div>
-                  <div className="text-[10px] text-muted-foreground font-medium">
+                  <div className="text-[10px] text-secondary font-medium">
                     New to Import
                   </div>
                 </div>
 
-                <div className="rounded-md border bg-muted/50 p-2 text-center">
+                <div className="rounded-[12px] bg-card border border-border/70 p-2.5 text-center shadow-soft-sm">
                   <div className="text-base font-bold text-foreground">
                     {preview.alreadyImportedCount}
                   </div>
-                  <div className="text-[10px] text-muted-foreground font-medium">
+                  <div className="text-[10px] text-secondary font-medium">
                     Already Tracked
                   </div>
                 </div>
 
-                <div className="rounded-md border bg-amber-500/10 border-amber-500/20 p-2 text-center">
-                  <div className="text-base font-bold text-amber-600 dark:text-amber-400">
+                <div className="rounded-[12px] bg-card border border-border/70 p-2.5 text-center shadow-soft-sm">
+                  <div className="text-base font-bold text-[#8F4A0B]">
                     {preview.invalidCount}
                   </div>
-                  <div className="text-[10px] text-muted-foreground font-medium">
+                  <div className="text-[10px] text-secondary font-medium">
                     Invalid / Duplicate
                   </div>
                 </div>
               </div>
 
               {preview.sampleTitles.length > 0 && (
-                <div className="text-[11px] text-muted-foreground">
-                  <span className="font-semibold text-foreground">Sample new items: </span>
+                <div className="text-[11px] text-secondary">
+                  <span className="font-bold text-foreground">Sample new items: </span>
                   {preview.sampleTitles.join(", ")}
                   {preview.newCount > 5 ? ` and ${preview.newCount - 5} more...` : ""}
                 </div>
@@ -263,27 +263,28 @@ export function LeetCodeImportDialog({
           )}
 
           {confirmError && (
-            <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
+            <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{confirmError}</span>
             </div>
           )}
 
           {confirmSuccess && (
-            <div className="flex items-center gap-2 rounded-md bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300">
+            <div className="flex items-center gap-2 rounded-[14px] bg-[#D6EEC6] p-3 text-xs font-semibold text-[#2D6A1E]">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span>{confirmSuccess}</span>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handlePreview}
               disabled={isPreviewing || !pastedJson.trim()}
+              className="rounded-[14px] font-semibold text-xs"
             >
               {isPreviewing ? (
                 <>
@@ -298,6 +299,7 @@ export function LeetCodeImportDialog({
               type="button"
               size="sm"
               onClick={handleConfirm}
+              className="rounded-[14px] font-semibold text-xs shadow-sm"
               disabled={
                 isConfirming ||
                 !preview ||

@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SolveButton } from "@/components/solve-button";
 import {
@@ -59,9 +60,10 @@ export default function RoadmapPage() {
   const [isRescheduling, setIsRescheduling] = useState(false);
 
   // Generator form states
-  const [goal, setGoal] = useState("Full DSA");
+  const [goal, setGoal] = useState("Crack product-company interviews in 3 months; weak at DP and graphs");
   const [level, setLevel] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [timeline, setTimeline] = useState<"4 weeks" | "8 weeks" | "12 weeks">("8 weeks");
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -86,6 +88,7 @@ export default function RoadmapPage() {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     startTransition(async () => {
       try {
         const res = await fetch("/api/roadmap", {
@@ -93,13 +96,16 @@ export default function RoadmapPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ goal, level, timeline }),
         });
+        const json = await res.json();
         if (res.ok) {
-          const json = await res.json();
           setData(json.roadmap);
           setDialogOpen(false);
+        } else {
+          setFormError(json.error || "Failed to generate roadmap. Please check your inputs.");
         }
       } catch (err) {
         console.error("Failed to generate roadmap", err);
+        setFormError("Network error. Please try again.");
       }
     });
   };
@@ -133,24 +139,30 @@ export default function RoadmapPage() {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">DSA Learning Roadmap</h1>
-            <Badge variant="secondary" className="gap-1">
-              <Map className="h-3 w-3" />
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">DSA Learning Roadmap</h1>
+            <Badge variant="secondary" className="gap-1 font-semibold text-xs">
+              <Map className="h-3 w-3 text-secondary" />
               Syllabus
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium text-secondary">
             A structured daily curriculum with increasing difficulty, day-completion tracking, and streak progression.
           </p>
         </div>
 
         {/* Generate / Regenerate Modal */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (open) setFormError(null);
+          }}
+        >
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-[14px] font-semibold shadow-sm">
               {data ? (
                 <>
                   <RefreshCw className="h-4 w-4" />
@@ -164,46 +176,84 @@ export default function RoadmapPage() {
               )}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="rounded-[24px] p-6 max-w-lg">
             <form onSubmit={handleGenerate}>
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-xl font-bold">
                   {data ? "Regenerate Learning Roadmap" : "Create Learning Roadmap"}
                 </DialogTitle>
-                <DialogDescription>
-                  Configure your learning target and timeline. A personalized daily syllabus with progressive difficulty will be constructed.
+                <DialogDescription className="text-secondary text-xs">
+                  Describe your study goals, interview target, and timeline. A personalized daily syllabus with progressive difficulty will be constructed.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="goal">Study Goal</Label>
-                  <Select
-                    value={goal}
-                    onValueChange={(val) => {
-                      if (val) setGoal(val);
-                    }}
-                  >
-                    <SelectTrigger id="goal">
-                      <SelectValue placeholder="Select goal" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Full DSA">Full DSA (Comprehensive)</SelectItem>
-                      <SelectItem value="Dynamic Programming">Dynamic Programming Deep-Dive</SelectItem>
-                      <SelectItem value="Trees & Graphs">Trees, BSTs & Graphs</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {formError && (
+                  <div className="flex items-start gap-2 rounded-[14px] bg-[#FFDAD6] p-3 text-xs font-semibold text-[#93000A]">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{formError}</span>
+                  </div>
+                )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="level">Starting Level</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="goal" className="text-xs font-semibold text-secondary">
+                      Study Goal / Target
+                    </Label>
+                    <span
+                      className={`text-[10px] font-mono ${
+                        goal.trim().length < 10 || goal.length > 500
+                          ? "text-[#93000A] font-bold"
+                          : "text-text-muted"
+                      }`}
+                    >
+                      {goal.length}/500 chars (min 10)
+                    </span>
+                  </div>
+
+                  <Textarea
+                    id="goal"
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value)}
+                    placeholder="e.g. Crack product-company interviews in 3 months; weak at DP and graphs"
+                    maxLength={500}
+                    rows={3}
+                    className="bg-tint border-transparent rounded-[14px] text-xs resize-none p-3 text-foreground placeholder:text-text-muted focus-visible:ring-1 focus-visible:ring-accent-orange"
+                  />
+
+                  {/* Preset examples */}
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                      Example Goals:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        "Crack product-company interviews in 3 months; weak at DP and graphs",
+                        "Master Trees, Tries and Dynamic Programming for FAANG rounds",
+                        "Foundations sprint: Arrays, Two Pointers & Binary Search",
+                      ].map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          onClick={() => setGoal(example)}
+                          className="rounded-full bg-tint hover:bg-muted-tint px-2.5 py-1 text-[10px] text-text-secondary text-left transition-colors font-medium border border-border/40"
+                        >
+                          {example.length > 44 ? example.slice(0, 44) + "..." : example}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="level" className="text-xs font-semibold text-secondary">Starting Level</Label>
                   <Select
                     value={level}
                     onValueChange={(v) =>
                       setLevel(v as "beginner" | "intermediate" | "advanced")
                     }
                   >
-                    <SelectTrigger id="level">
+                    <SelectTrigger id="level" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -214,15 +264,15 @@ export default function RoadmapPage() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="timeline">Timeline</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="timeline" className="text-xs font-semibold text-secondary">Timeline</Label>
                   <Select
                     value={timeline}
                     onValueChange={(v) =>
                       setTimeline(v as "4 weeks" | "8 weeks" | "12 weeks")
                     }
                   >
-                    <SelectTrigger id="timeline">
+                    <SelectTrigger id="timeline" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
                       <SelectValue placeholder="Select timeline" />
                     </SelectTrigger>
                     <SelectContent>
@@ -235,7 +285,11 @@ export default function RoadmapPage() {
               </div>
 
               <DialogFooter>
-                <Button type="submit" disabled={isPending}>
+                <Button
+                  type="submit"
+                  disabled={isPending || goal.trim().length < 10 || goal.trim().length > 500}
+                  className="rounded-[14px] font-semibold"
+                >
                   {isPending ? "Generating..." : "Generate Roadmap"}
                 </Button>
               </DialogFooter>
@@ -246,18 +300,18 @@ export default function RoadmapPage() {
 
       {/* Main Roadmap Content */}
       {!data ? (
-        <Card className="border-dashed py-16 text-center">
+        <Card className="rounded-[24px] border border-dashed border-border/80 bg-card/60 p-16 text-center shadow-soft">
           <CardContent className="flex flex-col items-center justify-center space-y-4">
-            <div className="rounded-full bg-primary/10 p-4">
-              <Map className="h-10 w-10 text-primary" />
+            <div className="rounded-[20px] bg-tint p-4">
+              <Map className="h-10 w-10 text-accent-orange" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xl font-semibold">No active roadmap</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              <h3 className="text-xl font-bold text-foreground">No active roadmap</h3>
+              <p className="text-sm font-medium text-secondary max-w-sm mx-auto">
                 Generate an ordered curriculum with questions scheduled for every day of every week to guide your preparation.
               </p>
             </div>
-            <Button onClick={() => setDialogOpen(true)} className="gap-2">
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-[14px] font-semibold">
               <Plus className="h-4 w-4" />
               Generate My Roadmap
             </Button>
@@ -265,60 +319,68 @@ export default function RoadmapPage() {
         </Card>
       ) : (
         <div className="space-y-8">
+          {/* Catalog Limited Topics Warning Banner */}
+          {data.roadmap.limitedTopicsNote && (
+            <div className="flex items-center gap-2.5 rounded-[16px] border border-accent-orange/40 bg-pill-streak-bg/30 p-4 text-xs font-medium text-text-secondary">
+              <AlertTriangle className="h-4 w-4 text-accent-orange shrink-0" />
+              <span>{data.roadmap.limitedTopicsNote}</span>
+            </div>
+          )}
+
           {/* Progress & Dual Streaks Banner */}
           <div className="grid gap-4 md:grid-cols-3">
             {/* Overall Syllabus Progress */}
-            <Card className="border shadow-xs p-5 md:col-span-1">
+            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft md:col-span-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Syllabus Progress</h3>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-primary">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Syllabus Progress</h3>
+                  <div className="mt-1.5 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-foreground">
                       {data.progress.percentage}%
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs font-medium text-secondary">
                       ({data.progress.completedDays} / {data.progress.totalDays} days)
                     </span>
                   </div>
                 </div>
-                <div className="rounded-full bg-primary/10 p-2.5 text-primary">
-                  <Trophy className="h-5 w-5" />
+                <div className="rounded-[14px] bg-tint p-3 text-foreground">
+                  <Trophy className="h-5 w-5 text-accent-orange" />
                 </div>
               </div>
-              <div className="mt-3 h-2 w-full rounded-full bg-muted overflow-hidden">
+              <div className="mt-4 h-2 w-full rounded-full bg-muted-tint overflow-hidden">
                 <div
-                  className="h-full bg-primary transition-all duration-500 rounded-full"
+                  className="h-full bg-accent-orange transition-all duration-500 rounded-full"
                   style={{ width: `${data.progress.percentage}%` }}
                 />
               </div>
             </Card>
 
             {/* Overall Practice Streak */}
-            <Card className="border shadow-xs p-5">
+            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-medium text-muted-foreground">Overall Practice Streak</h3>
+                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Practice Streak</h3>
                     {data.streaks.overall.atRisk && (
-                      <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-[10px] px-1.5 py-0">
+                      <Badge variant="streak" className="text-[10px] px-2 py-0 font-bold">
                         At Risk
                       </Badge>
                     )}
                   </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-orange-600 dark:text-orange-400">
+                  <div className="mt-1.5 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-foreground">
                       {data.streaks.overall.current}d
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs font-medium text-secondary">
                       (best: {data.streaks.overall.longest}d)
                     </span>
                   </div>
                 </div>
-                <div className="rounded-full bg-orange-500/15 p-2.5 text-orange-600 dark:text-orange-400">
-                  <Flame className="h-5 w-5 fill-current" />
+                <div className="rounded-[14px] bg-[#FFE5C4]/70 p-3 text-accent-orange dark:bg-orange-950/40">
+                  <Flame className="h-5 w-5 fill-accent-orange text-accent-orange" />
                 </div>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="mt-3 text-xs font-medium text-secondary">
                 {data.streaks.overall.solvedToday
                   ? "✓ Solved a problem today"
                   : data.streaks.overall.atRisk
@@ -328,31 +390,31 @@ export default function RoadmapPage() {
             </Card>
 
             {/* Roadmap Streak */}
-            <Card className="border shadow-xs p-5">
+            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-medium text-muted-foreground">Roadmap Streak</h3>
+                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Roadmap Streak</h3>
                     {data.streaks.roadmap.atRisk && (
-                      <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-[10px] px-1.5 py-0">
+                      <Badge variant="streak" className="text-[10px] px-2 py-0 font-bold">
                         At Risk
                       </Badge>
                     )}
                   </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">
+                  <div className="mt-1.5 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-foreground">
                       {data.streaks.roadmap.current}d
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs font-medium text-secondary">
                       (best: {data.streaks.roadmap.longest}d)
                     </span>
                   </div>
                 </div>
-                <div className="rounded-full bg-blue-500/15 p-2.5 text-blue-600 dark:text-blue-400">
-                  <Compass className="h-5 w-5" />
+                <div className="rounded-[14px] bg-tint p-3 text-foreground">
+                  <Compass className="h-5 w-5 text-accent-orange" />
                 </div>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="mt-3 text-xs font-medium text-secondary">
                 {data.streaks.roadmap.solvedToday
                   ? "✓ Completed today's roadmap goals"
                   : data.streaks.roadmap.atRisk
@@ -363,27 +425,27 @@ export default function RoadmapPage() {
           </div>
 
           {/* 1. Today's Questions (Top Section) */}
-          <Card className="border-primary/30 shadow-xs bg-card overflow-hidden">
-            <CardHeader className="bg-primary/5 pb-3 border-b">
+          <Card className="rounded-[24px] border border-border/70 shadow-soft bg-card overflow-hidden">
+            <CardHeader className="bg-tint/40 pb-4 pt-6 px-6 border-b border-border/50">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                    <CalendarDays className="h-5 w-5" />
+                <div className="flex items-center gap-3">
+                  <div className="rounded-[12px] bg-tint p-2 text-foreground font-bold">
+                    <CalendarDays className="h-5 w-5 text-accent-orange" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                       Today&apos;s Roadmap Questions
                       {data.todayItems.length > 0 && data.todayItems.every((i) => i.isCompleted) && (
-                        <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 gap-1 text-xs">
+                        <Badge variant="solved" className="gap-1 text-xs font-semibold">
                           <CheckCircle2 className="h-3 w-3" />
                           Day Completed!
                         </Badge>
                       )}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs text-secondary mt-0.5">
                       {data.todayItems[0]?.scheduledDate
                         ? formatDateDisplay(data.todayItems[0].scheduledDate)
-                        : "Today&apos;s focus"} • Keep your roadmap streak going by completing these questions.
+                        : "Today's focus"} • Keep your roadmap streak going by completing these questions.
                     </CardDescription>
                   </div>
                 </div>
@@ -392,9 +454,9 @@ export default function RoadmapPage() {
 
             <CardContent className="p-6">
               {data.todayItems.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground space-y-2">
-                  <p className="text-sm">No specific questions scheduled for today.</p>
-                  <p className="text-xs">
+                <div className="text-center py-8 text-secondary space-y-2">
+                  <p className="text-sm font-semibold">No specific questions scheduled for today.</p>
+                  <p className="text-xs text-muted-foreground">
                     You can work ahead on upcoming weeks below or catch up on overdue problems.
                   </p>
                 </div>
@@ -403,59 +465,59 @@ export default function RoadmapPage() {
                   {data.todayItems.map((dayItem) => (
                     <div
                       key={dayItem.id}
-                      className={`rounded-xl border p-4 transition-all ${
+                      className={`rounded-[20px] border p-4 sm:p-5 transition-all ${
                         dayItem.isCompleted
-                          ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/10"
-                          : "bg-card hover:border-primary/40"
+                          ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/20"
+                          : "border-border/70 bg-card shadow-soft-sm hover:border-accent-orange/40"
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2.5">
                             {dayItem.isCompleted ? (
-                              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                              <CheckCircle2 className="h-5 w-5 text-[#2D6A1E] shrink-0" />
                             ) : (
-                              <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <Circle className="h-5 w-5 text-secondary shrink-0" />
                             )}
-                            <h4 className="font-bold text-base">{dayItem.topicName}</h4>
-                            <Badge variant="outline" className="text-xs">
+                            <h4 className="font-bold text-base text-foreground">{dayItem.topicName}</h4>
+                            <Badge variant="outline" className="text-xs rounded-full bg-tint border-border/70 text-secondary">
                               Week {dayItem.weekNumber} • Day {dayItem.dayNumber}
                             </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground pl-7">
+                          <p className="text-xs text-secondary pl-7 leading-relaxed">
                             {dayItem.concept}
                           </p>
                         </div>
                       </div>
 
                       {/* Problems in this day item */}
-                      <div className="mt-4 pt-3 border-t space-y-2 pl-7">
+                      <div className="mt-4 pt-3.5 border-t border-border/50 space-y-2 pl-0 sm:pl-7">
                         {dayItem.problems.map((prob) => (
                           <div
                             key={prob.title}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border bg-background/60 p-3"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[14px] bg-tint p-3"
                           >
                             <div className="flex items-center gap-2.5">
                               {prob.isSolved ? (
-                                <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[11px] gap-1">
+                                <Badge variant="solved" className="text-[11px] font-semibold gap-1">
                                   <CheckCircle2 className="h-3 w-3" />
                                   Solved
                                 </Badge>
                               ) : (
-                                <Badge variant="secondary" className="text-[11px]">
+                                <Badge variant="secondary" className="text-[11px] font-medium bg-card">
                                   Unsolved
                                 </Badge>
                               )}
-                              <span className="font-semibold text-sm">{prob.title}</span>
+                              <span className="font-bold text-sm text-foreground">{prob.title}</span>
                               <Badge
-                                variant="outline"
-                                className={`text-[10px] ${
-                                  prob.difficulty === "EASY"
-                                    ? "text-emerald-600 border-emerald-500/30"
-                                    : prob.difficulty === "HARD"
-                                    ? "text-red-600 border-red-500/30"
-                                    : "text-amber-600 border-amber-500/30"
-                                }`}
+                                variant={
+                                  prob.difficulty.toLowerCase() === "easy"
+                                    ? "easy"
+                                    : prob.difficulty.toLowerCase() === "medium"
+                                    ? "medium"
+                                    : "hard"
+                                }
+                                className="text-[10px] px-2 py-0.5 font-semibold"
                               >
                                 {prob.difficulty}
                               </Badge>
@@ -466,6 +528,7 @@ export default function RoadmapPage() {
                                 url={prob.url}
                                 label="Solve Problem"
                                 size="sm"
+                                variant={prob.isSolved ? "secondary" : "dark"}
                               />
                             </div>
                           </div>
@@ -480,18 +543,18 @@ export default function RoadmapPage() {
 
           {/* 2. Overdue / Catch-Up Section (Shown when overdue problems exist) */}
           {data.overdueItems.length > 0 && (
-            <Card className="border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/10 shadow-xs">
-              <CardHeader className="pb-3 border-b border-amber-500/20">
+            <Card className="rounded-[24px] border border-[#E8871E]/30 bg-[#FFE5C4]/25 shadow-soft">
+              <CardHeader className="pb-3 pt-6 px-6 border-b border-[#E8871E]/20">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="rounded-lg bg-amber-500/20 p-2 text-amber-600 dark:text-amber-400">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-[12px] bg-[#FFE5C4]/60 p-2 text-accent-orange">
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                      <CardTitle className="text-lg font-bold text-[#8F4A0B] dark:text-[#FFE5C4] flex items-center gap-2">
                         Catch Up: {data.overdueItems.length} Overdue Day{data.overdueItems.length > 1 ? "s" : ""}
                       </CardTitle>
-                      <CardDescription className="text-amber-700/80 dark:text-amber-300/80">
+                      <CardDescription className="text-secondary text-xs">
                         These problems were scheduled for previous days but remain unsolved. You can catch up now or redistribute them across upcoming days.
                       </CardDescription>
                     </div>
@@ -501,7 +564,7 @@ export default function RoadmapPage() {
                     onClick={handleReschedule}
                     disabled={isRescheduling}
                     variant="outline"
-                    className="border-amber-500/40 hover:bg-amber-500/20 text-amber-800 dark:text-amber-200 gap-2 shrink-0"
+                    className="rounded-[14px] bg-card border-border/70 hover:bg-tint text-foreground font-semibold gap-2 shrink-0 text-xs"
                   >
                     <RefreshCw className={`h-4 w-4 ${isRescheduling ? "animate-spin" : ""}`} />
                     {isRescheduling ? "Rescheduling..." : "Reschedule Remaining"}
@@ -509,39 +572,49 @@ export default function RoadmapPage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-6 space-y-3">
                 {data.overdueItems.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-lg border border-amber-500/20 bg-background/80 p-3.5 space-y-2"
+                    className="rounded-[16px] border border-border/70 bg-card p-4 space-y-2.5 shadow-soft-sm"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="destructive" className="text-[10px] uppercase font-bold">
                           Overdue
                         </Badge>
-                        <span className="font-semibold text-sm">{item.topicName}</span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="font-bold text-sm text-foreground">{item.topicName}</span>
+                        <span className="text-xs text-secondary">
                           ({item.scheduledDate ? formatDateDisplay(item.scheduledDate) : `Week ${item.weekNumber}`})
                         </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{item.concept}</span>
+                      <span className="text-xs text-secondary font-medium">{item.concept}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 pt-1">
                       {item.problems.map((prob) => (
                         <div
                           key={prob.title}
-                          className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1 text-xs"
+                          className="flex items-center gap-2 rounded-[12px] bg-tint px-3 py-1.5 text-xs"
                         >
-                          <span className="font-medium">{prob.title}</span>
-                          <Badge variant="outline" className="text-[10px]">
+                          <span className="font-semibold text-foreground">{prob.title}</span>
+                          <Badge
+                            variant={
+                              prob.difficulty.toLowerCase() === "easy"
+                                ? "easy"
+                                : prob.difficulty.toLowerCase() === "medium"
+                                ? "medium"
+                                : "hard"
+                            }
+                            className="text-[10px] px-2 py-0 font-semibold"
+                          >
                             {prob.difficulty}
                           </Badge>
                           <SolveButton
                             url={prob.url}
                             label="Solve"
                             size="sm"
+                            variant="secondary"
                             className="h-6 px-2 text-[11px]"
                           />
                         </div>
@@ -557,8 +630,8 @@ export default function RoadmapPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold tracking-tight">Curriculum Schedule</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Curriculum Schedule</h2>
+                <p className="text-xs font-medium text-secondary">
                   Days with all problems solved earn checkmarks. Complete every day in a week to clear that level and unlock the next badge.
                 </p>
               </div>
@@ -567,38 +640,38 @@ export default function RoadmapPage() {
             {data.weeks.map((week) => (
               <Card
                 key={week.weekNumber}
-                className={`transition-all overflow-hidden ${
+                className={`rounded-[24px] transition-all overflow-hidden shadow-soft ${
                   week.isWeekCompleted
-                    ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-950/10 shadow-xs"
+                    ? "border-l-4 border-l-[#2D6A1E] border-border/70 bg-card"
                     : week.weekNumber === data.currentWeekNumber
-                    ? "border-primary/40 shadow-xs"
-                    : "border-border/60"
+                    ? "border-l-4 border-l-accent-orange border-border/70 bg-card"
+                    : "border-border/70 bg-card"
                 }`}
               >
-                <CardHeader className="pb-3 border-b bg-card/40">
+                <CardHeader className="pb-4 pt-6 px-6 border-b border-border/50 bg-tint/30">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <span
-                        className={`flex h-9 w-9 items-center justify-center rounded-lg font-bold text-sm ${
+                        className={`flex h-10 w-10 items-center justify-center rounded-[12px] font-bold text-sm ${
                           week.isWeekCompleted
-                            ? "bg-emerald-500 text-white shadow-xs"
+                            ? "bg-[#D6EEC6] text-[#2D6A1E]"
                             : week.weekNumber === data.currentWeekNumber
-                            ? "bg-primary text-primary-foreground shadow-xs"
-                            : "bg-muted text-muted-foreground"
+                            ? "bg-[#1E2B1D] text-white"
+                            : "bg-tint text-secondary"
                         }`}
                       >
                         W{week.weekNumber}
                       </span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg font-bold">
+                          <CardTitle className="text-lg font-bold text-foreground">
                             {week.levelTitle}
                           </CardTitle>
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-[10px] rounded-full bg-card border-border/70 text-secondary">
                             {week.difficultyLabel}
                           </Badge>
                         </div>
-                        <CardDescription className="text-xs mt-0.5">
+                        <CardDescription className="text-xs text-secondary mt-0.5">
                           {week.completedDays} of {week.totalDays} days completed ({week.percentage}%)
                         </CardDescription>
                       </div>
@@ -606,12 +679,12 @@ export default function RoadmapPage() {
 
                     <div className="flex items-center gap-3">
                       {week.isWeekCompleted ? (
-                        <Badge className="bg-emerald-500 text-white gap-1.5 py-1 px-2.5 font-semibold text-xs shadow-xs">
+                        <Badge variant="solved" className="gap-1.5 py-1 px-3 font-semibold text-xs">
                           <Sparkles className="h-3.5 w-3.5" />
                           Week Cleared!
                         </Badge>
                       ) : week.weekNumber === data.currentWeekNumber ? (
-                        <Badge variant="default" className="gap-1 py-1 px-2.5 text-xs">
+                        <Badge variant="default" className="gap-1 py-1 px-3 text-xs font-semibold">
                           <ArrowRight className="h-3.5 w-3.5" />
                           Current Level
                         </Badge>
@@ -624,111 +697,210 @@ export default function RoadmapPage() {
                   </div>
 
                   {/* Per-Week Progress Bar */}
-                  <div className="mt-3 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div className="mt-4 h-2 w-full rounded-full bg-muted-tint overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 rounded-full ${
-                        week.isWeekCompleted ? "bg-emerald-500" : "bg-primary"
+                        week.isWeekCompleted ? "bg-[#2D6A1E]" : "bg-accent-orange"
                       }`}
                       style={{ width: `${week.percentage}%` }}
                     />
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-3 pt-4">
-                  {week.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg border p-4 transition-colors ${
-                        item.isCompleted
-                          ? "border-emerald-500/25 bg-background/60"
-                          : item.isOverdue
-                          ? "border-amber-500/30 bg-amber-500/5"
-                          : "bg-card hover:bg-muted/30"
-                      }`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                        <div className="space-y-1.5 flex-1">
-                          <div className="flex items-center gap-2">
-                            {item.isCompleted ? (
-                              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                            ) : (
-                              <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
-                            )}
-                            <h4
-                              className={`text-base font-bold ${
-                                item.isCompleted
-                                  ? "line-through text-muted-foreground"
-                                  : "text-foreground"
-                              }`}
-                            >
-                              Day {item.dayNumber}: {item.topicName}
-                            </h4>
-
-                            {item.scheduledDate && (
-                              <span className="text-xs text-muted-foreground flex items-center gap-1 ml-1">
-                                <Calendar className="h-3 w-3" />
-                                {formatDateDisplay(item.scheduledDate)}
-                              </span>
-                            )}
-
-                            {item.isOverdue && (
-                              <Badge variant="destructive" className="text-[10px] uppercase">
-                                Overdue
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground pl-7">
-                            {item.concept}
-                          </p>
-
-                          {/* Problem list for this day */}
-                          <div className="pl-7 pt-2 space-y-2">
-                            {item.problems.map((prob) => (
-                              <div
-                                key={prob.title}
-                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md border bg-muted/40 p-2.5 text-xs"
-                              >
-                                <div className="flex items-center gap-2">
-                                  {prob.isSolved ? (
-                                    <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] gap-1">
-                                      <CheckCircle2 className="h-2.5 w-2.5" />
-                                      Solved
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="text-[10px]">
-                                      To solve
-                                    </Badge>
-                                  )}
-                                  <span className="font-semibold">{prob.title}</span>
-                                  <Badge
-                                    variant="outline"
-                                    className={`text-[9px] ${
-                                      prob.difficulty === "EASY"
-                                        ? "text-emerald-600 border-emerald-500/30"
-                                        : prob.difficulty === "HARD"
-                                        ? "text-red-600 border-red-500/30"
-                                        : "text-amber-600 border-amber-500/30"
-                                    }`}
-                                  >
-                                    {prob.difficulty}
+                <CardContent className="space-y-4 p-6">
+                  {/* 7-Day Strip for new format roadmaps with dayIndex */}
+                  {week.items.some((i) => i.dayIndex != null) ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                      {week.items.map((item) => {
+                        const isToday = data.todayItems.some((ti) => ti.id === item.id);
+                        return (
+                          <div
+                            key={item.id}
+                            className={`flex flex-col justify-between rounded-[16px] border p-3.5 transition-all text-xs ${
+                              item.isCompleted
+                                ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/15"
+                                : isToday
+                                ? "border-accent-orange ring-2 ring-accent-orange/30 bg-card shadow-soft"
+                                : item.isOverdue
+                                ? "border-accent-orange/30 bg-pill-streak-bg/20"
+                                : "border-border/60 bg-tint/40 hover:bg-tint/70"
+                            }`}
+                          >
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between gap-1.5">
+                                <span className="font-bold text-foreground text-xs">
+                                  Day {item.dayIndex || item.dayNumber}
+                                </span>
+                                {item.isCompleted ? (
+                                  <CheckCircle2 className="h-4 w-4 text-[#2D6A1E] shrink-0" />
+                                ) : isToday ? (
+                                  <Badge variant="default" className="text-[9px] px-1.5 py-0 font-bold uppercase">
+                                    Today
                                   </Badge>
-                                </div>
-
-                                <div className="w-full sm:w-auto">
-                                  <SolveButton
-                                    url={prob.url}
-                                    label="Solve"
-                                    size="sm"
-                                    className="h-7 text-xs"
-                                  />
-                                </div>
+                                ) : item.isOverdue ? (
+                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 font-bold uppercase">
+                                    Overdue
+                                  </Badge>
+                                ) : (
+                                  <Circle className="h-3.5 w-3.5 text-text-muted shrink-0" />
+                                )}
                               </div>
-                            ))}
+
+                              {item.scheduledDate && (
+                                <div className="text-[10px] text-text-muted font-medium flex items-center gap-1">
+                                  <CalendarDays className="h-3 w-3" />
+                                  {formatDateDisplay(item.scheduledDate)}
+                                </div>
+                              )}
+
+                              <div className="font-semibold text-foreground text-[11px] leading-tight line-clamp-1" title={item.topicName}>
+                                {item.topicName}
+                              </div>
+
+                              <p className="text-[10px] text-text-secondary leading-snug line-clamp-2" title={item.concept}>
+                                {item.concept}
+                              </p>
+                            </div>
+
+                            {/* Problem list for this day */}
+                            <div className="mt-3 pt-2.5 border-t border-border/50 space-y-2">
+                              {item.problems.length > 0 ? (
+                                item.problems.map((prob) => (
+                                  <div key={prob.title} className="space-y-1.5 rounded-[10px] bg-card/80 p-2 border border-border/50">
+                                    <div className="flex items-center justify-between gap-1">
+                                      <span className="font-medium text-foreground text-[11px] truncate" title={prob.title}>
+                                        {prob.title}
+                                      </span>
+                                      <Badge
+                                        variant={
+                                          prob.difficulty.toLowerCase() === "easy"
+                                            ? "easy"
+                                            : prob.difficulty.toLowerCase() === "medium"
+                                            ? "medium"
+                                            : "hard"
+                                        }
+                                        className="text-[9px] px-1.5 py-0 font-bold shrink-0"
+                                      >
+                                        {prob.difficulty}
+                                      </Badge>
+                                    </div>
+                                    <SolveButton
+                                      url={prob.url}
+                                      label="Solve"
+                                      size="sm"
+                                      variant={prob.isSolved ? "secondary" : isToday ? "default" : "dark"}
+                                      className="h-6 w-full text-[10px] rounded-[8px]"
+                                    />
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="text-[10px] text-text-muted italic py-1 text-center">
+                                  No problem scheduled
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    /* Legacy format for existing roadmaps without dayIndex */
+                    week.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`rounded-[16px] border p-4 transition-colors ${
+                          item.isCompleted
+                            ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/15"
+                            : item.isOverdue
+                            ? "border-[#E8871E]/30 bg-[#FFE5C4]/20"
+                            : "border-border/60 bg-tint/40 hover:bg-tint/70"
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                          <div className="space-y-1.5 flex-1">
+                            <div className="flex items-center gap-2.5">
+                              {item.isCompleted ? (
+                                <CheckCircle2 className="h-5 w-5 text-[#2D6A1E] shrink-0" />
+                              ) : (
+                                <Circle className="h-5 w-5 text-secondary shrink-0" />
+                              )}
+                              <h4
+                                className={`text-base font-bold ${
+                                  item.isCompleted
+                                    ? "line-through text-secondary"
+                                    : "text-foreground"
+                                }`}
+                              >
+                                Day {item.dayNumber}: {item.topicName}
+                              </h4>
+
+                              {item.scheduledDate && (
+                                <span className="text-xs text-secondary flex items-center gap-1 ml-1 font-medium">
+                                  <Calendar className="h-3 w-3" />
+                                  {formatDateDisplay(item.scheduledDate)}
+                                </span>
+                              )}
+
+                              {item.isOverdue && (
+                                <Badge variant="destructive" className="text-[10px] uppercase font-bold">
+                                  Overdue
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-secondary pl-7 leading-relaxed">
+                              {item.concept}
+                            </p>
+
+                            {/* Problem list for this day */}
+                            <div className="pl-0 sm:pl-7 pt-2.5 space-y-2">
+                              {item.problems.map((prob) => (
+                                <div
+                                  key={prob.title}
+                                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-[12px] bg-card border border-border/70 p-3 text-xs shadow-soft-sm"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {prob.isSolved ? (
+                                      <Badge variant="solved" className="text-[10px] font-semibold gap-1">
+                                        <CheckCircle2 className="h-2.5 w-2.5" />
+                                        Solved
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="secondary" className="text-[10px]">
+                                        To solve
+                                      </Badge>
+                                    )}
+                                    <span className="font-bold text-foreground">{prob.title}</span>
+                                    <Badge
+                                      variant={
+                                        prob.difficulty.toLowerCase() === "easy"
+                                          ? "easy"
+                                          : prob.difficulty.toLowerCase() === "medium"
+                                          ? "medium"
+                                          : "hard"
+                                      }
+                                      className="text-[10px] px-2 py-0.5 font-semibold"
+                                    >
+                                      {prob.difficulty}
+                                    </Badge>
+                                  </div>
+
+                                  <div className="w-full sm:w-auto">
+                                    <SolveButton
+                                      url={prob.url}
+                                      label="Solve"
+                                      size="sm"
+                                      variant={prob.isSolved ? "secondary" : "dark"}
+                                      className="h-7 text-xs"
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </CardContent>
               </Card>
             ))}

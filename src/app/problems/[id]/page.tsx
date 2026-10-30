@@ -31,7 +31,7 @@ import { CodeEditor } from "@/components/code-editor";
 import { CodeViewer } from "@/components/code-viewer";
 import { SubmissionHistory, type SubmissionItem } from "@/components/submission-history";
 import { ExamplesViewer, type TestCaseItem } from "@/components/test-case-runner";
-import { difficultyColor, statusColor, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
   Pencil,
@@ -189,7 +189,7 @@ function ProblemDetailContent({
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Back button and actions */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <Button asChild variant="ghost" size="sm">
+        <Button asChild variant="ghost" size="sm" className="rounded-[14px] text-secondary hover:text-foreground">
           <Link href="/problems">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Problems
           </Link>
@@ -201,8 +201,8 @@ function ProblemDetailContent({
             onValueChange={handleStatusChange}
             disabled={isUpdatingStatus}
           >
-            <SelectTrigger className="w-[140px] text-xs">
-              <span className="text-muted-foreground mr-1">Status:</span>
+            <SelectTrigger className="w-[140px] text-xs h-9 bg-tint border-transparent rounded-[14px]">
+              <span className="text-secondary mr-1">Status:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -212,7 +212,7 @@ function ProblemDetailContent({
             </SelectContent>
           </Select>
 
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="rounded-[14px] bg-card border-border/70">
             <Link href={`/problems/${id}/edit`}>
               <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
             </Link>
@@ -221,30 +221,31 @@ function ProblemDetailContent({
           <Dialog>
             <DialogTrigger asChild>
               <Button
-                variant="outline"
+                variant="destructive"
                 size="sm"
-                className="text-red-600 hover:text-red-700"
+                className="rounded-[14px]"
               >
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="rounded-[24px] p-6">
               <DialogHeader>
                 <DialogTitle>Delete Problem</DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-secondary">
                   Are you sure you want to delete &ldquo;{problem.title}&rdquo;?
                   This will also remove all test cases and submissions. This
                   action cannot be undone.
                 </DialogDescription>
               </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline" disabled={isDeleting}>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button variant="outline" disabled={isDeleting} className="rounded-[14px]">
                   Cancel
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
                   disabled={isDeleting}
+                  className="rounded-[14px]"
                 >
                   {isDeleting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -258,58 +259,67 @@ function ProblemDetailContent({
       </div>
 
       {/* Header Info */}
-      <div className="mb-6 rounded-xl border bg-card p-6 shadow-xs">
-        <div className="flex flex-wrap items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <div className="mb-6 rounded-[24px] border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
+        <div className="flex flex-wrap items-center gap-2.5 mb-3">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {problem.title}
           </h1>
           <Badge
-            variant="outline"
-            className={difficultyColor(problem.difficulty)}
+            variant={
+              problem.difficulty.toLowerCase() === "easy"
+                ? "easy"
+                : problem.difficulty.toLowerCase() === "medium"
+                ? "medium"
+                : "hard"
+            }
+            className="text-xs px-2.5 py-0.5 font-semibold"
           >
             {problem.difficulty}
           </Badge>
-          <Badge variant="secondary" className={statusColor(problem.status)}>
+          <Badge
+            variant={problem.status === "SOLVED" ? "solved" : "secondary"}
+            className="text-xs px-2.5 py-0.5 font-semibold"
+          >
             {problem.status}
           </Badge>
           {problem.source === "LEETCODE" && (
-            <Badge variant="outline" className="text-orange-600">
+            <Badge variant="streak" className="text-xs px-2.5 py-0.5 font-semibold">
               LeetCode
             </Badge>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5" />
+        <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-secondary">
+          <span className="flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5 text-secondary" />
             Added {formatDate(problem.createdAt)}
           </span>
           {problem.solvedAt && (
-            <span className="flex items-center gap-1 font-medium text-green-700">
+            <span className="flex items-center gap-1.5 font-semibold text-[#2D6A1E]">
               <CheckCircle2 className="h-3.5 w-3.5" />
               Solved {formatDate(problem.solvedAt)}
             </span>
           )}
-          <span className="font-mono text-[11px] text-muted-foreground/80">
+          <span className="font-mono text-[11px] text-secondary">
             ID: {problem.shortCode}
           </span>
         </div>
 
         {/* Complexity Pills */}
         {(problem.timeComplexity || problem.spaceComplexity) && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {problem.timeComplexity && (
               <Badge
-                variant="outline"
-                className="font-mono text-xs border-blue-200 bg-blue-50/70 text-blue-800"
+                variant="secondary"
+                className="font-mono text-xs px-3 py-1 font-medium"
               >
                 Time: {problem.timeComplexity}
               </Badge>
             )}
             {problem.spaceComplexity && (
               <Badge
-                variant="outline"
-                className="font-mono text-xs border-purple-200 bg-purple-50/70 text-purple-800"
+                variant="secondary"
+                className="font-mono text-xs px-3 py-1 font-medium"
               >
                 Space: {problem.spaceComplexity}
               </Badge>
@@ -321,7 +331,11 @@ function ProblemDetailContent({
         {problem.topics.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {problem.topics.map(({ topic }) => (
-              <Badge key={topic.id} variant="outline" className="text-xs">
+              <Badge
+                key={topic.id}
+                variant="outline"
+                className="text-xs rounded-full bg-tint/60 border-border/70 text-secondary font-medium px-3 py-0.5"
+              >
                 {topic.name}
               </Badge>
             ))}
@@ -330,33 +344,33 @@ function ProblemDetailContent({
       </div>
 
       {/* View Tabs */}
-      <div className="mb-6 flex gap-2 border-b pb-3">
+      <div className="mb-6 flex flex-wrap gap-2 border-b border-border/50 pb-3">
         <Button
           type="button"
-          variant={activeTab === "workspace" ? "default" : "ghost"}
+          variant={activeTab === "workspace" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("workspace")}
-          className="gap-1.5 text-xs"
+          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
         >
           <Code2 className="h-4 w-4" />
           Solutions &amp; Code ({problem.submissions.length})
         </Button>
         <Button
           type="button"
-          variant={activeTab === "overview" ? "default" : "ghost"}
+          variant={activeTab === "overview" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("overview")}
-          className="gap-1.5 text-xs"
+          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
         >
           <BookOpen className="h-4 w-4" />
           Description &amp; Examples ({problem.testCases.length})
         </Button>
         <Button
           type="button"
-          variant={activeTab === "hints" ? "default" : "ghost"}
+          variant={activeTab === "hints" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("hints")}
-          className="gap-1.5 text-xs"
+          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
         >
           <Lightbulb className="h-4 w-4" />
           Hints &amp; Approaches ({hints.length + approaches.length})
@@ -398,12 +412,12 @@ function ProblemDetailContent({
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             {/* Description */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Description</CardTitle>
+            <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+              <CardHeader className="pb-3 pt-6 px-6">
+                <CardTitle className="text-base font-bold text-foreground">Description</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+              <CardContent className="pb-6 px-6">
+                <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                   {problem.description}
                 </div>
               </CardContent>
@@ -411,12 +425,12 @@ function ProblemDetailContent({
 
             {/* Constraints */}
             {problem.constraints && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">Constraints</CardTitle>
+              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+                <CardHeader className="pb-3 pt-6 px-6">
+                  <CardTitle className="text-base font-bold text-foreground">Constraints</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-muted-foreground">
+                <CardContent className="pb-6 px-6">
+                  <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-secondary bg-tint rounded-[14px] p-3.5">
                     {problem.constraints}
                   </pre>
                 </CardContent>
@@ -425,21 +439,21 @@ function ProblemDetailContent({
 
             {/* Target Complexity */}
             {(problem.timeComplexity || problem.spaceComplexity) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">Target Complexity</CardTitle>
+              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+                <CardHeader className="pb-3 pt-6 px-6">
+                  <CardTitle className="text-base font-bold text-foreground">Target Complexity</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-6 px-6">
                   {problem.timeComplexity && (
-                    <div className="rounded-md border p-3">
-                      <span className="text-xs font-medium text-muted-foreground">Time Complexity</span>
-                      <p className="mt-1 font-mono text-sm font-semibold text-blue-700">{problem.timeComplexity}</p>
+                    <div className="rounded-[16px] bg-tint p-4 border border-transparent">
+                      <span className="text-xs font-semibold text-secondary">Time Complexity</span>
+                      <p className="mt-1 font-mono text-sm font-bold text-foreground">{problem.timeComplexity}</p>
                     </div>
                   )}
                   {problem.spaceComplexity && (
-                    <div className="rounded-md border p-3">
-                      <span className="text-xs font-medium text-muted-foreground">Space Complexity</span>
-                      <p className="mt-1 font-mono text-sm font-semibold text-purple-700">{problem.spaceComplexity}</p>
+                    <div className="rounded-[16px] bg-tint p-4 border border-transparent">
+                      <span className="text-xs font-semibold text-secondary">Space Complexity</span>
+                      <p className="mt-1 font-mono text-sm font-bold text-foreground">{problem.spaceComplexity}</p>
                     </div>
                   )}
                 </CardContent>
@@ -448,12 +462,12 @@ function ProblemDetailContent({
 
             {/* Notes */}
             {problem.notes && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-semibold">Personal Notes</CardTitle>
+              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+                <CardHeader className="pb-3 pt-6 px-6">
+                  <CardTitle className="text-base font-bold text-foreground">Personal Notes</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                <CardContent className="pb-6 px-6">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                     {problem.notes}
                   </p>
                 </CardContent>
@@ -472,28 +486,28 @@ function ProblemDetailContent({
       {activeTab === "hints" && (
         <div className="space-y-6">
           {/* Hints */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">
+          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+            <CardHeader className="pb-3 pt-6 px-6">
+              <CardTitle className="text-base font-bold text-foreground">
                 Hints ({hints.length})
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-6 px-6">
               {hints.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-secondary">
                   No hints recorded yet.
                 </p>
               ) : (
-                <ol className="space-y-2">
+                <ol className="space-y-2.5">
                   {hints.map((hint, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2.5 rounded-lg border bg-muted/30 p-3 text-sm"
+                      className="flex items-start gap-3 rounded-[16px] bg-tint p-3.5 text-sm"
                     >
-                      <span className="shrink-0 font-mono text-xs font-semibold text-primary">
+                      <span className="shrink-0 font-mono text-xs font-bold text-accent-orange">
                         Hint {i + 1}
                       </span>
-                      <span className="leading-relaxed">{hint as string}</span>
+                      <span className="leading-relaxed text-foreground">{hint as string}</span>
                     </li>
                   ))}
                 </ol>
@@ -502,25 +516,25 @@ function ProblemDetailContent({
           </Card>
 
           {/* Approaches */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">
+          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+            <CardHeader className="pb-3 pt-6 px-6">
+              <CardTitle className="text-base font-bold text-foreground">
                 Approaches ({approaches.length})
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pb-6 px-6">
               {approaches.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-secondary">
                   No approaches recorded yet.
                 </p>
               ) : (
                 approaches.map((approach, i) => (
                   <div key={i}>
-                    {i > 0 && <Separator className="my-4" />}
-                    <h4 className="font-semibold text-sm">
+                    {i > 0 && <Separator className="my-4 border-border/60" />}
+                    <h4 className="font-bold text-sm text-foreground">
                       {(approach as { title: string }).title}
                     </h4>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-secondary leading-relaxed">
                       {(approach as { description: string }).description}
                     </p>
                   </div>

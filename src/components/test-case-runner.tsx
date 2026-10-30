@@ -32,13 +32,13 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
 
   if (testCases.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
         <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <ListTree className="mb-2 h-8 w-8 text-muted-foreground/60" />
-          <p className="text-sm font-medium text-muted-foreground">
+          <ListTree className="mb-2 h-8 w-8 text-secondary" />
+          <p className="text-sm font-semibold text-secondary">
             No examples or edge cases recorded yet.
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Edit the problem to add sample inputs, expected outputs, and notes.
           </p>
         </CardContent>
@@ -49,15 +49,15 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
   const activeItem = testCases[activeIdx] || testCases[0];
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">
+    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+      <CardHeader className="pb-3 pt-6 px-6">
+        <CardTitle className="text-base font-bold text-foreground">
           Examples &amp; edge cases ({testCases.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pb-6 px-6">
         {/* Example Tabs */}
-        <div className="flex flex-wrap gap-2 border-b pb-3">
+        <div className="flex flex-wrap gap-2 border-b border-border/50 pb-3">
           {testCases.map((tc, idx) => (
             <Button
               key={tc.id || idx}
@@ -65,7 +65,7 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
               variant={activeIdx === idx ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setActiveIdx(idx)}
-              className="text-xs"
+              className="text-xs rounded-full font-semibold"
             >
               Example {idx + 1}
             </Button>
@@ -73,57 +73,57 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
         </div>
 
         {/* Selected Example Details */}
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {/* Input */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Input</span>
+              <span className="text-xs font-semibold text-secondary">Input</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCopy(`input-${activeIdx}`, activeItem.input)}
-                className="h-6 px-1.5 text-[11px]"
+                className="h-6 px-2 rounded-[8px] text-[11px] text-secondary hover:text-foreground"
               >
                 {copiedKey === `input-${activeIdx}` ? (
-                  <Check className="h-3 w-3 text-green-600" />
+                  <Check className="h-3 w-3 text-[#2D6A1E]" />
                 ) : (
                   <Copy className="h-3 w-3" />
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto rounded-md bg-muted/70 p-2.5 font-mono text-xs">
+            <pre className="overflow-x-auto rounded-[14px] bg-tint p-3 font-mono text-xs text-foreground leading-relaxed">
               {activeItem.input}
             </pre>
           </div>
 
           {/* Expected Output */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Expected Output</span>
+              <span className="text-xs font-semibold text-secondary">Expected Output</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCopy(`output-${activeIdx}`, activeItem.expectedOutput)}
-                className="h-6 px-1.5 text-[11px]"
+                className="h-6 px-2 rounded-[8px] text-[11px] text-secondary hover:text-foreground"
               >
                 {copiedKey === `output-${activeIdx}` ? (
-                  <Check className="h-3 w-3 text-green-600" />
+                  <Check className="h-3 w-3 text-[#2D6A1E]" />
                 ) : (
                   <Copy className="h-3 w-3" />
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto rounded-md bg-muted/70 p-2.5 font-mono text-xs">
+            <pre className="overflow-x-auto rounded-[14px] bg-tint p-3 font-mono text-xs text-foreground leading-relaxed">
               {activeItem.expectedOutput}
             </pre>
           </div>
 
           {/* Optional Note */}
           {activeItem.explanation && (
-            <div className="rounded-md border bg-muted/20 p-2.5 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Note: </span>
+            <div className="rounded-[14px] bg-tint p-3 text-xs text-secondary leading-relaxed">
+              <span className="font-bold text-foreground">Note: </span>
               {activeItem.explanation}
             </div>
           )}

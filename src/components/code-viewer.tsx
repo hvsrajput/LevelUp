@@ -36,23 +36,23 @@ export function CodeViewer({
   const lines = code.split("\n");
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-zinc-950 text-zinc-100 shadow-xs">
+    <div className="overflow-hidden rounded-[16px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] shadow-soft">
       {/* Header bar with language label and copy button */}
-      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/90 px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-[#223528] bg-[#0E1912] px-4 py-2.5">
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className="border-zinc-700 bg-zinc-800 font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-200"
+            className="border-transparent bg-[#1E2B1D] font-mono text-[11px] font-bold uppercase tracking-wider text-accent-orange rounded-full px-2.5 py-0.5"
           >
             {language}
           </Badge>
           {runtime && (
-            <span className="font-mono text-[11px] text-zinc-400">
+            <span className="font-mono text-[11px] text-[#8A977E]">
               Runtime: {runtime}
             </span>
           )}
           {memory && (
-            <span className="font-mono text-[11px] text-zinc-400">
+            <span className="font-mono text-[11px] text-[#8A977E]">
               Memory: {memory}
             </span>
           )}
@@ -63,12 +63,12 @@ export function CodeViewer({
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          className="h-7 gap-1 px-2 text-xs text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+          className="h-7 gap-1.5 px-2.5 rounded-[10px] text-xs text-[#A5B79C] hover:bg-[#1E2B1D] hover:text-[#FFFFFF]"
         >
           {copied ? (
             <>
-              <Check className="h-3.5 w-3.5 text-green-400" />
-              <span className="text-green-400">Copied</span>
+              <Check className="h-3.5 w-3.5 text-[#65C237]" />
+              <span className="text-[#65C237]">Copied</span>
             </>
           ) : (
             <>
@@ -84,11 +84,11 @@ export function CodeViewer({
         <table className="w-full border-collapse">
           <tbody>
             {lines.map((line, idx) => (
-              <tr key={idx} className="hover:bg-zinc-900/50">
-                <td className="w-8 select-none pr-4 text-right font-mono text-[11px] text-zinc-600">
+              <tr key={idx} className="hover:bg-[#1C2C20]/40">
+                <td className="w-8 select-none pr-4 text-right font-mono text-[11px] text-[#5B6B58]">
                   {idx + 1}
                 </td>
-                <td className="whitespace-pre break-all font-mono text-zinc-100">
+                <td className="whitespace-pre break-all font-mono text-[#E8F0DF]">
                   {line || " "}
                 </td>
               </tr>
@@ -99,8 +99,8 @@ export function CodeViewer({
 
       {/* Optional Solution Notes */}
       {notes && (
-        <div className="border-t border-zinc-800 bg-zinc-900/50 px-4 py-2 text-xs text-zinc-400">
-          <span className="font-semibold text-zinc-300">Notes: </span>
+        <div className="border-t border-[#223528] bg-[#0E1912]/80 px-4 py-2.5 text-xs text-[#8A977E]">
+          <span className="font-bold text-[#E8F0DF]">Notes: </span>
           {notes}
         </div>
       )}

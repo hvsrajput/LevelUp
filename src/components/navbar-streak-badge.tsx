@@ -44,11 +44,11 @@ export function NavbarStreakBadge() {
   if (isLoading) {
     return (
       <div
-        className="flex h-8 items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs animate-pulse"
+        className="flex h-7 items-center gap-1.5 rounded-full bg-tint px-3 py-1 text-xs animate-pulse"
         aria-label="Loading practice streak"
       >
-        <div className="h-3.5 w-3.5 rounded-full bg-muted" />
-        <div className="h-3 w-4 rounded bg-muted" />
+        <div className="h-3 w-3 rounded-full bg-tint-muted" />
+        <div className="h-2.5 w-12 rounded bg-tint-muted" />
       </div>
     );
   }
@@ -59,12 +59,12 @@ export function NavbarStreakBadge() {
   return (
     <Link
       href="/problems"
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all hover:scale-105 ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] font-bold tracking-wider uppercase transition-all hover:opacity-90 active:scale-95 ${
         current > 0
           ? atRisk
-            ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-            : "border-orange-500/30 bg-orange-500/10 text-orange-600 dark:text-orange-400"
-          : "border-border bg-muted/40 text-muted-foreground hover:text-foreground"
+            ? "bg-amber-100 text-amber-900 border border-amber-300"
+            : "bg-pill-streak-bg text-pill-streak-text shadow-2xs"
+          : "bg-tint text-text-muted hover:text-foreground"
       }`}
       title={
         current > 0
@@ -75,10 +75,10 @@ export function NavbarStreakBadge() {
     >
       <Flame
         className={`h-3.5 w-3.5 ${
-          current > 0 ? "fill-current text-current" : "text-muted-foreground"
+          current > 0 ? "fill-current text-current" : "text-text-muted"
         }`}
       />
-      <span>{current}</span>
+      <span>{current} DAY STREAK</span>
     </Link>
   );
 }

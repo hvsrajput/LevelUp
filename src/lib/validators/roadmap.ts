@@ -8,8 +8,8 @@ export const generateRoadmapSchema = z.object({
   goal: z
     .string()
     .trim()
-    .min(2, "Goal must be at least 2 characters")
-    .max(100, "Goal must not exceed 100 characters"),
+    .min(10, "Goal must be at least 10 characters")
+    .max(500, "Goal must not exceed 500 characters"),
   level: z.enum(["beginner", "intermediate", "advanced"], {
     message: "Level must be beginner, intermediate, or advanced",
   }),

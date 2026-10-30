@@ -42,17 +42,17 @@ export function PatternSuggestions({
   );
 
   return (
-    <Card className="border-primary/40 bg-linear-to-b from-primary/5 via-background to-background shadow-md">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 pt-6 px-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-tint text-accent-orange">
             <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <CardTitle className="text-base font-bold">
+            <CardTitle className="text-base font-bold text-foreground">
               AI Pattern Suggestions (RAG Grounded)
             </CardTitle>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[11px] text-secondary font-medium mt-0.5">
               Review and accept suggestions into your form. Nothing is saved until you confirm.
             </p>
           </div>
@@ -62,23 +62,23 @@ export function PatternSuggestions({
           variant="ghost"
           size="sm"
           onClick={onDismiss}
-          className="h-7 w-7 p-0"
+          className="h-8 w-8 p-0 rounded-[10px] text-secondary hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pb-6 px-6">
         {/* Grounded Citation Banner */}
-        <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs">
-          <span className="font-semibold text-primary flex items-center gap-1">
-            <Compass className="h-3.5 w-3.5" />
+        <div className="flex flex-wrap items-center gap-1.5 rounded-[16px] bg-tint px-3.5 py-2.5 text-xs">
+          <span className="font-semibold text-foreground flex items-center gap-1">
+            <Compass className="h-3.5 w-3.5 text-accent-orange" />
             Cited Patterns:
           </span>
           {suggestions.citedPatterns.map((chunk) => (
             <Badge
               key={chunk.id}
               variant="outline"
-              className="border-primary/30 bg-background font-medium text-primary text-[11px]"
+              className="border-border/70 bg-card font-medium text-secondary text-[11px] rounded-full px-2.5"
             >
               {chunk.topic}
             </Badge>

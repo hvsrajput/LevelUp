@@ -12,19 +12,19 @@ import { Code2 } from "lucide-react";
 export default function SignInPage() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Code2 className="h-6 w-6 text-primary" />
+      <Card className="w-full max-w-md rounded-[24px] border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
+        <CardHeader className="text-center p-0 mb-6">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[18px] bg-accent-orange text-white shadow-soft-sm">
+            <Code2 className="h-7 w-7 text-white" />
           </div>
-          <CardTitle className="text-2xl">Sign in to Level Up</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">Sign in to Level Up</CardTitle>
+          <p className="text-sm font-medium text-secondary mt-1">
             Choose a provider to continue
           </p>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-0">
           <Button
-            className="w-full"
+            className="w-full h-12 rounded-[14px] bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-sm"
             variant="outline"
             onClick={() => signIn("github", { callbackUrl: "/problems" })}
           >
@@ -34,7 +34,7 @@ export default function SignInPage() {
             Continue with GitHub
           </Button>
           <Button
-            className="w-full"
+            className="w-full h-12 rounded-[14px] bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-sm"
             variant="outline"
             onClick={() => signIn("google", { callbackUrl: "/problems" })}
           >

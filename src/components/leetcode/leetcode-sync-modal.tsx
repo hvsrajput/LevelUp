@@ -311,34 +311,34 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="border-amber-500/30 hover:border-amber-500/60 text-amber-600 dark:text-amber-400"
+          className="rounded-[14px] bg-card border-border/70 hover:bg-tint font-semibold text-xs text-foreground h-10"
         >
-          <DownloadCloud className="mr-2 h-4 w-4" /> LeetCode Sync
+          <DownloadCloud className="mr-2 h-4 w-4 text-accent-orange" /> LeetCode Sync
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-[24px] p-6">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-500/10 text-amber-500 font-bold text-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange font-bold text-sm">
               LC
             </span>
-            <DialogTitle>LeetCode Integration</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-foreground">LeetCode Integration</DialogTitle>
           </div>
-          <DialogDescription>
+          <DialogDescription className="text-xs text-secondary mt-1">
             Import problems and sync your accepted submissions directly into LevelUp.
           </DialogDescription>
         </DialogHeader>
 
         {/* Tab navigation */}
-        <div className="flex border-b text-sm font-medium">
+        <div className="flex border-b border-border/50 text-xs font-semibold gap-1 pb-1">
           <button
             type="button"
             onClick={() => setTab("link")}
-            className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
               tab === "link"
-                ? "border-amber-500 text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "bg-secondary text-primary font-bold"
+                : "text-secondary hover:text-foreground hover:bg-tint"
             }`}
           >
             <LinkIcon className="h-3.5 w-3.5" /> Account
@@ -346,10 +346,10 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
           <button
             type="button"
             onClick={() => setTab("sync24h")}
-            className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
               tab === "sync24h"
-                ? "border-amber-500 text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "bg-secondary text-primary font-bold"
+                : "text-secondary hover:text-foreground hover:bg-tint"
             }`}
           >
             <Clock className="h-3.5 w-3.5" /> 24h Sync
@@ -357,10 +357,10 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
           <button
             type="button"
             onClick={() => setTab("paste")}
-            className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
               tab === "paste"
-                ? "border-amber-500 text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "bg-secondary text-primary font-bold"
+                : "text-secondary hover:text-foreground hover:bg-tint"
             }`}
           >
             <FileCode className="h-3.5 w-3.5" /> Paste Import
@@ -368,10 +368,10 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
           <button
             type="button"
             onClick={() => setTab("importNumber")}
-            className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
               tab === "importNumber"
-                ? "border-amber-500 text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "bg-secondary text-primary font-bold"
+                : "text-secondary hover:text-foreground hover:bg-tint"
             }`}
           >
             <Hash className="h-3.5 w-3.5" /> Import by #
@@ -387,26 +387,26 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
               </div>
             ) : (
               <>
-                <div className="rounded-lg border bg-muted/40 p-3">
+                <div className="rounded-[16px] bg-tint p-3.5 border border-transparent">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Status</span>
+                    <span className="text-xs font-bold text-foreground">Status</span>
                     {linkedUsername ? (
-                      <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 bg-emerald-500/10">
+                      <Badge variant="solved" className="font-semibold text-xs">
                         Linked: {linkedUsername}
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-muted-foreground">
+                      <Badge variant="outline" className="text-secondary rounded-full bg-card">
                         Not linked
                       </Badge>
                     )}
                   </div>
                   {linkedUsername && (
-                    <div className="mt-2 flex items-center justify-between">
+                    <div className="mt-2.5 flex items-center justify-between">
                       <a
                         href={`https://leetcode.com/u/${linkedUsername}/`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 underline underline-offset-2"
+                        className="text-xs text-secondary hover:text-foreground flex items-center gap-1 underline underline-offset-2 font-medium"
                       >
                         View LeetCode Profile <ExternalLink className="h-3 w-3" />
                       </a>
@@ -415,7 +415,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                         size="sm"
                         onClick={handleUnlink}
                         disabled={isUnlinking}
-                        className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                        className="h-7 text-xs rounded-[8px] text-[#B42318] hover:bg-[#FFDDD8]"
                       >
                         {isUnlinking ? <Loader2 className="h-3 w-3 animate-spin" /> : "Unlink"}
                       </Button>
@@ -423,8 +423,8 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="lc-username" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <div className="space-y-1.5">
+                  <label htmlFor="lc-username" className="text-xs font-bold uppercase tracking-wider text-secondary">
                     LeetCode Username
                   </label>
                   <div className="flex gap-2">
@@ -434,11 +434,12 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                       value={usernameInput}
                       onChange={(e) => setUsernameInput(e.target.value)}
                       disabled={isLinking}
+                      className="bg-tint border-transparent rounded-[14px] h-10 text-sm"
                     />
                     <Button
                       onClick={handleLink}
                       disabled={isLinking || !usernameInput.trim()}
-                      className="shrink-0"
+                      className="shrink-0 rounded-[14px] font-semibold text-xs shadow-sm"
                     >
                       {isLinking ? (
                         <>
@@ -501,7 +502,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                 <Button
                   onClick={handleSync24h}
                   disabled={isSyncing24h}
-                  className="w-full"
+                  className="w-full rounded-[14px] font-semibold text-xs shadow-sm h-10"
                 >
                   {isSyncing24h ? (
                     <>
@@ -515,17 +516,17 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                 </Button>
 
                 {sync24hError && (
-                  <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
+                  <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     <span>{sync24hError}</span>
                   </div>
                 )}
 
                 {sync24hResult && (
-                  <div className="rounded-lg border bg-muted/30 p-3 space-y-2 text-xs">
-                    <div className="flex items-center justify-between font-medium">
+                  <div className="rounded-[16px] bg-tint p-3.5 space-y-2 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
                       <span>Sync Results:</span>
-                      <Badge variant="outline" className="border-emerald-500/40 text-emerald-600">
+                      <Badge variant="solved" className="text-xs font-semibold">
                         {sync24hResult.syncedCount} synced
                       </Badge>
                     </div>
@@ -535,19 +536,19 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                         {sync24hResult.syncedProblems.map((prob) => (
                           <li
                             key={prob.questionId}
-                            className="flex items-center justify-between py-1 border-b border-muted/50 last:border-0"
+                            className="flex items-center justify-between py-1 border-b border-border/40 last:border-0"
                           >
-                            <span className="truncate pr-2">
+                            <span className="truncate pr-2 font-medium text-foreground">
                               #{prob.questionId} {prob.title}
                             </span>
-                            <span className="text-muted-foreground text-[10px]">
+                            <span className="text-secondary text-[10px] font-medium">
                               {prob.isNew ? "New" : "Updated"}
                             </span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-muted-foreground py-2 text-center">
+                      <p className="text-secondary py-2 text-center font-medium">
                         No accepted submissions found in the last 24 hours.
                       </p>
                     )}
@@ -592,12 +593,12 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                 </Button>
               </div>
 
-              <div className="rounded-md border bg-muted/60 p-2 font-mono text-[10px] text-muted-foreground overflow-x-auto max-h-20">
+              <div className="rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[10px] overflow-x-auto max-h-20">
                 <pre className="whitespace-pre">{CONSOLE_IMPORT_SCRIPT}</pre>
               </div>
 
-              <div className="flex items-start gap-1.5 rounded-md bg-muted/40 p-2 text-[11px] text-muted-foreground">
-                <Info className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
+              <div className="flex items-start gap-2 rounded-[14px] bg-tint p-2.5 text-[11px] text-secondary leading-relaxed">
+                <Info className="h-4 w-4 shrink-0 text-accent-orange mt-0.5" />
                 <span>
                   It runs in your own browser on <strong>leetcode.com</strong> and sends nothing to this app until you paste the result.
                 </span>
@@ -605,7 +606,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="modal-paste-area" className="text-xs font-semibold text-muted-foreground">
+              <label htmlFor="modal-paste-area" className="text-xs font-bold text-secondary">
                 Paste JSON Output
               </label>
               <Textarea
@@ -619,57 +620,58 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                   setPreviewError(null);
                   setConfirmSuccess(null);
                 }}
-                className="font-mono text-xs"
+                className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3"
               />
             </div>
 
             {previewError && (
-              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+              <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{previewError}</span>
               </div>
             )}
 
             {preview && (
-              <div className="rounded-lg border bg-muted/30 p-2.5 space-y-2 text-xs">
+              <div className="rounded-[16px] bg-tint p-3 space-y-2 text-xs">
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded border bg-emerald-500/10 p-1.5">
-                    <div className="font-bold text-emerald-600">{preview.newCount}</div>
-                    <div className="text-[10px] text-muted-foreground">New</div>
+                  <div className="rounded-[10px] bg-card border border-border/70 p-2 shadow-soft-sm">
+                    <div className="font-bold text-[#2D6A1E] text-sm">{preview.newCount}</div>
+                    <div className="text-[10px] text-secondary font-medium">New</div>
                   </div>
-                  <div className="rounded border bg-muted/50 p-1.5">
-                    <div className="font-bold text-foreground">{preview.alreadyImportedCount}</div>
-                    <div className="text-[10px] text-muted-foreground">Tracked</div>
+                  <div className="rounded-[10px] bg-card border border-border/70 p-2 shadow-soft-sm">
+                    <div className="font-bold text-foreground text-sm">{preview.alreadyImportedCount}</div>
+                    <div className="text-[10px] text-secondary font-medium">Tracked</div>
                   </div>
-                  <div className="rounded border bg-amber-500/10 p-1.5">
-                    <div className="font-bold text-amber-600">{preview.invalidCount}</div>
-                    <div className="text-[10px] text-muted-foreground">Invalid</div>
+                  <div className="rounded-[10px] bg-card border border-border/70 p-2 shadow-soft-sm">
+                    <div className="font-bold text-[#8F4A0B] text-sm">{preview.invalidCount}</div>
+                    <div className="text-[10px] text-secondary font-medium">Invalid</div>
                   </div>
                 </div>
               </div>
             )}
 
             {confirmError && (
-              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+              <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{confirmError}</span>
               </div>
             )}
 
             {confirmSuccess && (
-              <div className="flex items-center gap-2 rounded-md bg-emerald-500/10 p-2 text-xs text-emerald-700 dark:text-emerald-300">
+              <div className="flex items-center gap-2 rounded-[14px] bg-[#D6EEC6] p-3 text-xs font-semibold text-[#2D6A1E]">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
                 <span>{confirmSuccess}</span>
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-1 border-t">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border/50">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handlePreviewPaste}
                 disabled={isPreviewing || !pastedJson.trim()}
+                className="rounded-[14px] font-semibold text-xs"
               >
                 {isPreviewing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Preview"}
               </Button>
@@ -677,6 +679,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                 type="button"
                 size="sm"
                 onClick={handleConfirmPaste}
+                className="rounded-[14px] font-semibold text-xs shadow-sm"
                 disabled={isConfirming || !preview || preview.newCount === 0 || confirmSuccess !== null}
               >
                 {isConfirming ? (
@@ -695,16 +698,16 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
         {tab === "importNumber" && (
           <div className="space-y-4 py-2">
             <div className="space-y-1">
-              <p className="text-sm">
+              <p className="text-sm font-bold text-foreground">
                 Import any official LeetCode problem directly by its question number.
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-secondary">
                 Fetches description, difficulty, topic tags, and creates the problem tracker entry.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="question-num" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="space-y-1.5">
+              <label htmlFor="question-num" className="text-xs font-bold uppercase tracking-wider text-secondary">
                 Problem Number
               </label>
               <div className="flex gap-2">
@@ -716,11 +719,12 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                   value={questionNumberInput}
                   onChange={(e) => setQuestionNumberInput(e.target.value)}
                   disabled={isImportingNumber}
+                  className="bg-tint border-transparent rounded-[14px] h-10 text-sm"
                 />
                 <Button
                   onClick={handleImportByNumber}
                   disabled={isImportingNumber || !questionNumberInput.trim()}
-                  className="shrink-0"
+                  className="shrink-0 rounded-[14px] font-semibold text-xs shadow-sm"
                 >
                   {isImportingNumber ? (
                     <>
@@ -734,27 +738,27 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
             </div>
 
             {importNumberError && (
-              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-2.5 text-xs text-destructive">
+              <div className="flex items-center gap-2 rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{importNumberError}</span>
               </div>
             )}
 
             {importNumberSuccess && (
-              <div className="rounded-lg border bg-emerald-500/10 border-emerald-500/20 p-3 space-y-1 text-xs text-emerald-700 dark:text-emerald-300">
-                <div className="flex items-center gap-2 font-medium">
-                  <CheckCircle2 className="h-4 w-4" />
+              <div className="rounded-[16px] bg-[#D6EEC6]/50 border border-[#2D6A1E]/30 p-4 space-y-1.5 text-xs text-[#2D6A1E]">
+                <div className="flex items-center gap-2 font-bold text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-[#2D6A1E]" />
                   <span>
                     {importNumberSuccess.alreadyExisted ? "Already Tracked" : "Successfully Imported"}
                   </span>
                 </div>
-                <p>
+                <p className="text-foreground">
                   &ldquo;{importNumberSuccess.title}&rdquo; is now in your problem list.
                 </p>
                 <div className="pt-1">
                   <a
                     href={`/problems/${importNumberSuccess.shortCode}`}
-                    className="underline font-semibold hover:text-emerald-900 dark:hover:text-emerald-100"
+                    className="underline font-bold text-[#2D6A1E] hover:text-[#1E4D13]"
                   >
                     View Problem Details &rarr;
                   </a>

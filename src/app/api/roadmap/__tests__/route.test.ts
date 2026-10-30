@@ -142,5 +142,80 @@ describe("Roadmap API Route Handlers", () => {
       const json = await res.json();
       expect(json.roadmap).toBeDefined();
     });
+
+    it("rejects goals unrelated to DSA or too vague to plan", async () => {
+      authMock.mockResolvedValueOnce({
+        user: { id: "user-unrelated" },
+      } as any);
+
+      const req = new Request("http://localhost:3000/api/roadmap", {
+        method: "POST",
+        body: JSON.stringify({
+          goal: "How to bake a chocolate cake with milk and sugar",
+          level: "intermediate",
+          timeline: "4 weeks",
+        }),
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      const json = await res.json();
+      expect(json.error).toContain("unrelated to Data Structures & Algorithms");
+    });
+
+    it("enforces rate limiting on repeated requests from the same user", async () => {
+      const userId = "user-ratelimit-test";
+      for (let i = 0; i < 3; i++) {
+        authMock.mockResolvedValueOnce({
+          user: { id: userId },
+        } as any);
+        (prismaMock.roadmap.deleteMany as any).mockResolvedValueOnce({});
+        (prismaMock.roadmap.create as any).mockResolvedValueOnce({
+          id: `road-${i}`,
+          title: "Goal",
+          goal: "Dynamic Programming",
+          level: "intermediate",
+          timeline: "4 weeks",
+        });
+        (prismaMock.roadmap.findFirst as any).mockResolvedValueOnce({
+          id: `road-${i}`,
+          title: "Goal",
+          goal: "Dynamic Programming",
+          level: "intermediate",
+          timeline: "4 weeks",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          items: [],
+        });
+
+        const req = new Request("http://localhost:3000/api/roadmap", {
+          method: "POST",
+          body: JSON.stringify({
+            goal: "Dynamic Programming",
+            level: "intermediate",
+            timeline: "4 weeks",
+          }),
+        });
+        const res = await POST(req);
+        expect(res.status).toBe(201);
+      }
+
+      // 4th request within 1 minute should be rate limited
+      authMock.mockResolvedValueOnce({
+        user: { id: userId },
+      } as any);
+      const req = new Request("http://localhost:3000/api/roadmap", {
+        method: "POST",
+        body: JSON.stringify({
+          goal: "Dynamic Programming",
+          level: "intermediate",
+          timeline: "4 weeks",
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(429);
+      const json = await res.json();
+      expect(json.error).toContain("Rate limit");
+    });
   });
 });

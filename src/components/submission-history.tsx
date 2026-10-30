@@ -38,13 +38,13 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
 
   if (submissions.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
         <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <Code2 className="mb-2 h-8 w-8 text-muted-foreground/60" />
-          <p className="text-sm font-medium text-muted-foreground">
+          <Code2 className="mb-2 h-8 w-8 text-secondary" />
+          <p className="text-sm font-semibold text-secondary">
             No code submissions recorded yet.
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Use the Code Workspace to submit and track your solutions.
           </p>
         </CardContent>
@@ -53,38 +53,38 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">
+    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
+      <CardHeader className="pb-3 pt-6 px-6">
+        <CardTitle className="text-base font-bold text-foreground">
           Submission History ({submissions.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 pb-6 px-6">
         {submissions.map((sub, index) => {
           const isExpanded = expandedIds[sub.id] ?? false;
           return (
             <div
               key={sub.id}
-              className="rounded-lg border bg-card transition-colors hover:border-primary/20"
+              className="rounded-[16px] border border-border/60 bg-tint/40 transition-colors hover:bg-tint/70"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-3.5">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="font-mono text-xs uppercase">
+                  <Badge variant="outline" className="font-mono text-xs uppercase rounded-full bg-card border-border/70">
                     {sub.language}
                   </Badge>
                   {index === 0 && (
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="solved" className="text-[10px] font-semibold">
                       Latest
                     </Badge>
                   )}
                   {sub.runtime && (
-                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <span className="flex items-center gap-1 font-mono text-[11px] text-secondary font-medium">
                       <Clock className="h-3 w-3" />
                       {sub.runtime}
                     </span>
                   )}
                   {sub.memory && (
-                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <span className="flex items-center gap-1 font-mono text-[11px] text-secondary font-medium">
                       <Cpu className="h-3 w-3" />
                       {sub.memory}
                     </span>
@@ -92,7 +92,7 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs font-medium text-secondary">
                     {formatDate(sub.createdAt)}
                   </span>
                   <Button
@@ -101,6 +101,7 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
                     size="sm"
                     onClick={() => toggleExpand(sub.id)}
                     title={isExpanded ? "Collapse" : "Expand"}
+                    className="rounded-[10px] h-7 w-7 p-0 text-secondary hover:text-foreground"
                   >
                     {isExpanded ? (
                       <ChevronUp className="h-3.5 w-3.5" />
@@ -112,7 +113,7 @@ export function SubmissionHistory({ submissions }: SubmissionHistoryProps) {
               </div>
 
               {isExpanded && (
-                <div className="border-t p-2">
+                <div className="border-t border-border/50 p-2 sm:p-3">
                   <CodeViewer
                     code={sub.code}
                     language={sub.language}

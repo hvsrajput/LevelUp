@@ -121,20 +121,22 @@ export function TimezoneSettingsDialog({
       if (!val) setSavedSuccess(false);
       onOpenChange(val);
     }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-[24px] p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold text-foreground">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange">
+              <Globe className="h-4 w-4" />
+            </span>
             Timezone Settings
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-secondary text-xs mt-1">
             Your practice streaks and calendar days are calculated in your configured timezone.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="tz-select">Current Timezone</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="tz-select" className="text-xs font-semibold text-secondary">Current Timezone</Label>
             <Select
               value={selectedTz}
               onValueChange={(val) => {
@@ -142,10 +144,10 @@ export function TimezoneSettingsDialog({
               }}
               disabled={isLoading || isPending}
             >
-              <SelectTrigger id="tz-select">
+              <SelectTrigger id="tz-select" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
                 <SelectValue placeholder="Select timezone" />
               </SelectTrigger>
-              <SelectContent className="max-h-60">
+              <SelectContent className="max-h-60 rounded-[16px]">
                 {!COMMON_TIMEZONES.includes(selectedTz) && (
                   <SelectItem value={selectedTz}>{selectedTz} (Custom)</SelectItem>
                 )}
@@ -158,27 +160,28 @@ export function TimezoneSettingsDialog({
             </Select>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
-            <span>Detected browser timezone</span>
+          <div className="flex items-center justify-between text-xs text-secondary pt-1">
+            <span className="font-medium">Detected browser timezone</span>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleDetectBrowser}
-              className="h-7 text-xs gap-1.5"
+              className="h-7 text-xs gap-1.5 rounded-[10px] bg-card border-border/70 font-semibold"
             >
-              <Wand2 className="h-3.5 w-3.5" />
+              <Wand2 className="h-3.5 w-3.5 text-accent-orange" />
               Auto-detect
             </Button>
           </div>
         </div>
 
-        <DialogFooter className="flex items-center justify-between sm:justify-between">
+        <DialogFooter className="flex items-center justify-between sm:justify-between pt-2 border-t border-border/40">
           <Button
             type="button"
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
+            className="rounded-[14px] text-secondary hover:text-foreground font-semibold"
           >
             Cancel
           </Button>
@@ -187,7 +190,7 @@ export function TimezoneSettingsDialog({
             type="button"
             onClick={handleSave}
             disabled={isPending || selectedTz === currentTimezone}
-            className="gap-1.5"
+            className="gap-1.5 rounded-[14px] font-semibold shadow-sm"
           >
             {savedSuccess ? (
               <>

@@ -229,17 +229,17 @@ function ProblemsPageContent() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Problems</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">My Problems</h1>
+          <p className="mt-1 text-sm font-medium text-secondary">
             {pagination.total} problem{pagination.total !== 1 ? "s" : ""} tracked
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <LeetCodeImportDialog onImportComplete={() => setRefreshKey((k) => k + 1)} />
           <LeetCodeSyncModal onSyncComplete={() => setRefreshKey((k) => k + 1)} />
-          <Button asChild>
+          <Button asChild className="rounded-[14px] shadow-sm">
             <Link href="/problems/new">
-              <Plus className="mr-2 h-4 w-4" /> Add Problem
+              <Plus className="mr-1.5 h-4 w-4" /> Add Problem
             </Link>
           </Button>
         </div>
@@ -257,13 +257,13 @@ function ProblemsPageContent() {
       </div>
 
       {/* Filter Bar */}
-      <div className="mb-6 space-y-3 rounded-xl border bg-card p-4 shadow-xs">
+      <div className="mb-6 space-y-3.5 rounded-[20px] border border-border/70 bg-card p-4 sm:p-5 shadow-soft">
         {/* Search Row */}
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary" />
             <Input
-              className="pl-9 pr-8 text-sm"
+              className="pl-10 pr-9 text-sm bg-tint border-transparent rounded-[14px] h-10"
               placeholder="Search title, description, notes..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -272,7 +272,7 @@ function ProblemsPageContent() {
               <button
                 type="button"
                 onClick={() => setSearchInput("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -291,8 +291,8 @@ function ProblemsPageContent() {
                 }
               }}
             >
-              <SelectTrigger className="w-[170px] text-xs">
-                <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+              <SelectTrigger className="w-[170px] text-xs h-10 bg-tint border-transparent rounded-[14px]">
+                <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5 text-secondary" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -310,7 +310,7 @@ function ProblemsPageContent() {
                 variant="ghost"
                 size="sm"
                 onClick={resetFilters}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-secondary hover:text-foreground rounded-[14px] h-10"
               >
                 <FilterX className="mr-1.5 h-3.5 w-3.5" />
                 Reset
@@ -332,8 +332,8 @@ function ProblemsPageContent() {
               }
             }}
           >
-            <SelectTrigger className="text-xs">
-              <span className="text-muted-foreground mr-1">Diff:</span>
+            <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
+              <span className="text-secondary mr-1">Diff:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -355,8 +355,8 @@ function ProblemsPageContent() {
               }
             }}
           >
-            <SelectTrigger className="text-xs">
-              <span className="text-muted-foreground mr-1">Status:</span>
+            <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
+              <span className="text-secondary mr-1">Status:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -378,8 +378,8 @@ function ProblemsPageContent() {
               }
             }}
           >
-            <SelectTrigger className="text-xs">
-              <span className="text-muted-foreground mr-1">Topic:</span>
+            <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
+              <span className="text-secondary mr-1">Topic:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -403,8 +403,8 @@ function ProblemsPageContent() {
               }
             }}
           >
-            <SelectTrigger className="text-xs">
-              <span className="text-muted-foreground mr-1">Date:</span>
+            <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
+              <span className="text-secondary mr-1">Date:</span>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -418,49 +418,49 @@ function ProblemsPageContent() {
 
         {/* Active Filter Badges */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-1.5 pt-1">
-            <span className="text-[11px] text-muted-foreground">Active:</span>
+          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/40 mt-3">
+            <span className="text-[11px] font-semibold text-secondary">Active:</span>
             {search && (
-              <Badge variant="secondary" className="gap-1 text-[11px]">
+              <Badge variant="secondary" className="gap-1 text-[11px] rounded-full py-1 px-3">
                 Search: &ldquo;{search}&rdquo;
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-3 w-3 cursor-pointer text-secondary hover:text-foreground"
                   onClick={() => setSearchInput("")}
                 />
               </Badge>
             )}
             {difficulty !== "all" && (
-              <Badge variant="secondary" className="gap-1 text-[11px]">
+              <Badge variant="secondary" className="gap-1 text-[11px] rounded-full py-1 px-3">
                 {difficulty}
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-3 w-3 cursor-pointer text-secondary hover:text-foreground"
                   onClick={() => setDifficulty("all")}
                 />
               </Badge>
             )}
             {status !== "all" && (
-              <Badge variant="secondary" className="gap-1 text-[11px]">
+              <Badge variant="secondary" className="gap-1 text-[11px] rounded-full py-1 px-3">
                 {status}
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-3 w-3 cursor-pointer text-secondary hover:text-foreground"
                   onClick={() => setStatus("all")}
                 />
               </Badge>
             )}
             {topic !== "all" && (
-              <Badge variant="secondary" className="gap-1 text-[11px]">
+              <Badge variant="secondary" className="gap-1 text-[11px] rounded-full py-1 px-3">
                 Topic: {topics.find((t) => t.slug === topic)?.name || topic}
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-3 w-3 cursor-pointer text-secondary hover:text-foreground"
                   onClick={() => setTopic("all")}
                 />
               </Badge>
             )}
             {timeframe !== "all" && (
-              <Badge variant="secondary" className="gap-1 text-[11px]">
+              <Badge variant="secondary" className="gap-1 text-[11px] rounded-full py-1 px-3">
                 Time: {timeframe}
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-3 w-3 cursor-pointer text-secondary hover:text-foreground"
                   onClick={() => setTimeframe("all")}
                 />
               </Badge>
@@ -471,22 +471,22 @@ function ProblemsPageContent() {
 
       {/* Problem List */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-accent-orange" />
         </div>
       ) : problems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
-          <p className="mb-3 text-lg font-medium text-muted-foreground">
+        <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-border/80 bg-card/60 p-12 text-center shadow-soft">
+          <p className="mb-4 text-base font-medium text-secondary">
             {hasActiveFilters
               ? "No problems match your search criteria."
               : "No problems yet. Start tracking your DSA practice!"}
           </p>
           {hasActiveFilters ? (
-            <Button variant="outline" size="sm" onClick={resetFilters}>
+            <Button variant="outline" size="sm" onClick={resetFilters} className="rounded-[14px]">
               Clear All Filters
             </Button>
           ) : (
-            <Button asChild>
+            <Button asChild className="rounded-[14px]">
               <Link href="/problems/new">
                 <Plus className="mr-2 h-4 w-4" /> Add Your First Problem
               </Link>
@@ -503,10 +503,11 @@ function ProblemsPageContent() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-4">
+            <div className="mt-8 flex items-center justify-center gap-3">
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-[14px] bg-card border-border/70"
                 disabled={pagination.page <= 1}
                 onClick={() =>
                   setPagination((p) => ({ ...p, page: p.page - 1 }))
@@ -514,12 +515,13 @@ function ProblemsPageContent() {
               >
                 Previous
               </Button>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs font-semibold text-secondary px-2">
                 Page {pagination.page} of {pagination.totalPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-[14px] bg-card border-border/70"
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() =>
                   setPagination((p) => ({ ...p, page: p.page + 1 }))

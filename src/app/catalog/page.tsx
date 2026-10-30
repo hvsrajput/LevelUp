@@ -10,13 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -24,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { difficultyColor } from "@/lib/utils";
 import {
   BookOpen,
   Search,
@@ -104,30 +97,30 @@ function CatalogContent() {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">Curated Problem Catalog</h1>
-            <Badge variant="secondary" className="gap-1">
-              <BookOpen className="h-3 w-3" />
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Curated Problem Catalog</h1>
+            <Badge variant="secondary" className="gap-1 font-semibold text-xs">
+              <BookOpen className="h-3 w-3 text-secondary" />
               Foundations
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium text-secondary">
             A battle-tested set of canonical interview problems categorized by algorithmic pattern and topic.
           </p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-card p-4 rounded-xl border shadow-xs">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-card p-4 sm:p-5 rounded-[20px] border border-border/70 shadow-soft">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary" />
           <Input
             placeholder="Search catalog problems, summaries, or pattern tags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-10 text-sm bg-tint border-transparent rounded-[14px] h-10"
           />
         </div>
 
@@ -139,7 +132,7 @@ function CatalogContent() {
                 if (val) setTopic(val);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
                 <SelectValue placeholder="Topic" />
               </SelectTrigger>
               <SelectContent>
@@ -159,7 +152,7 @@ function CatalogContent() {
                 if (val) setDifficulty(val);
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent>
@@ -174,7 +167,7 @@ function CatalogContent() {
       </div>
 
       {/* Results Count */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+      <div className="flex items-center justify-between text-xs font-semibold text-secondary px-1">
         <span>Showing {problems.length} of {total} curated problems</span>
       </div>
 
@@ -182,18 +175,18 @@ function CatalogContent() {
       {isLoading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="h-24 bg-muted/30" />
-              <CardContent className="h-28 bg-muted/20" />
+            <Card key={i} className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft animate-pulse">
+              <div className="h-10 w-2/3 rounded-[12px] bg-tint mb-4" />
+              <div className="h-20 w-full rounded-[14px] bg-tint" />
             </Card>
           ))}
         </div>
       ) : problems.length === 0 ? (
-        <Card className="border-dashed py-16 text-center">
+        <Card className="rounded-[24px] border border-dashed border-border/80 bg-card/60 p-16 text-center shadow-soft">
           <CardContent className="flex flex-col items-center justify-center space-y-3">
-            <Filter className="h-8 w-8 text-muted-foreground/60" />
-            <h3 className="text-lg font-semibold">No problems match your filter</h3>
-            <p className="text-xs text-muted-foreground max-w-sm">
+            <Filter className="h-8 w-8 text-secondary" />
+            <h3 className="text-lg font-bold text-foreground">No problems match your filter</h3>
+            <p className="text-xs text-secondary max-w-sm">
               Try adjusting your search terms, topic selection, or difficulty level.
             </p>
           </CardContent>
@@ -201,47 +194,49 @@ function CatalogContent() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {problems.map((p, idx) => (
-            <Card key={p.id || idx} className="flex flex-col justify-between hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
+            <Card key={p.id || idx} className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-lg font-bold leading-snug">
+                  <h3 className="text-lg font-bold leading-snug text-foreground">
                     {p.title}
-                  </CardTitle>
+                  </h3>
                   <Badge
-                    className={`shrink-0 text-[11px] px-2 py-0.5 ${difficultyColor(
-                      p.difficulty
-                    )}`}
+                    variant={
+                      p.difficulty.toLowerCase() === "easy"
+                        ? "easy"
+                        : p.difficulty.toLowerCase() === "medium"
+                        ? "medium"
+                        : "hard"
+                    }
+                    className="shrink-0 text-[11px] px-2 py-0.5 font-semibold"
                   >
                     {p.difficulty}
                   </Badge>
                 </div>
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {p.topicTags.map((tag) => (
                     <Badge
                       key={tag}
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0 font-normal"
+                      variant="outline"
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-tint/60 border-border/70 text-secondary font-medium"
                     >
                       {tag}
                     </Badge>
                   ))}
                   <Badge
                     variant="outline"
-                    className="text-[10px] px-1.5 py-0 font-mono text-muted-foreground"
+                    className="text-[10px] px-2 py-0.5 font-mono text-secondary rounded-full bg-tint/40 border-border/70"
                   >
                     #{p.patternTag}
                   </Badge>
                 </div>
-              </CardHeader>
-
-              <CardContent>
-                <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                <p className="text-xs text-secondary line-clamp-3 leading-relaxed pt-1">
                   {p.summary}
                 </p>
-              </CardContent>
+              </div>
 
-              <CardFooter className="pt-2 border-t bg-muted/20">
-                <Button asChild size="sm" className="w-full gap-2">
+              <div className="pt-5 border-t border-border/40 mt-4">
+                <Button asChild size="sm" className="w-full gap-2 rounded-[14px] font-semibold text-xs shadow-sm">
                   <Link
                     href={`/problems/new?title=${encodeURIComponent(
                       p.title
@@ -253,7 +248,7 @@ function CatalogContent() {
                     Track in My Problems
                   </Link>
                 </Button>
-              </CardFooter>
+              </div>
             </Card>
           ))}
         </div>
