@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { Calendar, MessageSquare, ChevronRight, Check } from "lucide-react";
+import { Calendar, MessageSquare, ChevronRight, Check, ExternalLink } from "lucide-react";
+import { getProblemLeetCodeUrl } from "@/lib/leetcode/url";
 
 interface ProblemCardProps {
   problem: {
@@ -17,6 +18,8 @@ interface ProblemCardProps {
     status: string;
     source: string;
     createdAt: string;
+    titleSlug?: string | null;
+    url?: string | null;
     timeComplexity?: string | null;
     topics: { topic: { name: string } }[];
     _count?: { submissions: number };
@@ -24,6 +27,8 @@ interface ProblemCardProps {
 }
 
 export function ProblemCard({ problem }: ProblemCardProps) {
+  const leetcodeUrl = getProblemLeetCodeUrl(problem);
+
   const getDifficultyBadge = (diff: string) => {
     switch (diff) {
       case "EASY":
@@ -49,22 +54,49 @@ export function ProblemCard({ problem }: ProblemCardProps) {
   };
 
   return (
-    <Link href={`/problems/${problem.id}`} className="block h-full group">
-      <Card className="h-full rounded-[20px] bg-card p-5 shadow-soft border border-border/40 transition-all hover:shadow-md hover:border-primary/40 flex flex-col justify-between">
+    <div className="relative h-full group">
+      {/* Card link for clicking anywhere on the card to open detail page */}
+      <Link
+        href={`/problems/${problem.id}`}
+        className="absolute inset-0 z-0 rounded-[20px]"
+        aria-label={`View problem ${problem.title}`}
+      />
+
+      <Card className="h-full rounded-[20px] bg-card p-5 shadow-soft border border-border/40 transition-all group-hover:shadow-md group-hover:border-primary/40 flex flex-col justify-between pointer-events-none">
         <div>
           <CardHeader className="p-0 pb-3.5">
             <div className="flex items-start justify-between gap-2">
-              <CardTitle className="line-clamp-1 text-base font-bold text-foreground group-hover:text-primary transition-colors">
-                {problem.title}
+              <CardTitle className="line-clamp-1 text-base font-bold text-foreground group-hover:text-primary transition-colors pointer-events-auto">
+                <Link href={`/problems/${problem.id}`} className="relative z-10">
+                  {problem.title}
+                </Link>
               </CardTitle>
-              <Badge
-                variant="outline"
-                className={`font-mono text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full shrink-0 ${getDifficultyBadge(
-                  problem.difficulty
-                )}`}
-              >
-                {problem.difficulty}
-              </Badge>
+
+              <div className="flex items-center gap-1.5 shrink-0 pointer-events-auto">
+                {/* Open on LeetCode external icon button (sibling to card link) */}
+                {leetcodeUrl && (
+                  <a
+                    href={leetcodeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="Open on LeetCode"
+                    title="Open on LeetCode"
+                    className="relative z-10 flex h-6 w-6 items-center justify-center rounded-[8px] bg-tint/80 text-secondary hover:text-foreground hover:bg-muted-tint transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+
+                <Badge
+                  variant="outline"
+                  className={`font-mono text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full shrink-0 ${getDifficultyBadge(
+                    problem.difficulty
+                  )}`}
+                >
+                  {problem.difficulty}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
 
@@ -136,6 +168,6 @@ export function ProblemCard({ problem }: ProblemCardProps) {
           <ChevronRight className="h-4 w-4 text-text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
         </div>
       </Card>
-    </Link>
+    </div>
   );
 }

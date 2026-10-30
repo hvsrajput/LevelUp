@@ -42,7 +42,9 @@ import {
   Code2,
   BookOpen,
   Lightbulb,
+  ExternalLink,
 } from "lucide-react";
+import { getProblemLeetCodeUrl } from "@/lib/leetcode/url";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,6 +58,8 @@ interface Problem {
   difficulty: string;
   source: string;
   status: string;
+  titleSlug?: string | null;
+  url?: string | null;
   constraints: string | null;
   timeComplexity: string | null;
   spaceComplexity: string | null;
@@ -184,6 +188,7 @@ function ProblemDetailContent({
 
   const hints = Array.isArray(problem.hints) ? problem.hints : [];
   const approaches = Array.isArray(problem.approaches) ? problem.approaches : [];
+  const leetcodeUrl = getProblemLeetCodeUrl(problem);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -211,6 +216,14 @@ function ProblemDetailContent({
               <SelectItem value="REVISIT">Revisit</SelectItem>
             </SelectContent>
           </Select>
+
+          {leetcodeUrl && (
+            <Button asChild variant="outline" size="sm" className="rounded-[14px] bg-card border-border/70 gap-1.5 font-semibold text-xs">
+              <a href={leetcodeUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-3.5 w-3.5" /> Open on LeetCode
+              </a>
+            </Button>
+          )}
 
           <Button asChild variant="outline" size="sm" className="rounded-[14px] bg-card border-border/70">
             <Link href={`/problems/${id}/edit`}>
@@ -303,6 +316,17 @@ function ProblemDetailContent({
           <span className="font-mono text-[11px] text-secondary">
             ID: {problem.shortCode}
           </span>
+          {leetcodeUrl && (
+            <a
+              href={leetcodeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline ml-auto"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Open on LeetCode
+            </a>
+          )}
         </div>
 
         {/* Complexity Pills */}
