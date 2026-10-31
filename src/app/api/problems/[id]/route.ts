@@ -110,7 +110,46 @@ export async function PUT(request: Request, ctx: Ctx) {
     );
   }
 
-  const { topicNames, testCases, ...updateData } = parsed.data;
+  const { topicNames, testCases, code, language, ...rawUpdateData } = parsed.data;
+  delete (rawUpdateData as Record<string, unknown>).url;
+
+  // Protect fields the form must not overwrite:
+  // shortCode, source, leetcodeQuestionId are immutable from form edits.
+  // Optional string fields: empty string -> null.
+  const updateData: Record<string, unknown> = {};
+
+  if (rawUpdateData.title !== undefined) updateData.title = rawUpdateData.title;
+  if (rawUpdateData.description !== undefined) updateData.description = rawUpdateData.description;
+  if (rawUpdateData.difficulty !== undefined) updateData.difficulty = rawUpdateData.difficulty;
+  if (rawUpdateData.status !== undefined) updateData.status = rawUpdateData.status;
+
+  if (rawUpdateData.constraints !== undefined) {
+    updateData.constraints = rawUpdateData.constraints?.trim() || null;
+  }
+  if (rawUpdateData.timeComplexity !== undefined) {
+    updateData.timeComplexity = rawUpdateData.timeComplexity?.trim() || null;
+  }
+  if (rawUpdateData.spaceComplexity !== undefined) {
+    updateData.spaceComplexity = rawUpdateData.spaceComplexity?.trim() || null;
+  }
+  if (rawUpdateData.notes !== undefined) {
+    updateData.notes = rawUpdateData.notes?.trim() || null;
+  }
+
+  if (rawUpdateData.hints !== undefined) updateData.hints = rawUpdateData.hints;
+  if (rawUpdateData.approaches !== undefined) updateData.approaches = rawUpdateData.approaches;
+
+  // Only update titleSlug if non-empty, otherwise keep existing
+  if (rawUpdateData.titleSlug !== undefined && rawUpdateData.titleSlug !== null) {
+    const slug = rawUpdateData.titleSlug.trim();
+    if (slug) updateData.titleSlug = slug;
+  }
+
+  // Only update catalogProblemId if non-empty, otherwise keep existing
+  if (rawUpdateData.catalogProblemId !== undefined && rawUpdateData.catalogProblemId !== null) {
+    const catId = rawUpdateData.catalogProblemId.trim();
+    if (catId) updateData.catalogProblemId = catId;
+  }
 
   const updated = await prisma.$transaction(async (tx) => {
     // Update topics if provided
@@ -142,8 +181,6 @@ export async function PUT(request: Request, ctx: Ctx) {
 
     // Update test cases if provided
     if (testCases !== undefined) {
-      // Simple strategy: delete all existing, recreate
-      // For Phase 2, we can do smarter diffing
       await tx.testCase.deleteMany({ where: { problemId: id } });
 
       if (testCases.length > 0) {
@@ -156,6 +193,18 @@ export async function PUT(request: Request, ctx: Ctx) {
           })),
         });
       }
+    }
+
+    // Optional submission update/creation if code is provided
+    if (code && code.trim()) {
+      await tx.submission.create({
+        data: {
+          problemId: id,
+          userId: session.user.id,
+          code: code.trim(),
+          language: language || "typescript",
+        },
+      });
     }
 
     // Fetch user's timezone to compute solvedDay accurately (defensive check for test mocks)
@@ -173,7 +222,7 @@ export async function PUT(request: Request, ctx: Ctx) {
     let solvedAtToSet: Date | null | undefined = undefined;
     let solvedDayToSet: string | null | undefined = undefined;
 
-    const newStatus = updateData.status ?? result.problem.status;
+    const newStatus = (updateData.status as string) ?? result.problem.status;
     const isBecomingOrRemainingSolved = newStatus === "SOLVED";
 
     if (updateData.status !== undefined && updateData.status !== "SOLVED") {
@@ -181,9 +230,9 @@ export async function PUT(request: Request, ctx: Ctx) {
       solvedAtToSet = null;
       solvedDayToSet = null;
     } else if (isBecomingOrRemainingSolved) {
-      if (updateData.solvedAt !== undefined) {
-        if (updateData.solvedAt) {
-          const target = new Date(updateData.solvedAt);
+      if (rawUpdateData.solvedAt !== undefined) {
+        if (rawUpdateData.solvedAt) {
+          const target = new Date(rawUpdateData.solvedAt);
           if (target.getTime() > Date.now() + 60_000) {
             throw new Error("solvedAt cannot be in the future");
           }

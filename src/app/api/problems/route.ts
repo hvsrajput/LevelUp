@@ -157,7 +157,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const { topicNames, testCases, ...problemData } = parsed.data;
+  const { topicNames, testCases, code, language, ...problemData } = parsed.data;
+  delete (problemData as Record<string, unknown>).url;
 
   // Fetch user's timezone to compute solvedDay accurately (defensive check for test mocks)
   const user = prisma.user?.findUnique
@@ -225,10 +226,24 @@ export async function POST(request: Request) {
             explanation: tc.explanation || null,
           })),
         },
+
+        // 5. Create initial submission if code provided
+        ...(code && code.trim()
+          ? {
+              submissions: {
+                create: {
+                  code: code.trim(),
+                  language: language || "typescript",
+                  userId: session.user.id,
+                },
+              },
+            }
+          : {}),
       },
       include: {
         topics: { include: { topic: true } },
         testCases: true,
+        submissions: true,
       },
     });
 
