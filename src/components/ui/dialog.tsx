@@ -81,7 +81,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 flex flex-col w-[calc(100vw-2rem)] max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 gap-0 overflow-hidden overflow-x-hidden rounded-[24px] bg-card text-sm text-card-foreground shadow-soft border border-border/60 duration-100 outline-none p-0",
+          "fixed top-1/2 left-1/2 z-50 flex flex-col w-[calc(100vw-2rem)] max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 gap-0 overflow-hidden overflow-x-hidden rounded-2xl bg-card text-sm text-card-foreground shadow-xl border border-border/70 duration-100 outline-none p-0",
           dialogSizeClasses[size],
           "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className

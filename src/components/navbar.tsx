@@ -39,25 +39,25 @@ export function Navbar() {
     <>
       <TimezoneSync />
       <TimezoneSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
-      <nav className="sticky top-0 z-40 border-b border-border/40 bg-card/92 backdrop-blur-md shadow-soft-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <nav className="sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo / Brand */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-glow-orange transition-transform group-hover:scale-105">
+            <div className="flex h-8.5 w-8.5 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
               <Code2 className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-extrabold tracking-tight text-foreground leading-tight">
+              <span className="text-base font-extrabold tracking-tight text-foreground leading-tight">
                 Level Up
               </span>
-              <span className="font-mono text-[9px] font-bold tracking-widest text-text-muted uppercase leading-none">
+              <span className="text-[10px] font-semibold tracking-wider text-text-muted uppercase leading-none">
                 DSA Mastery
               </span>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-1.5 md:flex">
             {session && (
               <>
                 {navLinks.map((link) => {
@@ -69,10 +69,10 @@ export function Navbar() {
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        "rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all",
+                        "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none",
                         isActive
-                          ? "bg-secondary text-foreground shadow-2xs"
-                          : "text-muted-foreground hover:bg-tint hover:text-foreground"
+                          ? "bg-tint text-foreground font-semibold border border-border/60"
+                          : "text-muted-foreground hover:bg-tint/70 hover:text-foreground"
                       )}
                     >
                       {link.label}

@@ -74,7 +74,7 @@ function AlertDialogAction({
   className,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  return <Button className={cn("rounded-[14px]", className)} {...props} />
+  return <Button className={cn("rounded-lg", className)} {...props} />
 }
 
 function AlertDialogCancel({
@@ -86,7 +86,7 @@ function AlertDialogCancel({
       render={
         <Button
           variant="outline"
-          className={cn("rounded-[14px]", className)}
+          className={cn("rounded-lg", className)}
           {...props}
         />
       }
