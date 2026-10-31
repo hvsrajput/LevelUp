@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -165,21 +166,21 @@ export default function GroupsPage() {
                 Join with Code
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[24px] p-6">
-              <form onSubmit={handleJoinGroup}>
+            <DialogContent size="md" className="rounded-[24px]">
+              <form onSubmit={handleJoinGroup} className="flex flex-col flex-1 min-h-0">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold text-foreground">Join a Study Group</DialogTitle>
                   <DialogDescription className="text-secondary text-xs">
                     Enter the 8-character invite code shared by the group owner.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                <DialogBody className="space-y-4 py-4 min-w-0">
                   {formError && (
                     <div className="rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                       {formError}
                     </div>
                   )}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 min-w-0">
                     <Label htmlFor="joinCode" className="text-xs font-semibold text-secondary">Join Code</Label>
                     <Input
                       id="joinCode"
@@ -191,7 +192,7 @@ export default function GroupsPage() {
                       required
                     />
                   </div>
-                </div>
+                </DialogBody>
                 <DialogFooter>
                   <Button type="submit" disabled={isPending || !joinCode.trim()} className="rounded-[14px] font-semibold">
                     {isPending ? "Joining..." : "Join Group"}
@@ -209,21 +210,21 @@ export default function GroupsPage() {
                 Create Group
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[24px] p-6">
-              <form onSubmit={handleCreateGroup}>
+            <DialogContent size="md" className="rounded-[24px]">
+              <form onSubmit={handleCreateGroup} className="flex flex-col flex-1 min-h-0">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-bold text-foreground">Create Study Group</DialogTitle>
                   <DialogDescription className="text-secondary text-xs">
                     Give your circle a name. You will be assigned as the Owner and receive a unique invite code.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                <DialogBody className="space-y-4 py-4 min-w-0">
                   {formError && (
                     <div className="rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
                       {formError}
                     </div>
                   )}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 min-w-0">
                     <Label htmlFor="groupName" className="text-xs font-semibold text-secondary">Group Name</Label>
                     <Input
                       id="groupName"
@@ -235,7 +236,7 @@ export default function GroupsPage() {
                       required
                     />
                   </div>
-                </div>
+                </DialogBody>
                 <DialogFooter>
                   <Button type="submit" disabled={isPending || !groupName.trim()} className="rounded-[14px] font-semibold">
                     {isPending ? "Creating..." : "Create Group"}

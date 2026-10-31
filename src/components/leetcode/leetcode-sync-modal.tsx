@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -317,7 +318,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-[24px] p-6">
+      <DialogContent size="lg" className="rounded-[24px]">
         <DialogHeader>
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange font-bold text-sm">
@@ -331,7 +332,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
         </DialogHeader>
 
         {/* Tab navigation */}
-        <div className="flex border-b border-border/50 text-xs font-semibold gap-1 pb-1">
+        <div className="flex border-b border-border/50 text-xs font-semibold gap-1 px-6 md:px-8 pb-2 pt-2 bg-card shrink-0">
           <button
             type="button"
             onClick={() => setTab("link")}
@@ -377,6 +378,8 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
             <Hash className="h-3.5 w-3.5" /> Import by #
           </button>
         </div>
+
+        <DialogBody className="space-y-4 py-4 min-w-0">
 
         {/* Tab 1: Account Link */}
         {tab === "link" && (
@@ -593,8 +596,8 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                 </Button>
               </div>
 
-              <div className="rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[10px] overflow-x-auto max-h-20">
-                <pre className="whitespace-pre">{CONSOLE_IMPORT_SCRIPT}</pre>
+              <div className="rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[10px] overflow-x-auto max-w-full max-h-24">
+                <pre className="whitespace-pre max-w-full overflow-x-auto">{CONSOLE_IMPORT_SCRIPT}</pre>
               </div>
 
               <div className="flex items-start gap-2 rounded-[14px] bg-tint p-2.5 text-[11px] text-secondary leading-relaxed">
@@ -605,14 +608,14 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0">
               <label htmlFor="modal-paste-area" className="text-xs font-bold text-secondary">
                 Paste JSON Output
               </label>
               <Textarea
                 id="modal-paste-area"
                 placeholder={`{\n  "version": 1,\n  "problems": [...] \n}`}
-                rows={4}
+                rows={6}
                 value={pastedJson}
                 onChange={(e) => {
                   setPastedJson(e.target.value);
@@ -620,7 +623,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
                   setPreviewError(null);
                   setConfirmSuccess(null);
                 }}
-                className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3"
+                className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3 min-h-36 md:min-h-48"
               />
             </div>
 
@@ -767,6 +770,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
             )}
           </div>
         )}
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

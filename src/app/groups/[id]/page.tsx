@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -590,14 +591,16 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
 
       {/* Confirm Delete Group Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="rounded-[24px] p-6">
+        <DialogContent size="sm" className="rounded-[24px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Delete Study Group?</DialogTitle>
+          </DialogHeader>
+          <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
               This will permanently dissolve &quot;{group.name}&quot; and remove all members.
               This action cannot be undone.
             </DialogDescription>
-          </DialogHeader>
+          </DialogBody>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
@@ -621,13 +624,15 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
 
       {/* Confirm Leave Group Dialog */}
       <Dialog open={leaveConfirmOpen} onOpenChange={setLeaveConfirmOpen}>
-        <DialogContent className="rounded-[24px] p-6">
+        <DialogContent size="sm" className="rounded-[24px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Leave Study Group?</DialogTitle>
+          </DialogHeader>
+          <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
               Are you sure you want to leave &quot;{group.name}&quot;? You will need the invite code to rejoin.
             </DialogDescription>
-          </DialogHeader>
+          </DialogBody>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
@@ -654,9 +659,11 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
         open={!!removeMemberTarget}
         onOpenChange={(open) => !open && setRemoveMemberTarget(null)}
       >
-        <DialogContent className="rounded-[24px] p-6">
+        <DialogContent size="sm" className="rounded-[24px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Remove Member?</DialogTitle>
+          </DialogHeader>
+          <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
               Are you sure you want to remove{" "}
               <span className="font-semibold text-foreground">
@@ -664,7 +671,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               </span>{" "}
               from the group?
             </DialogDescription>
-          </DialogHeader>
+          </DialogBody>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -241,15 +242,17 @@ function ProblemDetailContent({
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[24px] p-6">
+            <DialogContent size="sm" className="rounded-[24px]">
               <DialogHeader>
                 <DialogTitle>Delete Problem</DialogTitle>
+              </DialogHeader>
+              <DialogBody className="py-4 min-w-0">
                 <DialogDescription className="text-secondary">
                   Are you sure you want to delete &ldquo;{problem.title}&rdquo;?
                   This will also remove all test cases and submissions. This
                   action cannot be undone.
                 </DialogDescription>
-              </DialogHeader>
+              </DialogBody>
               <DialogFooter className="gap-2 sm:gap-0">
                 <Button variant="outline" disabled={isDeleting} className="rounded-[14px]">
                   Cancel
