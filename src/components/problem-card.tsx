@@ -58,15 +58,15 @@ export function ProblemCard({ problem }: ProblemCardProps) {
       {/* Card link for clicking anywhere on the card to open detail page */}
       <Link
         href={`/problems/${problem.id}`}
-        className="absolute inset-0 z-0 rounded-[20px]"
+        className="absolute inset-0 z-0 rounded-xl"
         aria-label={`View problem ${problem.title}`}
       />
 
-      <Card className="h-full rounded-[20px] bg-card p-5 shadow-soft border border-border/40 transition-all group-hover:shadow-md group-hover:border-primary/40 flex flex-col justify-between pointer-events-none">
+      <Card className="h-full rounded-xl bg-card p-4 border border-border/70 transition-colors duration-150 motion-reduce:transition-none group-hover:border-primary/50 flex flex-col justify-between pointer-events-none">
         <div>
-          <CardHeader className="p-0 pb-3.5">
+          <CardHeader className="p-0 pb-2.5">
             <div className="flex items-start justify-between gap-2">
-              <CardTitle className="line-clamp-1 text-base font-bold text-foreground group-hover:text-primary transition-colors pointer-events-auto">
+              <CardTitle className="line-clamp-1 text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-150 pointer-events-auto">
                 <Link href={`/problems/${problem.id}`} className="relative z-10">
                   {problem.title}
                 </Link>
@@ -82,15 +82,15 @@ export function ProblemCard({ problem }: ProblemCardProps) {
                     onClick={(e) => e.stopPropagation()}
                     aria-label="Open on LeetCode"
                     title="Open on LeetCode"
-                    className="relative z-10 flex h-6 w-6 items-center justify-center rounded-[8px] bg-tint/80 text-secondary hover:text-foreground hover:bg-muted-tint transition-colors"
+                    className="relative z-10 flex h-6 w-6 items-center justify-center rounded-md bg-tint/80 text-secondary hover:text-foreground hover:bg-tint transition-colors border border-border/40"
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
 
                 <Badge
                   variant="outline"
-                  className={`font-mono text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full shrink-0 ${getDifficultyBadge(
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${getDifficultyBadge(
                     problem.difficulty
                   )}`}
                 >
@@ -100,11 +100,11 @@ export function ProblemCard({ problem }: ProblemCardProps) {
             </div>
           </CardHeader>
 
-          <CardContent className="p-0 space-y-3">
+          <CardContent className="p-0 space-y-2.5">
             <div className="flex flex-wrap items-center gap-1.5">
               <Badge
                 variant="secondary"
-                className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${getStatusBadge(
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${getStatusBadge(
                   problem.status
                 )}`}
               >
@@ -115,7 +115,7 @@ export function ProblemCard({ problem }: ProblemCardProps) {
               {problem.source === "LEETCODE" && (
                 <Badge
                   variant="outline"
-                  className="bg-tint/70 text-text-secondary border-0 text-[11px] px-2 py-0.5 rounded-full font-medium"
+                  className="bg-tint/70 text-text-secondary border-border/40 text-xs px-2 py-0.5 rounded-md font-medium"
                 >
                   LeetCode
                 </Badge>
@@ -124,7 +124,7 @@ export function ProblemCard({ problem }: ProblemCardProps) {
               {problem.timeComplexity && (
                 <Badge
                   variant="outline"
-                  className="font-mono text-[10px] bg-tint/60 text-text-secondary border-0 px-2 py-0.5 rounded-full"
+                  className="font-mono text-xs tabular-nums bg-tint/60 text-text-secondary border-border/40 px-2 py-0.5 rounded-md"
                 >
                   {problem.timeComplexity}
                 </Badge>
@@ -134,7 +134,7 @@ export function ProblemCard({ problem }: ProblemCardProps) {
                 <Badge
                   key={topic.name}
                   variant="outline"
-                  className="bg-tint/60 text-text-secondary border-0 text-[11px] px-2 py-0.5 rounded-full font-medium"
+                  className="bg-tint/60 text-text-secondary border-border/40 text-xs px-2 py-0.5 rounded-md font-medium"
                 >
                   {topic.name}
                 </Badge>
@@ -143,7 +143,7 @@ export function ProblemCard({ problem }: ProblemCardProps) {
               {problem.topics.length > 3 && (
                 <Badge
                   variant="outline"
-                  className="bg-tint/60 text-text-secondary border-0 text-[11px] px-1.5 py-0.5 rounded-full font-medium"
+                  className="bg-tint/60 text-text-secondary border-border/40 text-xs px-1.5 py-0.5 rounded-md font-medium tabular-nums"
                 >
                   +{problem.topics.length - 3}
                 </Badge>
@@ -152,20 +152,20 @@ export function ProblemCard({ problem }: ProblemCardProps) {
           </CardContent>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between text-xs text-text-muted">
+        <div className="mt-3.5 pt-2.5 border-t border-border/40 flex items-center justify-between text-xs text-text-muted">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 font-mono text-[11px]">
+            <span className="flex items-center gap-1.5 font-mono text-xs tabular-nums">
               <Calendar className="h-3.5 w-3.5" />
               {formatDate(problem.createdAt)}
             </span>
             {problem._count && problem._count.submissions > 0 && (
-              <span className="flex items-center gap-1 text-[11px]">
+              <span className="flex items-center gap-1 text-xs tabular-nums">
                 <MessageSquare className="h-3 w-3" />
                 {problem._count.submissions}
               </span>
             )}
           </div>
-          <ChevronRight className="h-4 w-4 text-text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+          <ChevronRight className="h-4 w-4 text-text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-transform duration-150 motion-reduce:transition-none" />
         </div>
       </Card>
     </div>
