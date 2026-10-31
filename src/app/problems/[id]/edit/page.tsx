@@ -53,17 +53,17 @@ export default async function EditProblemPage({
   const initialValues = toFormValues(problem);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
       {notice && (
-        <div className="mb-6 flex items-center gap-2.5 rounded-[16px] bg-[#D6EEC6] p-4 text-xs font-semibold text-[#2D6A1E] border border-[#2D6A1E]/20 shadow-soft">
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-[#2D6A1E]" />
+        <div className="mb-5 flex items-center gap-2 rounded-lg bg-[#D6EEC6] p-3 text-xs font-semibold text-badge-solved-text border border-badge-solved-text/20">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-badge-solved-text" />
           <span>{notice}</span>
         </div>
       )}
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Edit Problem</h1>
-        <p className="mt-1 text-muted-foreground">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Edit Problem</h1>
+        <p className="mt-1 text-xs text-secondary">
           Update &ldquo;{problem.title}&rdquo;
         </p>
       </div>

@@ -56,10 +56,10 @@ export default async function NewProblemPage({ searchParams }: NewProblemPagePro
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Add New Problem</h1>
-        <p className="mt-1 text-muted-foreground">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Add New Problem</h1>
+        <p className="mt-1 text-xs text-secondary">
           Track a new DSA problem you&apos;re working on.
         </p>
       </div>
