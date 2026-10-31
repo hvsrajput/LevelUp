@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Copy, ListTree } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface TestCaseItem {
   id: string;
@@ -32,10 +33,10 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
 
   if (testCases.length === 0) {
     return (
-      <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-        <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <ListTree className="mb-2 h-8 w-8 text-secondary" />
-          <p className="text-sm font-semibold text-secondary">
+      <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+        <CardContent className="flex flex-col items-center justify-center py-6 text-center p-0">
+          <ListTree className="mb-2 h-7 w-7 text-secondary" />
+          <p className="text-xs font-semibold text-secondary">
             No examples or edge cases recorded yet.
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -49,15 +50,15 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
   const activeItem = testCases[activeIdx] || testCases[0];
 
   return (
-    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-      <CardHeader className="pb-3 pt-6 px-6">
-        <CardTitle className="text-base font-bold text-foreground">
+    <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+      <CardHeader className="pb-2.5 p-0">
+        <CardTitle className="text-sm font-bold text-foreground">
           Examples &amp; edge cases ({testCases.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 pb-6 px-6">
+      <CardContent className="space-y-3.5 p-0 pt-2.5">
         {/* Example Tabs */}
-        <div className="flex flex-wrap gap-2 border-b border-border/50 pb-3">
+        <div className="flex flex-wrap gap-1.5 border-b border-border/50 pb-2.5">
           {testCases.map((tc, idx) => (
             <Button
               key={tc.id || idx}
@@ -65,7 +66,10 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
               variant={activeIdx === idx ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setActiveIdx(idx)}
-              className="text-xs rounded-full font-semibold"
+              className={cn(
+                "text-xs rounded-lg font-semibold px-2.5 py-1 h-7",
+                activeIdx === idx ? "bg-tint text-foreground border border-border/60" : ""
+              )}
             >
               Example {idx + 1}
             </Button>
@@ -73,9 +77,9 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
         </div>
 
         {/* Selected Example Details */}
-        <div className="space-y-3.5">
+        <div className="space-y-3">
           {/* Input */}
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-secondary">Input</span>
               <Button
@@ -83,22 +87,22 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCopy(`input-${activeIdx}`, activeItem.input)}
-                className="h-6 px-2 rounded-[8px] text-[11px] text-secondary hover:text-foreground"
+                className="h-6 px-2 rounded-md text-xs text-secondary hover:text-foreground"
               >
                 {copiedKey === `input-${activeIdx}` ? (
-                  <Check className="h-3 w-3 text-[#2D6A1E]" />
+                  <Check className="h-3 w-3 text-badge-solved-text" />
                 ) : (
                   <Copy className="h-3 w-3" />
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto rounded-[14px] bg-tint p-3 font-mono text-xs text-foreground leading-relaxed">
+            <pre className="overflow-x-auto rounded-lg bg-tint/60 border border-border/50 p-2.5 font-mono text-xs text-foreground leading-relaxed tabular-nums">
               {activeItem.input}
             </pre>
           </div>
 
           {/* Expected Output */}
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-secondary">Expected Output</span>
               <Button
@@ -106,23 +110,23 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCopy(`output-${activeIdx}`, activeItem.expectedOutput)}
-                className="h-6 px-2 rounded-[8px] text-[11px] text-secondary hover:text-foreground"
+                className="h-6 px-2 rounded-md text-xs text-secondary hover:text-foreground"
               >
                 {copiedKey === `output-${activeIdx}` ? (
-                  <Check className="h-3 w-3 text-[#2D6A1E]" />
+                  <Check className="h-3 w-3 text-badge-solved-text" />
                 ) : (
                   <Copy className="h-3 w-3" />
                 )}
               </Button>
             </div>
-            <pre className="overflow-x-auto rounded-[14px] bg-tint p-3 font-mono text-xs text-foreground leading-relaxed">
+            <pre className="overflow-x-auto rounded-lg bg-tint/60 border border-border/50 p-2.5 font-mono text-xs text-foreground leading-relaxed tabular-nums">
               {activeItem.expectedOutput}
             </pre>
           </div>
 
           {/* Optional Note */}
           {activeItem.explanation && (
-            <div className="rounded-[14px] bg-tint p-3 text-xs text-secondary leading-relaxed">
+            <div className="rounded-lg bg-tint/60 border border-border/50 p-2.5 text-xs text-secondary leading-relaxed">
               <span className="font-bold text-foreground">Note: </span>
               {activeItem.explanation}
             </div>

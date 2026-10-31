@@ -169,12 +169,12 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
   }
 
   return (
-    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 pt-6 px-6">
-        <CardTitle className="text-base font-bold text-foreground">Record Solution</CardTitle>
+    <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+      <CardHeader className="flex flex-row items-center justify-between pb-2.5 p-0">
+        <CardTitle className="text-sm font-bold text-foreground">Record Solution</CardTitle>
         <div className="flex items-center gap-2">
           <Select value={language} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="w-[140px] text-xs h-9 bg-tint border-transparent rounded-[14px]">
+            <SelectTrigger className="w-[130px] text-xs h-8 bg-tint/60 border border-border/70 rounded-lg">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -191,41 +191,41 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
             size="sm"
             onClick={() => setCode(STARTER_CODE[language] || "")}
             title="Reset to starter template"
-            className="rounded-[10px] text-secondary hover:text-foreground"
+            className="rounded-lg h-8 w-8 p-0 text-secondary hover:text-foreground"
           >
             <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 pb-6 px-6">
+      <CardContent className="space-y-3.5 p-0 pt-3">
         {error && (
-          <div className="rounded-[14px] bg-[#FFDDD8] p-3 text-xs font-semibold text-[#B42318]">
+          <div className="rounded-lg bg-[#FFDDD8] p-2.5 text-xs font-semibold text-[#B42318]">
             {error}
           </div>
         )}
         {successMsg && (
-          <div className="flex items-center gap-2 rounded-[14px] bg-[#D6EEC6] p-3 text-xs font-semibold text-[#2D6A1E]">
+          <div className="flex items-center gap-2 rounded-lg bg-[#D6EEC6] p-2.5 text-xs font-semibold text-badge-solved-text">
             <CheckCircle2 className="h-4 w-4" />
             {successMsg}
           </div>
         )}
 
         {/* Code Editor */}
-        <div className="relative rounded-[16px] border border-[#223528] bg-[#14221A] overflow-hidden focus-within:ring-2 focus-within:ring-accent-orange/40">
+        <div className="relative rounded-lg border border-[#223528] bg-[#14221A] overflow-hidden focus-within:ring-2 focus-within:ring-accent-orange/40">
           <Textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={14}
-            className="border-0 bg-transparent font-mono text-xs text-[#E8F0DF] placeholder:text-[#5B6B58] leading-relaxed focus-visible:ring-0 resize-y p-4"
+            className="border-0 bg-transparent font-mono text-xs text-[#E8F0DF] placeholder:text-[#5B6B58] leading-relaxed focus-visible:ring-0 resize-y p-3.5"
             placeholder="Write your solution here..."
             spellCheck={false}
           />
         </div>
 
         {/* Submission Metadata */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          <div className="space-y-1">
             <Label htmlFor="runtime" className="text-xs font-semibold text-secondary">
               Runtime (optional)
             </Label>
@@ -234,10 +234,10 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
               placeholder="e.g. 48ms"
               value={runtime}
               onChange={(e) => setRuntime(e.target.value)}
-              className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
+              className="text-xs h-8 bg-tint/60 border border-border/70 rounded-lg font-mono tabular-nums"
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="memory" className="text-xs font-semibold text-secondary">
               Memory (optional)
             </Label>
@@ -246,10 +246,10 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
               placeholder="e.g. 17.2MB"
               value={memory}
               onChange={(e) => setMemory(e.target.value)}
-              className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
+              className="text-xs h-8 bg-tint/60 border border-border/70 rounded-lg font-mono tabular-nums"
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="status" className="text-xs font-semibold text-secondary">
               Update Status
             </Label>
@@ -259,7 +259,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
                 if (v) setMarkStatus(v as "ATTEMPTED" | "SOLVED" | "REVISIT");
               }}
             >
-              <SelectTrigger className="text-xs h-10 bg-tint border-transparent rounded-[14px]">
+              <SelectTrigger className="text-xs h-8 bg-tint/60 border border-border/70 rounded-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -271,7 +271,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
           </div>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="sub-notes" className="text-xs font-semibold text-secondary">
             Submission Notes
           </Label>
@@ -280,7 +280,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
             placeholder="Key insights, time/space complexity O(n), edge cases..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="text-xs h-10 bg-tint border-transparent rounded-[14px]"
+            className="text-xs h-8 bg-tint/60 border border-border/70 rounded-lg"
           />
         </div>
 
@@ -290,7 +290,7 @@ export function CodeEditor({ problemId, onSubmissionCreated }: CodeEditorProps) 
             onClick={handleSubmit}
             disabled={isSubmitting}
             size="sm"
-            className="rounded-[14px] font-semibold"
+            className="rounded-lg h-9 font-semibold text-xs"
           >
             {isSubmitting ? (
               <>
