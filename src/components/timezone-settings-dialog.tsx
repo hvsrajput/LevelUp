@@ -122,10 +122,10 @@ export function TimezoneSettingsDialog({
       if (!val) setSavedSuccess(false);
       onOpenChange(val);
     }}>
-      <DialogContent size="md" className="rounded-[24px]">
+      <DialogContent size="md" className="rounded-2xl border-border/70">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold text-foreground">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange">
+          <DialogTitle className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-tint text-accent-orange">
               <Globe className="h-4 w-4" />
             </span>
             Timezone Settings
@@ -137,7 +137,7 @@ export function TimezoneSettingsDialog({
 
         <DialogBody className="space-y-4 py-4 min-w-0">
           <div className="space-y-1.5 min-w-0">
-            <Label htmlFor="tz-select" className="text-xs font-semibold text-secondary">Current Timezone</Label>
+            <Label htmlFor="tz-select" className="text-xs font-semibold text-foreground">Current Timezone</Label>
             <Select
               value={selectedTz}
               onValueChange={(val) => {
@@ -145,10 +145,10 @@ export function TimezoneSettingsDialog({
               }}
               disabled={isLoading || isPending}
             >
-              <SelectTrigger id="tz-select" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
+              <SelectTrigger id="tz-select" className="h-9 bg-tint/50 border border-border/60 rounded-lg text-xs focus:border-foreground/30">
                 <SelectValue placeholder="Select timezone" />
               </SelectTrigger>
-              <SelectContent className="max-h-60 rounded-[16px]">
+              <SelectContent className="max-h-60 rounded-xl border border-border/70">
                 {!COMMON_TIMEZONES.includes(selectedTz) && (
                   <SelectItem value={selectedTz}>{selectedTz} (Custom)</SelectItem>
                 )}
@@ -168,7 +168,7 @@ export function TimezoneSettingsDialog({
               variant="outline"
               size="sm"
               onClick={handleDetectBrowser}
-              className="h-7 text-xs gap-1.5 rounded-[10px] bg-card border-border/70 font-semibold"
+              className="h-8 text-xs gap-1.5 rounded-lg bg-card border-border/70 font-semibold hover:bg-tint"
             >
               <Wand2 className="h-3.5 w-3.5 text-accent-orange" />
               Auto-detect
@@ -176,13 +176,13 @@ export function TimezoneSettingsDialog({
           </div>
         </DialogBody>
 
-        <DialogFooter className="flex items-center justify-between sm:justify-between">
+        <DialogFooter className="flex items-center justify-between sm:justify-between gap-2">
           <Button
             type="button"
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
-            className="rounded-[14px] text-secondary hover:text-foreground font-semibold"
+            className="h-9 rounded-lg text-secondary hover:text-foreground font-semibold text-xs"
           >
             Cancel
           </Button>
@@ -191,7 +191,7 @@ export function TimezoneSettingsDialog({
             type="button"
             onClick={handleSave}
             disabled={isPending || selectedTz === currentTimezone}
-            className="gap-1.5 rounded-[14px] font-semibold shadow-sm"
+            className="gap-1.5 rounded-lg font-semibold shadow-sm h-9 text-xs"
           >
             {savedSuccess ? (
               <>
