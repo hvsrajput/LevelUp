@@ -23,7 +23,6 @@ import {
   Search,
   Plus,
   Loader2,
-  Filter,
 } from "lucide-react";
 
 interface CatalogItem {
@@ -182,9 +181,8 @@ function CatalogContent() {
           ))}
         </div>
       ) : problems.length === 0 ? (
-        <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-8 sm:p-12 text-center">
-          <CardContent className="flex flex-col items-center justify-center space-y-2.5 p-0">
-            <Filter className="h-7 w-7 text-secondary" />
+        <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-6 sm:p-8 text-left">
+          <CardContent className="flex flex-col items-start space-y-1 p-0">
             <h3 className="text-base font-bold text-foreground">No problems match your filter</h3>
             <p className="text-xs text-secondary max-w-sm">
               Try adjusting your search terms, topic selection, or difficulty level.
@@ -236,7 +234,7 @@ function CatalogContent() {
               </div>
 
               <div className="pt-3.5 border-t border-border/40 mt-3.5">
-                <Button asChild size="sm" className="w-full h-8 gap-1.5 rounded-lg font-semibold text-xs shadow-xs">
+                <Button asChild size="sm" variant="outline" className="w-full h-8 gap-1.5 rounded-lg bg-card border-border/70 hover:bg-tint font-semibold text-xs">
                   <Link href={`/problems/new?catalogId=${encodeURIComponent(p.id || p.title)}`}>
                     <Plus className="h-3.5 w-3.5" />
                     Track in My Problems
