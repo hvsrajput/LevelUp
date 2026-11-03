@@ -102,8 +102,8 @@ export function Navbar() {
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 rounded-[18px] p-1.5 shadow-soft border-border/60" align="end">
-                  <div className="flex items-center justify-start gap-2 p-2.5 bg-tint/60 rounded-[12px] mb-1">
+                <DropdownMenuContent className="w-56 rounded-xl p-1.5 shadow-md border border-border/70 bg-card" align="end">
+                  <div className="flex items-center justify-start gap-2 p-2.5 bg-tint/60 rounded-lg mb-1">
                     <div className="flex flex-col space-y-0.5 leading-none">
                       {session.user.name && (
                         <p className="font-bold text-sm text-foreground">{session.user.name}</p>
@@ -117,40 +117,40 @@ export function Navbar() {
                   </div>
                   <DropdownMenuSeparator className="my-1 bg-border/40" />
                   <Link href="/problems">
-                    <DropdownMenuItem className="cursor-pointer rounded-[10px] text-xs font-semibold py-2">
-                      <User className="mr-2 h-4 w-4 text-primary" />
+                    <DropdownMenuItem className="cursor-pointer rounded-md text-xs font-semibold py-2">
+                      <User className="mr-2 h-4 w-4 text-secondary" />
                       My Problems
                     </DropdownMenuItem>
                   </Link>
                   <Link href="/roadmap">
-                    <DropdownMenuItem className="cursor-pointer rounded-[10px] text-xs font-semibold py-2">
-                      <Map className="mr-2 h-4 w-4 text-primary" />
+                    <DropdownMenuItem className="cursor-pointer rounded-md text-xs font-semibold py-2">
+                      <Map className="mr-2 h-4 w-4 text-secondary" />
                       Learning Roadmap
                     </DropdownMenuItem>
                   </Link>
                   <Link href="/catalog">
-                    <DropdownMenuItem className="cursor-pointer rounded-[10px] text-xs font-semibold py-2">
-                      <BookOpen className="mr-2 h-4 w-4 text-primary" />
+                    <DropdownMenuItem className="cursor-pointer rounded-md text-xs font-semibold py-2">
+                      <BookOpen className="mr-2 h-4 w-4 text-secondary" />
                       Problem Catalog
                     </DropdownMenuItem>
                   </Link>
                   <Link href="/groups">
-                    <DropdownMenuItem className="cursor-pointer rounded-[10px] text-xs font-semibold py-2">
-                      <Users className="mr-2 h-4 w-4 text-primary" />
+                    <DropdownMenuItem className="cursor-pointer rounded-md text-xs font-semibold py-2">
+                      <Users className="mr-2 h-4 w-4 text-secondary" />
                       Study Groups
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator className="my-1 bg-border/40" />
                   <DropdownMenuItem
-                    className="cursor-pointer rounded-[10px] text-xs font-semibold py-2"
+                    className="cursor-pointer rounded-md text-xs font-semibold py-2"
                     onClick={() => setSettingsOpen(true)}
                   >
-                    <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Settings className="mr-2 h-4 w-4 text-secondary" />
                     Timezone & Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="my-1 bg-border/40" />
                   <DropdownMenuItem
-                    className="cursor-pointer text-destructive rounded-[10px] text-xs font-semibold py-2"
+                    className="cursor-pointer text-destructive rounded-md text-xs font-semibold py-2"
                     onClick={() => signOut()}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
