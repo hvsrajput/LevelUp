@@ -7,24 +7,20 @@
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code2 } from "lucide-react";
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
-      <Card className="w-full max-w-md rounded-[24px] border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">
+      <Card className="w-full max-w-sm rounded-2xl border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
         <CardHeader className="text-center p-0 mb-6">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[18px] bg-accent-orange text-white shadow-soft-sm">
-            <Code2 className="h-7 w-7 text-white" />
-          </div>
-          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">Sign in to Level Up</CardTitle>
-          <p className="text-sm font-medium text-secondary mt-1">
+          <CardTitle className="text-xl font-bold tracking-tight text-foreground">Sign in to Level Up</CardTitle>
+          <p className="text-xs font-medium text-secondary mt-1.5">
             Choose a provider to continue
           </p>
         </CardHeader>
-        <CardContent className="space-y-3 p-0">
+        <CardContent className="space-y-2.5 p-0">
           <Button
-            className="w-full h-12 rounded-[14px] bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-sm"
+            className="w-full h-10 rounded-lg bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-xs shadow-soft-sm"
             variant="outline"
             onClick={() => signIn("github", { callbackUrl: "/problems" })}
           >
@@ -34,7 +30,7 @@ export default function SignInPage() {
             Continue with GitHub
           </Button>
           <Button
-            className="w-full h-12 rounded-[14px] bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-sm"
+            className="w-full h-10 rounded-lg bg-card border border-border/70 hover:bg-tint text-foreground font-semibold text-xs shadow-soft-sm"
             variant="outline"
             onClick={() => signIn("google", { callbackUrl: "/problems" })}
           >

@@ -46,9 +46,9 @@ export function SolveButton({
       <div className="w-full space-y-1">
         <div
           className={cn(
-            "flex w-full items-center justify-center gap-2 rounded-[14px] bg-tint px-4 py-2 text-sm font-medium text-text-muted select-none cursor-not-allowed border border-border/40",
-            size === "sm" && "h-8 px-3 text-xs rounded-[12px]",
-            size === "lg" && "h-11 px-6 rounded-[14px]",
+            "flex w-full items-center justify-center gap-2 rounded-lg bg-tint px-4 py-2 text-sm font-medium text-text-muted select-none cursor-not-allowed border border-border/40",
+            size === "sm" && "h-8 px-3 text-xs rounded-lg",
+            size === "lg" && "h-11 px-6 rounded-lg",
             className
           )}
           aria-disabled="true"

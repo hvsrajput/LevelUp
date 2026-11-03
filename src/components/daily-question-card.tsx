@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SolveButton } from "@/components/solve-button";
-import { Calendar, Flame, Sparkles, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 interface DailyQuestionData {
   dailyQuestionId: string;
@@ -66,20 +66,14 @@ export function DailyQuestionCard() {
     <Card className="rounded-xl border border-border/70 bg-card">
       <CardHeader className="pb-2.5 pt-4 sm:pt-5 px-4 sm:px-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-tint text-foreground font-bold">
-              <Calendar className="h-3.5 w-3.5 text-accent-orange" />
-            </span>
-            <CardTitle className="text-sm font-bold text-foreground">Daily Challenge</CardTitle>
-          </div>
+          <CardTitle className="text-sm font-bold text-foreground">Daily Challenge</CardTitle>
           {data.isSpacedRepetition ? (
             <Badge variant="streak" className="gap-1 text-xs font-semibold">
               <RotateCcw className="h-3 w-3" />
               Spaced Repetition
             </Badge>
           ) : (
-            <Badge variant="secondary" className="gap-1 text-xs font-semibold">
-              <Flame className="h-3 w-3 text-accent-orange fill-accent-orange" />
+            <Badge variant="secondary" className="text-xs font-semibold">
               Progressive Difficulty
             </Badge>
           )}
@@ -124,8 +118,7 @@ export function DailyQuestionCard() {
 
         {/* Explainability Box */}
         <div className="rounded-lg bg-tint/60 border border-border/50 p-3 text-xs text-secondary">
-          <div className="flex items-center gap-1.5 font-semibold text-foreground text-xs mb-1">
-            <Sparkles className="h-3.5 w-3.5 text-accent-orange" />
+          <div className="font-semibold text-foreground text-xs mb-1">
             Why this question was picked:
           </div>
           <p className="leading-relaxed">{data.reason}</p>

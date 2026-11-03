@@ -62,7 +62,7 @@ export function NavbarStreakBadge() {
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] font-bold tracking-wider uppercase transition-all hover:opacity-90 active:scale-95 ${
         current > 0
           ? atRisk
-            ? "bg-amber-100 text-amber-900 border border-amber-300"
+            ? "bg-[#FFE5C4] text-[#8F4A0B] border border-[#8F4A0B]/30"
             : "bg-pill-streak-bg text-pill-streak-text shadow-2xs"
           : "bg-tint text-text-muted hover:text-foreground"
       }`}

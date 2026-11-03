@@ -42,14 +42,12 @@ import {
   RefreshCw,
   Plus,
   Loader2,
-  Flame,
   AlertTriangle,
-  Compass,
-  Trophy,
   ArrowRight,
   Sparkles,
   CalendarDays,
   FileEdit,
+  Check,
 } from "lucide-react";
 import { formatDateDisplay } from "@/lib/date";
 import type { UserRoadmapData } from "@/lib/recommendations/roadmap";
@@ -142,18 +140,18 @@ export default function RoadmapPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-5">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">DSA Learning Roadmap</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">DSA Learning Roadmap</h1>
             <Badge variant="secondary" className="gap-1 font-semibold text-xs">
               <Map className="h-3 w-3 text-secondary" />
               Syllabus
             </Badge>
           </div>
-          <p className="mt-1 text-sm font-medium text-secondary">
+          <p className="mt-1 text-xs text-secondary">
             A structured daily curriculum with increasing difficulty, day-completion tracking, and streak progression.
           </p>
         </div>
@@ -164,9 +162,9 @@ export default function RoadmapPage() {
             <Button
               variant="outline"
               onClick={() => setCustomBuilderOpen(true)}
-              className="gap-2 rounded-[14px] font-semibold shadow-sm"
+              className="gap-2 rounded-lg h-9 text-xs font-semibold shadow-xs"
             >
-              <FileEdit className="h-4 w-4" />
+              <FileEdit className="h-3.5 w-3.5" />
               Edit Roadmap
             </Button>
           ) : (
@@ -178,24 +176,24 @@ export default function RoadmapPage() {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="gap-2 rounded-[14px] font-semibold shadow-sm">
+                <Button className="gap-2 rounded-lg h-9 text-xs font-semibold shadow-xs">
                   {data ? (
                     <>
-                      <RefreshCw className="h-4 w-4" />
+                      <RefreshCw className="h-3.5 w-3.5" />
                       Regenerate Roadmap
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" />
+                      <Sparkles className="h-3.5 w-3.5" />
                       Generate with AI
                     </>
                   )}
                 </Button>
               </DialogTrigger>
-          <DialogContent size="md" className="rounded-[24px]">
+          <DialogContent size="md" className="rounded-2xl border border-border/70">
             <form onSubmit={handleGenerate} className="flex flex-col flex-1 min-h-0">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold">
+                <DialogTitle className="text-lg font-bold">
                   {data ? "Regenerate Learning Roadmap" : "Create Learning Roadmap"}
                 </DialogTitle>
                 <DialogDescription className="text-secondary text-xs">
@@ -205,22 +203,22 @@ export default function RoadmapPage() {
 
               <DialogBody className="space-y-4 py-4 min-w-0">
                 {formError && (
-                  <div className="flex items-start gap-2 rounded-[14px] bg-[#FFDAD6] p-3 text-xs font-semibold text-[#93000A]">
+                  <div className="flex items-start gap-2 rounded-lg bg-[#FFDAD6] p-2.5 text-xs font-semibold text-[#93000A]">
                     <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                     <span>{formError}</span>
                   </div>
                 )}
 
-                <div className="space-y-2 min-w-0">
+                <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="goal" className="text-xs font-semibold text-secondary">
                       Study Goal / Target
                     </Label>
                     <span
-                      className={`text-[10px] font-mono ${
+                      className={`text-[10px] font-mono tabular-nums ${
                         goal.trim().length < 10 || goal.length > 500
                           ? "text-[#93000A] font-bold"
-                          : "text-text-muted"
+                          : "text-secondary"
                       }`}
                     >
                       {goal.length}/500 chars (min 10)
@@ -234,12 +232,12 @@ export default function RoadmapPage() {
                     placeholder="e.g. Crack product-company interviews in 3 months; weak at DP and graphs"
                     maxLength={500}
                     rows={4}
-                    className="bg-tint border-transparent rounded-[14px] text-xs resize-none p-3 text-foreground placeholder:text-text-muted focus-visible:ring-1 focus-visible:ring-accent-orange min-h-24 md:min-h-36"
+                    className="bg-tint/60 border border-border/70 rounded-lg text-xs resize-none p-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/40 min-h-24 md:min-h-36"
                   />
 
                   {/* Preset examples */}
                   <div className="space-y-1 pt-1 min-w-0">
-                    <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                    <span className="text-[10px] font-semibold text-secondary uppercase tracking-wider">
                       Example Goals:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -252,7 +250,7 @@ export default function RoadmapPage() {
                           key={example}
                           type="button"
                           onClick={() => setGoal(example)}
-                          className="rounded-full bg-tint hover:bg-muted-tint px-2.5 py-1 text-[10px] text-text-secondary text-left transition-colors font-medium border border-border/40"
+                          className="rounded-md bg-tint/60 hover:bg-tint px-2 py-0.5 text-xs text-secondary text-left transition-colors font-medium border border-border/50"
                         >
                           {example.length > 44 ? example.slice(0, 44) + "..." : example}
                         </button>
@@ -261,7 +259,7 @@ export default function RoadmapPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 min-w-0">
+                <div className="space-y-1 min-w-0">
                   <Label htmlFor="level" className="text-xs font-semibold text-secondary">Starting Level</Label>
                   <Select
                     value={level}
@@ -269,7 +267,7 @@ export default function RoadmapPage() {
                       setLevel(v as "beginner" | "intermediate" | "advanced")
                     }
                   >
-                    <SelectTrigger id="level" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
+                    <SelectTrigger id="level" className="h-9 bg-tint/60 border border-border/70 rounded-lg text-xs">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -280,7 +278,7 @@ export default function RoadmapPage() {
                   </Select>
                 </div>
 
-                <div className="space-y-1.5 min-w-0">
+                <div className="space-y-1 min-w-0">
                   <Label htmlFor="timeline" className="text-xs font-semibold text-secondary">Timeline</Label>
                   <Select
                     value={timeline}
@@ -288,7 +286,7 @@ export default function RoadmapPage() {
                       setTimeline(v as "4 weeks" | "8 weeks" | "12 weeks")
                     }
                   >
-                    <SelectTrigger id="timeline" className="h-10 bg-tint border-transparent rounded-[14px] text-xs">
+                    <SelectTrigger id="timeline" className="h-9 bg-tint/60 border border-border/70 rounded-lg text-xs">
                       <SelectValue placeholder="Select timeline" />
                     </SelectTrigger>
                     <SelectContent>
@@ -304,7 +302,7 @@ export default function RoadmapPage() {
                 <Button
                   type="submit"
                   disabled={isPending || goal.trim().length < 10 || goal.trim().length > 500}
-                  className="rounded-[14px] font-semibold"
+                  className="rounded-lg h-9 px-4 text-xs font-semibold"
                 >
                   {isPending ? "Generating..." : "Generate Roadmap"}
                 </Button>
@@ -318,9 +316,9 @@ export default function RoadmapPage() {
           <Button
             variant={data?.roadmap.source === "CUSTOM" ? "default" : "outline"}
             onClick={() => setCustomBuilderOpen(true)}
-            className="gap-2 rounded-[14px] font-semibold shadow-sm"
+            className="gap-2 rounded-lg h-9 text-xs font-semibold shadow-xs"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5" />
             Create your own roadmap
           </Button>
         </div>
@@ -328,76 +326,68 @@ export default function RoadmapPage() {
 
       {/* Main Roadmap Content */}
       {!data ? (
-        <Card className="rounded-[24px] border border-dashed border-border/80 bg-card/60 p-16 text-center shadow-soft">
-          <CardContent className="flex flex-col items-center justify-center space-y-4">
-            <div className="rounded-[20px] bg-tint p-4">
-              <Map className="h-10 w-10 text-accent-orange" />
-            </div>
+        <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-6 sm:p-8 text-left">
+          <CardContent className="flex flex-col items-start space-y-3.5 p-0">
             <div className="space-y-1">
-              <h3 className="text-xl font-bold text-foreground">No active roadmap</h3>
-              <p className="text-sm font-medium text-secondary max-w-sm mx-auto">
+              <h3 className="text-lg font-bold text-foreground">No active roadmap</h3>
+              <p className="text-xs text-secondary max-w-lg leading-relaxed">
                 Generate an ordered curriculum with questions scheduled for every day of every week to guide your preparation, or design your own custom multi-week syllabus.
               </p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-[14px] font-semibold">
-                <Sparkles className="h-4 w-4" />
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-lg h-9 text-xs font-semibold">
+                <Sparkles className="h-3.5 w-3.5" />
                 Generate with AI
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setCustomBuilderOpen(true)}
-                className="gap-2 rounded-[14px] font-semibold"
+                className="gap-2 rounded-lg h-9 text-xs font-semibold bg-card border-border/70 hover:bg-tint"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3.5 w-3.5" />
                 Create your own roadmap
               </Button>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Catalog Limited Topics Warning Banner */}
           {data.roadmap.limitedTopicsNote && (
-            <div className="flex items-center gap-2.5 rounded-[16px] border border-accent-orange/40 bg-pill-streak-bg/30 p-4 text-xs font-medium text-text-secondary">
+            <div className="flex items-center gap-2.5 rounded-lg border border-accent-orange/40 bg-pill-streak-bg/30 p-3 text-xs font-medium text-secondary">
               <AlertTriangle className="h-4 w-4 text-accent-orange shrink-0" />
               <span>{data.roadmap.limitedTopicsNote}</span>
             </div>
           )}
 
           {/* Progress & Dual Streaks Banner */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-3.5 md:grid-cols-3">
             {/* Overall Syllabus Progress */}
-            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft md:col-span-1">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                      Syllabus Progress
-                    </h3>
-                    {data.roadmap.source === "CUSTOM" && (
-                      <Badge
-                        variant="outline"
-                        className="text-[9px] px-1.5 py-0 border-indigo-500/40 text-indigo-600 bg-indigo-500/10 font-bold"
-                      >
-                        Custom
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1.5 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-foreground">
-                      {data.progress.percentage}%
-                    </span>
-                    <span className="text-xs font-medium text-secondary">
-                      ({data.progress.completedDays} / {data.progress.totalDays} days)
-                    </span>
-                  </div>
+            <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 md:col-span-1 shadow-xs">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">
+                    Syllabus Progress
+                  </h3>
+                  {data.roadmap.source === "CUSTOM" && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0 border-border/70 text-secondary bg-tint/60 font-semibold rounded-md"
+                    >
+                      Custom
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-[14px] bg-tint p-3 text-foreground">
-                  <Trophy className="h-5 w-5 text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.progress.percentage}%
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    ({data.progress.completedDays}/{data.progress.totalDays} days)
+                  </span>
                 </div>
               </div>
-              <div className="mt-4 h-2 w-full rounded-full bg-muted-tint overflow-hidden">
+              <div className="mt-3.5 h-1.5 w-full rounded-full bg-muted-tint overflow-hidden">
                 <div
                   className="h-full bg-accent-orange transition-all duration-500 rounded-full"
                   style={{ width: `${data.progress.percentage}%` }}
@@ -406,88 +396,84 @@ export default function RoadmapPage() {
             </Card>
 
             {/* Overall Practice Streak */}
-            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Practice Streak</h3>
-                    {data.streaks.overall.atRisk && (
-                      <Badge variant="streak" className="text-[10px] px-2 py-0 font-bold">
-                        At Risk
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1.5 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-foreground">
-                      {data.streaks.overall.current}d
-                    </span>
-                    <span className="text-xs font-medium text-secondary">
-                      (best: {data.streaks.overall.longest}d)
-                    </span>
-                  </div>
+            <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs">
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Practice Streak</h3>
+                  {data.streaks.overall.atRisk && (
+                    <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
+                      At Risk
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-[14px] bg-[#FFE5C4]/70 p-3 text-accent-orange dark:bg-orange-950/40">
-                  <Flame className="h-5 w-5 fill-accent-orange text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.streaks.overall.current}d
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    (best: {data.streaks.overall.longest}d)
+                  </span>
                 </div>
               </div>
-              <p className="mt-3 text-xs font-medium text-secondary">
-                {data.streaks.overall.solvedToday
-                  ? "✓ Solved a problem today"
-                  : data.streaks.overall.atRisk
-                  ? "Solve any problem today to keep alive!"
-                  : "Solve problems daily to grow your streak"}
+              <p className="mt-2.5 text-xs text-secondary flex items-center gap-1">
+                {data.streaks.overall.solvedToday && (
+                  <Check className="h-3.5 w-3.5 text-[#2D6A1E]" />
+                )}
+                <span>
+                  {data.streaks.overall.solvedToday
+                    ? "Solved a problem today"
+                    : data.streaks.overall.atRisk
+                    ? "Solve any problem today to keep alive!"
+                    : "Solve problems daily to grow your streak"}
+                </span>
               </p>
             </Card>
 
             {/* Roadmap Streak */}
-            <Card className="rounded-[24px] border border-border/70 bg-card p-6 shadow-soft">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Roadmap Streak</h3>
-                    {data.streaks.roadmap.atRisk && (
-                      <Badge variant="streak" className="text-[10px] px-2 py-0 font-bold">
-                        At Risk
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1.5 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-foreground">
-                      {data.streaks.roadmap.current}d
-                    </span>
-                    <span className="text-xs font-medium text-secondary">
-                      (best: {data.streaks.roadmap.longest}d)
-                    </span>
-                  </div>
+            <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs">
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Roadmap Streak</h3>
+                  {data.streaks.roadmap.atRisk && (
+                    <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
+                      At Risk
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-[14px] bg-tint p-3 text-foreground">
-                  <Compass className="h-5 w-5 text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.streaks.roadmap.current}d
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    (best: {data.streaks.roadmap.longest}d)
+                  </span>
                 </div>
               </div>
-              <p className="mt-3 text-xs font-medium text-secondary">
-                {data.streaks.roadmap.solvedToday
-                  ? "✓ Completed today's roadmap goals"
-                  : data.streaks.roadmap.atRisk
-                  ? "Complete today's roadmap questions to keep alive!"
-                  : "Complete scheduled daily roadmap questions"}
+              <p className="mt-2.5 text-xs text-secondary flex items-center gap-1">
+                {data.streaks.roadmap.solvedToday && (
+                  <Check className="h-3.5 w-3.5 text-[#2D6A1E]" />
+                )}
+                <span>
+                  {data.streaks.roadmap.solvedToday
+                    ? "Completed today's roadmap goals"
+                    : data.streaks.roadmap.atRisk
+                    ? "Complete today's roadmap questions to keep alive!"
+                    : "Complete scheduled daily roadmap questions"}
+                </span>
               </p>
             </Card>
           </div>
 
           {/* 1. Today's Questions (Top Section) */}
-          <Card className="rounded-[24px] border border-border/70 shadow-soft bg-card overflow-hidden">
-            <CardHeader className="bg-tint/40 pb-4 pt-6 px-6 border-b border-border/50">
+          <Card className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
+            <CardHeader className="bg-tint/40 p-4 sm:p-5 border-b border-border/50">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-[12px] bg-tint p-2 text-foreground font-bold">
-                    <CalendarDays className="h-5 w-5 text-accent-orange" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                      Today&apos;s Roadmap Questions
-                      {data.todayItems.length > 0 && data.todayItems.every((i) => i.isCompleted) && (
-                        <Badge variant="solved" className="gap-1 text-xs font-semibold">
-                          <CheckCircle2 className="h-3 w-3" />
+                <div>
+                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                    Today&apos;s Roadmap Questions
+                    {data.todayItems.length > 0 && data.todayItems.every((i) => i.isCompleted) && (
+                      <Badge variant="solved" className="gap-1 text-xs font-semibold">
+                        <CheckCircle2 className="h-3 w-3" />
                           Day Completed!
                         </Badge>
                       )}
@@ -498,67 +484,66 @@ export default function RoadmapPage() {
                         : "Today's focus"} • Keep your roadmap streak going by completing these questions.
                     </CardDescription>
                   </div>
-                </div>
               </div>
             </CardHeader>
 
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-5">
               {data.todayItems.length === 0 ? (
-                <div className="text-center py-8 text-secondary space-y-2">
-                  <p className="text-sm font-semibold">No specific questions scheduled for today.</p>
+                <div className="text-center py-6 text-secondary space-y-1.5">
+                  <p className="text-xs font-semibold">No specific questions scheduled for today.</p>
                   <p className="text-xs text-muted-foreground">
                     You can work ahead on upcoming weeks below or catch up on overdue problems.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {data.todayItems.map((dayItem) => (
                     <div
                       key={dayItem.id}
-                      className={`rounded-[20px] border p-4 sm:p-5 transition-all ${
+                      className={`rounded-lg border p-3.5 sm:p-4 transition-all ${
                         dayItem.isCompleted
-                          ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/20"
-                          : "border-border/70 bg-card shadow-soft-sm hover:border-accent-orange/40"
+                          ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/15"
+                          : "border-border/70 bg-card hover:border-accent-orange/40"
                       }`}
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
                             {dayItem.isCompleted ? (
-                              <CheckCircle2 className="h-5 w-5 text-[#2D6A1E] shrink-0" />
+                              <CheckCircle2 className="h-4 w-4 text-[#2D6A1E] shrink-0" />
                             ) : (
-                              <Circle className="h-5 w-5 text-secondary shrink-0" />
+                              <Circle className="h-4 w-4 text-secondary shrink-0" />
                             )}
-                            <h4 className="font-bold text-base text-foreground">{dayItem.topicName}</h4>
-                            <Badge variant="outline" className="text-xs rounded-full bg-tint border-border/70 text-secondary">
+                            <h4 className="font-bold text-sm text-foreground">{dayItem.topicName}</h4>
+                            <Badge variant="outline" className="text-xs rounded-md bg-tint/60 border-border/70 text-secondary">
                               Week {dayItem.weekNumber} • Day {dayItem.dayNumber}
                             </Badge>
                           </div>
-                          <p className="text-xs text-secondary pl-7 leading-relaxed">
+                          <p className="text-xs text-secondary pl-6 leading-relaxed">
                             {dayItem.concept}
                           </p>
                         </div>
                       </div>
 
                       {/* Problems in this day item */}
-                      <div className="mt-4 pt-3.5 border-t border-border/50 space-y-2 pl-0 sm:pl-7">
+                      <div className="mt-3 pt-3 border-t border-border/50 space-y-2 pl-0 sm:pl-6">
                         {dayItem.problems.map((prob) => (
                           <div
                             key={prob.title}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[14px] bg-tint p-3"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-lg bg-tint/60 border border-border/50 p-2.5"
                           >
-                            <div className="flex items-center gap-2.5">
+                            <div className="flex items-center gap-2">
                               {prob.isSolved ? (
-                                <Badge variant="solved" className="text-[11px] font-semibold gap-1">
+                                <Badge variant="solved" className="text-xs font-semibold gap-1">
                                   <CheckCircle2 className="h-3 w-3" />
                                   Solved
                                 </Badge>
                               ) : (
-                                <Badge variant="secondary" className="text-[11px] font-medium bg-card">
+                                <Badge variant="secondary" className="text-xs font-medium bg-card">
                                   Unsolved
                                 </Badge>
                               )}
-                              <span className="font-bold text-sm text-foreground">{prob.title}</span>
+                              <span className="font-semibold text-xs text-foreground">{prob.title}</span>
                               <Badge
                                 variant={
                                   prob.difficulty.toLowerCase() === "easy"
@@ -567,7 +552,7 @@ export default function RoadmapPage() {
                                     ? "medium"
                                     : "hard"
                                 }
-                                className="text-[10px] px-2 py-0.5 font-semibold"
+                                className="text-xs px-1.5 py-0 font-semibold"
                               >
                                 {prob.difficulty}
                               </Badge>
@@ -579,6 +564,7 @@ export default function RoadmapPage() {
                                 label="Solve Problem"
                                 size="sm"
                                 variant={prob.isSolved ? "secondary" : "dark"}
+                                className="h-8 text-xs rounded-lg"
                               />
                             </div>
                           </div>
@@ -593,15 +579,15 @@ export default function RoadmapPage() {
 
           {/* 2. Overdue / Catch-Up Section (Shown when overdue problems exist) */}
           {data.overdueItems.length > 0 && (
-            <Card className="rounded-[24px] border border-[#E8871E]/30 bg-[#FFE5C4]/25 shadow-soft">
-              <CardHeader className="pb-3 pt-6 px-6 border-b border-[#E8871E]/20">
+            <Card className="rounded-xl border border-[#E8871E]/30 bg-[#FFE5C4]/20 shadow-xs">
+              <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-[#E8871E]/20">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-[12px] bg-[#FFE5C4]/60 p-2 text-accent-orange">
-                      <AlertTriangle className="h-5 w-5" />
+                    <div className="rounded-lg bg-[#FFE5C4]/60 p-2 text-accent-orange">
+                      <AlertTriangle className="h-4 w-4" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-bold text-[#8F4A0B] dark:text-[#FFE5C4] flex items-center gap-2">
+                      <CardTitle className="text-base font-bold text-[#8F4A0B] dark:text-[#FFE5C4] flex items-center gap-2">
                         Catch Up: {data.overdueItems.length} Overdue Day{data.overdueItems.length > 1 ? "s" : ""}
                       </CardTitle>
                       <CardDescription className="text-secondary text-xs">
@@ -614,27 +600,27 @@ export default function RoadmapPage() {
                     onClick={handleReschedule}
                     disabled={isRescheduling}
                     variant="outline"
-                    className="rounded-[14px] bg-card border-border/70 hover:bg-tint text-foreground font-semibold gap-2 shrink-0 text-xs"
+                    className="rounded-lg h-8 px-3 bg-card border-border/70 hover:bg-tint text-foreground font-semibold gap-2 shrink-0 text-xs"
                   >
-                    <RefreshCw className={`h-4 w-4 ${isRescheduling ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3.5 w-3.5 ${isRescheduling ? "animate-spin" : ""}`} />
                     {isRescheduling ? "Rescheduling..." : "Reschedule Remaining"}
                   </Button>
                 </div>
               </CardHeader>
 
-              <CardContent className="p-6 space-y-3">
+              <CardContent className="p-4 sm:p-5 space-y-2.5">
                 {data.overdueItems.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-[16px] border border-border/70 bg-card p-4 space-y-2.5 shadow-soft-sm"
+                    className="rounded-lg border border-border/70 bg-card p-3 space-y-2 shadow-xs"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <Badge variant="destructive" className="text-[10px] uppercase font-bold">
+                        <Badge variant="destructive" className="text-xs uppercase font-semibold rounded-md">
                           Overdue
                         </Badge>
-                        <span className="font-bold text-sm text-foreground">{item.topicName}</span>
-                        <span className="text-xs text-secondary">
+                        <span className="font-semibold text-xs text-foreground">{item.topicName}</span>
+                        <span className="text-xs font-mono tabular-nums text-secondary">
                           ({item.scheduledDate ? formatDateDisplay(item.scheduledDate) : `Week ${item.weekNumber}`})
                         </span>
                       </div>
@@ -645,9 +631,9 @@ export default function RoadmapPage() {
                       {item.problems.map((prob) => (
                         <div
                           key={prob.title}
-                          className="flex items-center gap-2 rounded-[12px] bg-tint px-3 py-1.5 text-xs"
+                          className="flex items-center gap-2 rounded-md bg-tint/60 border border-border/50 px-2.5 py-1 text-xs"
                         >
-                          <span className="font-semibold text-foreground">{prob.title}</span>
+                          <span className="font-medium text-foreground">{prob.title}</span>
                           <Badge
                             variant={
                               prob.difficulty.toLowerCase() === "easy"
@@ -656,7 +642,7 @@ export default function RoadmapPage() {
                                 ? "medium"
                                 : "hard"
                             }
-                            className="text-[10px] px-2 py-0 font-semibold"
+                            className="text-xs px-1.5 py-0 font-semibold"
                           >
                             {prob.difficulty}
                           </Badge>
@@ -665,7 +651,7 @@ export default function RoadmapPage() {
                             label="Solve"
                             size="sm"
                             variant="secondary"
-                            className="h-6 px-2 text-[11px]"
+                            className="h-6 px-2 text-xs rounded-md"
                           />
                         </div>
                       ))}
@@ -677,11 +663,11 @@ export default function RoadmapPage() {
           )}
 
           {/* 3. Week-by-Week View with Level Progression */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-foreground">Curriculum Schedule</h2>
-                <p className="text-xs font-medium text-secondary">
+                <h2 className="text-lg font-bold tracking-tight text-foreground">Curriculum Schedule</h2>
+                <p className="text-xs text-secondary">
                   Days with all problems solved earn checkmarks. Complete every day in a week to clear that level and unlock the next badge.
                 </p>
               </div>
@@ -690,7 +676,7 @@ export default function RoadmapPage() {
             {data.weeks.map((week) => (
               <Card
                 key={week.weekNumber}
-                className={`rounded-[24px] transition-all overflow-hidden shadow-soft ${
+                className={`rounded-xl transition-all overflow-hidden shadow-xs ${
                   week.isWeekCompleted
                     ? "border-l-4 border-l-[#2D6A1E] border-border/70 bg-card"
                     : week.weekNumber === data.currentWeekNumber
@@ -698,11 +684,11 @@ export default function RoadmapPage() {
                     : "border-border/70 bg-card"
                 }`}
               >
-                <CardHeader className="pb-4 pt-6 px-6 border-b border-border/50 bg-tint/30">
+                <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-border/50 bg-tint/30">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-center gap-3">
                       <span
-                        className={`flex h-10 w-10 items-center justify-center rounded-[12px] font-bold text-sm ${
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg font-bold text-xs ${
                           week.isWeekCompleted
                             ? "bg-[#D6EEC6] text-[#2D6A1E]"
                             : week.weekNumber === data.currentWeekNumber
@@ -714,10 +700,10 @@ export default function RoadmapPage() {
                       </span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg font-bold text-foreground">
+                          <CardTitle className="text-base font-bold text-foreground">
                             {week.levelTitle}
                           </CardTitle>
-                          <Badge variant="outline" className="text-[10px] rounded-full bg-card border-border/70 text-secondary">
+                          <Badge variant="outline" className="text-xs rounded-md bg-card border-border/70 text-secondary">
                             {week.difficultyLabel}
                           </Badge>
                         </div>
@@ -727,14 +713,14 @@ export default function RoadmapPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       {week.isWeekCompleted ? (
-                        <Badge variant="solved" className="gap-1.5 py-1 px-3 font-semibold text-xs">
+                        <Badge variant="solved" className="gap-1.5 py-0.5 px-2.5 font-semibold text-xs">
                           <Sparkles className="h-3.5 w-3.5" />
                           Week Cleared!
                         </Badge>
                       ) : week.weekNumber === data.currentWeekNumber ? (
-                        <Badge variant="default" className="gap-1 py-1 px-3 text-xs font-semibold">
+                        <Badge variant="default" className="gap-1 py-0.5 px-2.5 text-xs font-semibold">
                           <ArrowRight className="h-3.5 w-3.5" />
                           Current Level
                         </Badge>
@@ -747,7 +733,7 @@ export default function RoadmapPage() {
                   </div>
 
                   {/* Per-Week Progress Bar */}
-                  <div className="mt-4 h-2 w-full rounded-full bg-muted-tint overflow-hidden">
+                  <div className="mt-3.5 h-1.5 w-full rounded-full bg-muted-tint overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 rounded-full ${
                         week.isWeekCompleted ? "bg-[#2D6A1E]" : "bg-accent-orange"
@@ -757,66 +743,66 @@ export default function RoadmapPage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-4 p-6">
+                <CardContent className="space-y-3.5 p-4 sm:p-5">
                   {/* 7-Day Strip for new format roadmaps with dayIndex */}
                   {week.items.some((i) => i.dayIndex != null) ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
                       {week.items.map((item) => {
                         const isToday = data.todayItems.some((ti) => ti.id === item.id);
                         return (
                           <div
                             key={item.id}
-                            className={`flex flex-col justify-between rounded-[16px] border p-3.5 transition-all text-xs ${
+                            className={`flex flex-col justify-between rounded-lg border p-3 transition-colors text-xs ${
                               item.isCompleted
                                 ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/15"
                                 : isToday
-                                ? "border-accent-orange ring-2 ring-accent-orange/30 bg-card shadow-soft"
+                                ? "border-accent-orange ring-1 ring-accent-orange/40 bg-card shadow-xs"
                                 : item.isOverdue
                                 ? "border-accent-orange/30 bg-pill-streak-bg/20"
                                 : "border-border/60 bg-tint/40 hover:bg-tint/70"
                             }`}
                           >
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                               <div className="flex items-center justify-between gap-1.5">
                                 <span className="font-bold text-foreground text-xs">
                                   Day {item.dayIndex || item.dayNumber}
                                 </span>
                                 {item.isCompleted ? (
-                                  <CheckCircle2 className="h-4 w-4 text-[#2D6A1E] shrink-0" />
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-[#2D6A1E] shrink-0" />
                                 ) : isToday ? (
-                                  <Badge variant="default" className="text-[9px] px-1.5 py-0 font-bold uppercase">
+                                  <Badge variant="default" className="text-[10px] px-1 py-0 font-bold uppercase rounded">
                                     Today
                                   </Badge>
                                 ) : item.isOverdue ? (
-                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 font-bold uppercase">
+                                  <Badge variant="destructive" className="text-[10px] px-1 py-0 font-bold uppercase rounded">
                                     Overdue
                                   </Badge>
                                 ) : (
-                                  <Circle className="h-3.5 w-3.5 text-text-muted shrink-0" />
+                                  <Circle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                                 )}
                               </div>
 
                               {item.scheduledDate && (
-                                <div className="text-[10px] text-text-muted font-medium flex items-center gap-1">
+                                <div className="text-[10px] font-mono tabular-nums text-secondary font-medium flex items-center gap-1">
                                   <CalendarDays className="h-3 w-3" />
                                   {formatDateDisplay(item.scheduledDate)}
                                 </div>
                               )}
 
-                              <div className="font-semibold text-foreground text-[11px] leading-tight line-clamp-1" title={item.topicName}>
+                              <div className="font-semibold text-foreground text-xs leading-tight line-clamp-1" title={item.topicName}>
                                 {item.topicName}
                               </div>
 
-                              <p className="text-[10px] text-text-secondary leading-snug line-clamp-2" title={item.concept}>
+                              <p className="text-[11px] text-secondary leading-snug line-clamp-2" title={item.concept}>
                                 {item.concept}
                               </p>
                             </div>
 
                             {/* Problem list for this day */}
-                            <div className="mt-3 pt-2.5 border-t border-border/50 space-y-2">
+                            <div className="mt-2.5 pt-2 border-t border-border/50 space-y-1.5">
                               {item.problems.length > 0 ? (
                                 item.problems.map((prob) => (
-                                  <div key={prob.title} className="space-y-1.5 rounded-[10px] bg-card/80 p-2 border border-border/50">
+                                  <div key={prob.title} className="space-y-1 rounded-md bg-card/80 p-1.5 border border-border/50">
                                     <div className="flex items-center justify-between gap-1">
                                       <span className="font-medium text-foreground text-[11px] truncate" title={prob.title}>
                                         {prob.title}
@@ -829,7 +815,7 @@ export default function RoadmapPage() {
                                             ? "medium"
                                             : "hard"
                                         }
-                                        className="text-[9px] px-1.5 py-0 font-bold shrink-0"
+                                        className="text-[10px] px-1 py-0 font-semibold shrink-0"
                                       >
                                         {prob.difficulty}
                                       </Badge>
@@ -839,12 +825,12 @@ export default function RoadmapPage() {
                                       label="Solve"
                                       size="sm"
                                       variant={prob.isSolved ? "secondary" : isToday ? "default" : "dark"}
-                                      className="h-6 w-full text-[10px] rounded-[8px]"
+                                      className="h-6 w-full text-[10px] rounded-md"
                                     />
                                   </div>
                                 ))
                               ) : (
-                                <div className="text-[10px] text-text-muted italic py-1 text-center">
+                                <div className="text-[10px] text-muted-foreground italic py-1 text-center">
                                   No problem scheduled
                                 </div>
                               )}
@@ -858,7 +844,7 @@ export default function RoadmapPage() {
                     week.items.map((item) => (
                       <div
                         key={item.id}
-                        className={`rounded-[16px] border p-4 transition-colors ${
+                        className={`rounded-lg border p-3 sm:p-3.5 transition-colors ${
                           item.isCompleted
                             ? "border-[#2D6A1E]/30 bg-[#D6EEC6]/15"
                             : item.isOverdue
@@ -867,15 +853,15 @@ export default function RoadmapPage() {
                         }`}
                       >
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                          <div className="space-y-1.5 flex-1">
-                            <div className="flex items-center gap-2.5">
+                          <div className="space-y-1 flex-1">
+                            <div className="flex items-center gap-2">
                               {item.isCompleted ? (
-                                <CheckCircle2 className="h-5 w-5 text-[#2D6A1E] shrink-0" />
+                                <CheckCircle2 className="h-4 w-4 text-[#2D6A1E] shrink-0" />
                               ) : (
-                                <Circle className="h-5 w-5 text-secondary shrink-0" />
+                                <Circle className="h-4 w-4 text-secondary shrink-0" />
                               )}
                               <h4
-                                className={`text-base font-bold ${
+                                className={`text-sm font-bold ${
                                   item.isCompleted
                                     ? "line-through text-secondary"
                                     : "text-foreground"
@@ -885,41 +871,41 @@ export default function RoadmapPage() {
                               </h4>
 
                               {item.scheduledDate && (
-                                <span className="text-xs text-secondary flex items-center gap-1 ml-1 font-medium">
+                                <span className="text-xs font-mono tabular-nums text-secondary flex items-center gap-1 ml-1 font-medium">
                                   <Calendar className="h-3 w-3" />
                                   {formatDateDisplay(item.scheduledDate)}
                                 </span>
                               )}
 
                               {item.isOverdue && (
-                                <Badge variant="destructive" className="text-[10px] uppercase font-bold">
+                                <Badge variant="destructive" className="text-xs uppercase font-semibold rounded-md">
                                   Overdue
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-xs text-secondary pl-7 leading-relaxed">
+                            <p className="text-xs text-secondary pl-6 leading-relaxed">
                               {item.concept}
                             </p>
 
                             {/* Problem list for this day */}
-                            <div className="pl-0 sm:pl-7 pt-2.5 space-y-2">
+                            <div className="pl-0 sm:pl-6 pt-2 space-y-1.5">
                               {item.problems.map((prob) => (
                                 <div
                                   key={prob.title}
-                                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-[12px] bg-card border border-border/70 p-3 text-xs shadow-soft-sm"
+                                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg bg-card border border-border/70 p-2.5 text-xs shadow-xs"
                                 >
                                   <div className="flex items-center gap-2">
                                     {prob.isSolved ? (
-                                      <Badge variant="solved" className="text-[10px] font-semibold gap-1">
+                                      <Badge variant="solved" className="text-xs font-semibold gap-1">
                                         <CheckCircle2 className="h-2.5 w-2.5" />
                                         Solved
                                       </Badge>
                                     ) : (
-                                      <Badge variant="secondary" className="text-[10px]">
+                                      <Badge variant="secondary" className="text-xs">
                                         To solve
                                       </Badge>
                                     )}
-                                    <span className="font-bold text-foreground">{prob.title}</span>
+                                    <span className="font-semibold text-foreground text-xs">{prob.title}</span>
                                     <Badge
                                       variant={
                                         prob.difficulty.toLowerCase() === "easy"
@@ -928,7 +914,7 @@ export default function RoadmapPage() {
                                           ? "medium"
                                           : "hard"
                                       }
-                                      className="text-[10px] px-2 py-0.5 font-semibold"
+                                      className="text-xs px-1.5 py-0 font-semibold"
                                     >
                                       {prob.difficulty}
                                     </Badge>
@@ -940,7 +926,7 @@ export default function RoadmapPage() {
                                       label="Solve"
                                       size="sm"
                                       variant={prob.isSolved ? "secondary" : "dark"}
-                                      className="h-7 text-xs"
+                                      className="h-7 text-xs rounded-md"
                                     />
                                   </div>
                                 </div>

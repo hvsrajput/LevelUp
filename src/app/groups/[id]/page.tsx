@@ -34,8 +34,6 @@ import {
   LogOut,
   UserX,
   Code2,
-  Activity,
-  Trophy,
   Loader2,
   AlertTriangle,
 } from "lucide-react";
@@ -272,43 +270,43 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
   const { group, members, activityFeed } = data;
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+    <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
       {/* Back button */}
       <div>
         <Link
           href="/groups"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-secondary hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" />
           Back to Groups
         </Link>
       </div>
 
       {/* Group Header Banner */}
-      <div className="rounded-[24px] border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+      <div className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 {group.name}
               </h1>
               {group.isOwner ? (
-                <Badge variant="streak" className="gap-1 font-semibold text-xs">
+                <Badge variant="streak" className="gap-1 font-semibold text-xs rounded-md">
                   <Crown className="h-3 w-3" />
                   Owner
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="gap-1 font-semibold text-xs">
+                <Badge variant="secondary" className="gap-1 font-semibold text-xs rounded-md">
                   <Shield className="h-3 w-3" />
                   Member
                 </Badge>
               )}
-              <Badge variant="outline" className="gap-1 rounded-full bg-tint border-border/70 text-secondary font-medium text-xs">
+              <Badge variant="outline" className="gap-1 rounded-md bg-tint/60 border-border/70 text-secondary font-medium text-xs">
                 <Users className="h-3 w-3" />
                 {group.memberCount} {group.memberCount === 1 ? "member" : "members"}
               </Badge>
             </div>
-            <p className="text-xs font-medium text-secondary">
+            <p className="text-xs font-mono tabular-nums text-secondary">
               Created on {new Date(group.createdAt).toLocaleDateString(undefined, {
                 month: "long",
                 day: "numeric",
@@ -318,26 +316,26 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           {/* Join Code Widget & Controls */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 rounded-[14px] bg-tint px-3.5 py-2">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2 rounded-lg bg-tint/60 border border-border/60 px-3 py-1.5">
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-secondary uppercase tracking-wider">
+                <span className="text-[10px] font-semibold text-secondary uppercase tracking-wider">
                   Invite Code
                 </span>
-                <span className="font-mono text-base font-bold tracking-widest text-foreground">
+                <span className="font-mono text-sm font-bold tracking-widest text-foreground">
                   {group.joinCode}
                 </span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 px-2.5 rounded-[10px] gap-1 ml-1 text-secondary hover:text-foreground"
+                className="h-7 px-2 rounded-md gap-1 ml-1 text-secondary hover:text-foreground"
                 onClick={handleCopyCode}
               >
                 {copied ? (
                   <>
-                    <Check className="h-3.5 w-3.5 text-[#2D6A1E]" />
-                    <span className="text-xs text-[#2D6A1E] font-semibold">Copied</span>
+                    <Check className="h-3.5 w-3.5 text-badge-solved-text" />
+                    <span className="text-xs text-badge-solved-text font-semibold">Copied</span>
                   </>
                 ) : (
                   <>
@@ -350,7 +348,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-2 rounded-[10px] text-secondary hover:text-foreground"
+                  className="h-7 w-7 p-0 rounded-md text-secondary hover:text-foreground"
                   title="Regenerate invite code"
                   disabled={isRegenerating}
                   onClick={handleRegenerateCode}
@@ -365,20 +363,20 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-1.5 rounded-[14px] font-semibold"
+                className="gap-1.5 rounded-lg h-8 text-xs font-semibold"
                 onClick={() => setDeleteConfirmOpen(true)}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5" />
                 Delete Group
               </Button>
             ) : (
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-1.5 rounded-[14px] font-semibold"
+                className="gap-1.5 rounded-lg h-8 text-xs font-semibold"
                 onClick={() => setLeaveConfirmOpen(true)}
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-3.5 w-3.5" />
                 Leave Group
               </Button>
             )}
@@ -387,15 +385,14 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
       </div>
 
       {/* Main Grid: Leaderboard & Activity Feed */}
-      <div className="grid gap-8 lg:grid-cols-12">
+      <div className="grid gap-6 lg:grid-cols-12">
         {/* Left Column: Leaderboard / Member Roster (7 cols) */}
-        <div className="space-y-6 lg:col-span-7">
-          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft overflow-hidden">
-            <CardHeader className="pb-4 pt-6 px-6 border-b border-border/50">
+        <div className="space-y-4 lg:col-span-7">
+          <Card className="rounded-xl border border-border/70 bg-card shadow-xs overflow-hidden">
+            <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-border/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-accent-orange" />
+                  <CardTitle className="text-base font-bold text-foreground">
                     Member Standings & Streaks
                   </CardTitle>
                   <CardDescription className="text-secondary text-xs mt-0.5">
@@ -407,36 +404,35 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
             <CardContent className="p-0">
               <div className="divide-y divide-border/50">
                 {members.map((member, index) => {
-                  const rankIcons = ["🥇", "🥈", "🥉"];
-                  const rankDisplay = rankIcons[index] || `#${index + 1}`;
+                  const rankDisplay = `#${index + 1}`;
 
                   return (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between px-6 py-4 hover:bg-tint/40 transition-colors"
+                      className="flex items-center justify-between px-4 sm:px-5 py-3 hover:bg-tint/40 transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="w-6 text-center font-bold text-sm text-secondary">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-5 text-center font-bold text-xs text-secondary font-mono tabular-nums">
                           {rankDisplay}
                         </span>
-                        <Avatar className="h-10 w-10 rounded-[12px] border border-border/70">
+                        <Avatar className="h-8 w-8 rounded-lg border border-border/70">
                           <AvatarImage src={member.user.image || undefined} />
                           <AvatarFallback className="font-bold text-xs bg-tint text-foreground">
                             {member.user.name?.charAt(0)?.toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm text-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs text-foreground">
                               {member.user.name || "Anonymous User"}
                             </span>
                             {member.role === "OWNER" && (
                               <span title="Group Owner">
-                                <Crown className="h-3.5 w-3.5 text-accent-orange" />
+                                <Crown className="h-3 w-3 text-accent-orange" />
                               </span>
                             )}
                           </div>
-                          <span className="text-xs font-medium text-secondary">
+                          <span className="text-[11px] font-mono tabular-nums text-secondary">
                             Joined {new Date(member.joinedAt).toLocaleDateString(undefined, {
                               month: "short",
                               day: "numeric",
@@ -445,20 +441,20 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         {/* Solved Count */}
                         <div className="text-right">
-                          <div className="text-sm font-bold flex items-center justify-end gap-1 text-foreground">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-[#2D6A1E]" />
+                          <div className="text-xs font-bold font-mono tabular-nums flex items-center justify-end gap-1 text-foreground">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-badge-solved-text" />
                             {member.solvedCount}
                           </div>
-                          <div className="text-[11px] font-medium text-secondary">solved</div>
+                          <div className="text-[10px] text-secondary">solved</div>
                         </div>
 
                         {/* Current Streak */}
-                        <div className="text-right min-w-[70px]">
+                        <div className="text-right min-w-[65px]">
                           <div
-                            className={`text-sm font-bold flex items-center justify-end gap-1 ${
+                            className={`text-xs font-bold font-mono tabular-nums flex items-center justify-end gap-1 ${
                               member.currentStreak > 0
                                 ? "text-accent-orange"
                                 : "text-secondary"
@@ -473,7 +469,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                             />
                             {member.currentStreak}d
                           </div>
-                          <div className="text-[11px] font-medium text-secondary">
+                          <div className="text-[10px] font-mono tabular-nums text-secondary">
                             best: {member.longestStreak}d
                           </div>
                         </div>
@@ -483,11 +479,11 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 rounded-[10px] text-secondary hover:text-[#B42318] hover:bg-[#FFDDD8]"
+                            className="h-7 w-7 p-0 rounded-md text-secondary hover:text-[#B42318] hover:bg-[#FFDDD8]"
                             title="Remove member"
                             onClick={() => setRemoveMemberTarget(member)}
                           >
-                            <UserX className="h-4 w-4" />
+                            <UserX className="h-3.5 w-3.5" />
                           </Button>
                         )}
                       </div>
@@ -500,36 +496,34 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         {/* Right Column: Shared Activity Feed (5 cols) */}
-        <div className="space-y-6 lg:col-span-5">
-          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft overflow-hidden">
-            <CardHeader className="pb-4 pt-6 px-6 border-b border-border/50">
-              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Activity className="h-5 w-5 text-accent-orange" />
+        <div className="space-y-4 lg:col-span-5">
+          <Card className="rounded-xl border border-border/70 bg-card shadow-xs overflow-hidden">
+            <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-border/50">
+              <CardTitle className="text-base font-bold text-foreground">
                 Shared Activity Feed
               </CardTitle>
               <CardDescription className="text-secondary text-xs mt-0.5">
                 Recent solutions, submissions, and member milestones.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-5">
               {activityFeed.length === 0 ? (
-                <div className="py-12 text-center text-sm font-medium text-secondary">
-                  <Activity className="h-8 w-8 mx-auto mb-2 text-secondary" />
+                <div className="py-6 text-left text-xs text-secondary">
                   No group activity yet. When members solve problems or submit code, their progress will show up here.
                 </div>
               ) : (
-                <div className="relative space-y-4 before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
+                <div className="relative space-y-3 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
                   {activityFeed.map((event) => (
-                    <div key={event.id} className="relative flex items-start gap-3 pl-2">
-                      <div className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-tint text-xs shadow-soft-sm">
+                    <div key={event.id} className="relative flex items-start gap-2.5 pl-1.5">
+                      <div className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-tint text-xs shadow-xs">
                         {event.type === "PROBLEM_SOLVED" && (
-                          <CheckCircle2 className="h-4 w-4 text-[#2D6A1E]" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-badge-solved-text" />
                         )}
                         {event.type === "CODE_SUBMISSION" && (
-                          <Code2 className="h-4 w-4 text-accent-orange" />
+                          <Code2 className="h-3.5 w-3.5 text-accent-orange" />
                         )}
                         {event.type === "MEMBER_JOINED" && (
-                          <Users className="h-4 w-4 text-secondary" />
+                          <Users className="h-3.5 w-3.5 text-secondary" />
                         )}
                       </div>
                       <div className="flex-1 space-y-0.5 pt-0.5">
@@ -550,7 +544,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                                       ? "medium"
                                       : "hard"
                                   }
-                                  className="ml-1.5 text-[10px] px-2 py-0 font-semibold"
+                                  className="ml-1 text-[10px] px-1.5 py-0 font-semibold"
                                 >
                                   {event.details.difficulty}
                                 </Badge>
@@ -564,7 +558,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                                 {event.details.problemTitle || "a problem"}
                               </span>
                               {event.details.language && (
-                                <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 font-mono rounded-full bg-tint border-border/70 text-secondary">
+                                <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 font-mono rounded-md bg-tint/60 border-border/70 text-secondary">
                                   {event.details.language}
                                 </Badge>
                               )}
@@ -576,7 +570,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] font-medium text-secondary">
+                        <p className="text-[10px] font-mono tabular-nums text-secondary">
                           {timeAgo(event.timestamp)}
                         </p>
                       </div>
@@ -591,9 +585,9 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
 
       {/* Confirm Delete Group Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent size="sm" className="rounded-[24px]">
+        <DialogContent size="sm" className="rounded-2xl border border-border/70">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Delete Study Group?</DialogTitle>
+            <DialogTitle className="text-lg font-bold">Delete Study Group?</DialogTitle>
           </DialogHeader>
           <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
@@ -606,7 +600,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="outline"
               onClick={() => setDeleteConfirmOpen(false)}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs"
             >
               Cancel
             </Button>
@@ -614,7 +608,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="destructive"
               onClick={handleDeleteGroup}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs font-semibold"
             >
               {isPending ? "Deleting..." : "Delete Permanently"}
             </Button>
@@ -624,9 +618,9 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
 
       {/* Confirm Leave Group Dialog */}
       <Dialog open={leaveConfirmOpen} onOpenChange={setLeaveConfirmOpen}>
-        <DialogContent size="sm" className="rounded-[24px]">
+        <DialogContent size="sm" className="rounded-2xl border border-border/70">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Leave Study Group?</DialogTitle>
+            <DialogTitle className="text-lg font-bold">Leave Study Group?</DialogTitle>
           </DialogHeader>
           <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
@@ -638,7 +632,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="outline"
               onClick={() => setLeaveConfirmOpen(false)}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs"
             >
               Cancel
             </Button>
@@ -646,7 +640,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="destructive"
               onClick={handleLeaveGroup}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs font-semibold"
             >
               {isPending ? "Leaving..." : "Leave Group"}
             </Button>
@@ -659,9 +653,9 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
         open={!!removeMemberTarget}
         onOpenChange={(open) => !open && setRemoveMemberTarget(null)}
       >
-        <DialogContent size="sm" className="rounded-[24px]">
+        <DialogContent size="sm" className="rounded-2xl border border-border/70">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Remove Member?</DialogTitle>
+            <DialogTitle className="text-lg font-bold">Remove Member?</DialogTitle>
           </DialogHeader>
           <DialogBody className="py-4 min-w-0">
             <DialogDescription className="text-secondary text-xs">
@@ -677,7 +671,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="outline"
               onClick={() => setRemoveMemberTarget(null)}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs"
             >
               Cancel
             </Button>
@@ -685,7 +679,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
               variant="destructive"
               onClick={handleRemoveMember}
               disabled={isPending}
-              className="rounded-[14px]"
+              className="rounded-lg h-9 px-4 text-xs font-semibold"
             >
               {isPending ? "Removing..." : "Remove Member"}
             </Button>

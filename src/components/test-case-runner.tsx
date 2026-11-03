@@ -7,7 +7,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Copy, ListTree } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface TestCaseItem {
@@ -34,12 +34,11 @@ export function ExamplesViewer({ testCases }: ExamplesViewerProps) {
   if (testCases.length === 0) {
     return (
       <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
-        <CardContent className="flex flex-col items-center justify-center py-6 text-center p-0">
-          <ListTree className="mb-2 h-7 w-7 text-secondary" />
+        <CardContent className="space-y-1 p-0 text-left">
           <p className="text-xs font-semibold text-secondary">
             No examples or edge cases recorded yet.
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground">
             Edit the problem to add sample inputs, expected outputs, and notes.
           </p>
         </CardContent>

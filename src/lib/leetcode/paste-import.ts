@@ -45,9 +45,9 @@ export const CONSOLE_IMPORT_SCRIPT = `(async () => {
   const payload = JSON.stringify({ version: 1, problems }, null, 2);
   if (typeof copy === "function") {
     copy(payload);
-    console.log("✅ Successfully copied " + problems.length + " problems to your clipboard! Paste into LevelUp.");
+    console.log("Successfully copied " + problems.length + " problems to your clipboard! Paste into LevelUp.");
   } else {
-    console.log("📋 Copy the JSON below and paste into LevelUp:\\n", payload);
+    console.log("Copy the JSON below and paste into LevelUp:\\n", payload);
   }
 })();`;
 
