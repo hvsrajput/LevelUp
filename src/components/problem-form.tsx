@@ -535,8 +535,7 @@ export function ProblemForm({
           {/* RAG Suggestion Action Banner */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-tint/60 border border-border/70 p-3 sm:p-3.5 mt-1">
             <div>
-              <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-accent-orange" />
+              <p className="text-xs font-bold text-foreground">
                 RAG Pattern Intelligence
               </p>
               <p className="text-xs text-secondary mt-0.5">

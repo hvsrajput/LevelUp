@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SuggestResponse } from "@/lib/validators/suggest";
-import { Sparkles, Check, Plus, X, BookOpen, Lightbulb, Compass, ArrowRight } from "lucide-react";
+import { Check, Plus, X, ArrowRight } from "lucide-react";
 
 interface PatternSuggestionsProps {
   suggestions: SuggestResponse;
@@ -44,18 +44,13 @@ export function PatternSuggestions({
   return (
     <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
       <CardHeader className="flex flex-row items-center justify-between pb-3 p-0">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-tint text-accent-orange">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle className="text-sm font-bold text-foreground">
-              AI Pattern Suggestions (RAG Grounded)
-            </CardTitle>
-            <p className="text-xs text-secondary mt-0.5">
-              Review and accept suggestions into your form. Nothing is saved until you confirm.
-            </p>
-          </div>
+        <div>
+          <CardTitle className="text-sm font-bold text-foreground">
+            AI Pattern Suggestions (RAG Grounded)
+          </CardTitle>
+          <p className="text-xs text-secondary mt-0.5">
+            Review and accept suggestions into your form. Nothing is saved until you confirm.
+          </p>
         </div>
         <Button
           type="button"
@@ -70,8 +65,7 @@ export function PatternSuggestions({
       <CardContent className="space-y-3.5 p-0 pt-3">
         {/* Grounded Citation Banner */}
         <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-tint/60 border border-border/60 px-3 py-2 text-xs">
-          <span className="font-semibold text-foreground flex items-center gap-1">
-            <Compass className="h-3.5 w-3.5 text-accent-orange" />
+          <span className="font-semibold text-foreground">
             Cited Patterns:
           </span>
           {suggestions.citedPatterns.map((chunk) => (
@@ -88,8 +82,7 @@ export function PatternSuggestions({
         {/* 1. Suggested Topics */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-primary" />
+            <h4 className="text-xs font-semibold text-foreground">
               Suggested Topics ({suggestions.suggestedTopics.length})
             </h4>
             {pendingTopics.length > 1 && (
@@ -119,7 +112,7 @@ export function PatternSuggestions({
                 >
                   {isAccepted ? (
                     <>
-                      <Check className="h-3 w-3 text-green-600" />
+                      <Check className="h-3 w-3 text-[#2D6A1E]" />
                       {topic}
                     </>
                   ) : (
@@ -136,8 +129,7 @@ export function PatternSuggestions({
 
         {/* 2. Candidate Approaches */}
         <div className="space-y-1.5">
-          <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-            <Compass className="h-3.5 w-3.5 text-primary" />
+          <h4 className="text-xs font-semibold text-foreground">
             Candidate Approaches ({suggestions.candidateApproaches.length})
           </h4>
           <div className="space-y-2">
@@ -152,12 +144,12 @@ export function PatternSuggestions({
                   </span>
                   <div className="flex items-center gap-2">
                     {approach.timeComplexity && (
-                      <Badge variant="outline" className="font-mono tabular-nums text-xs rounded-md text-blue-700">
+                      <Badge variant="outline" className="font-mono tabular-nums text-xs rounded-md border-border/70 text-secondary bg-tint/60">
                         {approach.timeComplexity}
                       </Badge>
                     )}
                     {approach.spaceComplexity && (
-                      <Badge variant="outline" className="font-mono tabular-nums text-xs rounded-md text-purple-700">
+                      <Badge variant="outline" className="font-mono tabular-nums text-xs rounded-md border-border/70 text-secondary bg-tint/60">
                         {approach.spaceComplexity}
                       </Badge>
                     )}
@@ -188,8 +180,7 @@ export function PatternSuggestions({
         {/* 3. Progressive Hints */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Lightbulb className="h-3.5 w-3.5 text-primary" />
+            <h4 className="text-xs font-semibold text-foreground">
               Progressive Hints ({suggestions.progressiveHints.length})
             </h4>
             {pendingHints.length > 1 && (
@@ -209,10 +200,10 @@ export function PatternSuggestions({
               const isAccepted = currentHints.includes(hint.text);
               const badgeVariant =
                 hint.level === "nudge"
-                  ? "bg-blue-100 text-blue-800"
+                  ? "bg-tint text-secondary border border-border/70"
                   : hint.level === "moderate"
-                  ? "bg-amber-100 text-amber-800"
-                  : "bg-purple-100 text-purple-800";
+                  ? "bg-pill-streak-bg text-pill-streak-text border border-accent-orange/30"
+                  : "bg-destructive/10 text-destructive border border-destructive/20";
 
               return (
                 <div
@@ -239,7 +230,7 @@ export function PatternSuggestions({
                   >
                     {isAccepted ? (
                       <>
-                        <Check className="mr-1 h-3 w-3 text-green-600" />
+                        <Check className="mr-1 h-3 w-3 text-[#2D6A1E]" />
                         Added
                       </>
                     ) : (
