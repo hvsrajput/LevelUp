@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Globe, Wand2, Check } from "lucide-react";
+import { Wand2, Check } from "lucide-react";
 import { isValidIanaTimezone, DEFAULT_TIMEZONE } from "@/lib/date";
 
 const COMMON_TIMEZONES = [
@@ -124,10 +124,7 @@ export function TimezoneSettingsDialog({
     }}>
       <DialogContent size="md" className="rounded-2xl border-border/70">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-tint text-accent-orange">
-              <Globe className="h-4 w-4" />
-            </span>
+          <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
             Timezone Settings
           </DialogTitle>
           <DialogDescription className="text-secondary text-xs mt-1">
@@ -170,7 +167,7 @@ export function TimezoneSettingsDialog({
               onClick={handleDetectBrowser}
               className="h-8 text-xs gap-1.5 rounded-lg bg-card border-border/70 font-semibold hover:bg-tint"
             >
-              <Wand2 className="h-3.5 w-3.5 text-accent-orange" />
+              <Wand2 className="h-3.5 w-3.5 text-secondary" />
               Auto-detect
             </Button>
           </div>

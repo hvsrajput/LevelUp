@@ -24,7 +24,6 @@ import {
 import {
   Copy,
   Check,
-  FileCode,
   Loader2,
   AlertCircle,
   CheckCircle2,
@@ -135,12 +134,7 @@ export function LeetCodeImportDialog({
 
       <DialogContent size="lg" className="rounded-2xl border-border/70">
         <DialogHeader>
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-tint text-accent-orange font-bold text-sm">
-              LC
-            </span>
-            <DialogTitle className="text-lg font-bold tracking-tight text-foreground">Import from LeetCode</DialogTitle>
-          </div>
+          <DialogTitle className="text-lg font-bold tracking-tight text-foreground">Import from LeetCode</DialogTitle>
           <DialogDescription className="text-xs text-secondary mt-1">
             Import your solved problems by copying and pasting a client-side JSON export directly from your browser.
           </DialogDescription>
@@ -150,8 +144,7 @@ export function LeetCodeImportDialog({
           {/* Step 1: Script */}
           <div className="space-y-2 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <FileCode className="h-3.5 w-3.5 text-accent-orange" />
+              <span className="text-xs font-semibold text-foreground">
                 1. Copy &amp; Run Console Script on leetcode.com
               </span>
               <Button
@@ -178,7 +171,7 @@ export function LeetCodeImportDialog({
             </div>
 
             <div className="flex items-start gap-2 rounded-lg bg-tint/80 border border-border/50 p-3 text-xs text-secondary leading-relaxed">
-              <Info className="h-4 w-4 shrink-0 text-accent-orange mt-0.5" />
+              <Info className="h-4 w-4 shrink-0 text-secondary mt-0.5" />
               <span>
                 It runs in your own browser on <strong>leetcode.com</strong> (press F12 &rarr; Console) and sends nothing to this app until you paste the result below.
               </span>

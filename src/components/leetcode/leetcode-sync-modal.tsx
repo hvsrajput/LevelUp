@@ -320,12 +320,7 @@ export function LeetCodeSyncModal({ onSyncComplete }: LeetCodeSyncModalProps) {
 
       <DialogContent size="lg" className="rounded-2xl border-border/70">
         <DialogHeader>
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-tint text-accent-orange font-bold text-sm">
-              LC
-            </span>
-            <DialogTitle className="text-lg font-bold tracking-tight text-foreground">LeetCode Integration</DialogTitle>
-          </div>
+          <DialogTitle className="text-lg font-bold tracking-tight text-foreground">LeetCode Integration</DialogTitle>
           <DialogDescription className="text-xs text-secondary mt-1">
             Import problems and sync your accepted submissions directly into LevelUp.
           </DialogDescription>
