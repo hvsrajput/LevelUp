@@ -260,18 +260,15 @@ export default function GroupsPage() {
             ))}
           </div>
         ) : groups.length === 0 ? (
-          <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-8 sm:p-12 text-center">
-            <CardContent className="flex flex-col items-center justify-center space-y-3.5 p-0">
-              <div className="rounded-xl bg-tint p-3">
-                <Users className="h-8 w-8 text-accent-orange" />
-              </div>
+          <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-6 sm:p-8 text-left">
+            <CardContent className="flex flex-col items-start space-y-3.5 p-0">
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-foreground">No study groups yet</h3>
-                <p className="text-xs text-secondary max-w-sm mx-auto">
+                <p className="text-xs text-secondary max-w-sm">
                   Collaborate with friends to keep each other accountable, compare problem streaks, and celebrate solves.
                 </p>
               </div>
-              <div className="flex gap-2.5 pt-1">
+              <div className="flex flex-wrap gap-2.5 pt-1">
                 <Button onClick={() => setCreateOpen(true)} className="gap-2 rounded-lg h-9 text-xs font-semibold">
                   <Plus className="h-3.5 w-3.5" />
                   Create a Group

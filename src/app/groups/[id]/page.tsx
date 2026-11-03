@@ -34,8 +34,6 @@ import {
   LogOut,
   UserX,
   Code2,
-  Activity,
-  Trophy,
   Loader2,
   AlertTriangle,
 } from "lucide-react";
@@ -394,8 +392,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
             <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-border/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-accent-orange" />
+                  <CardTitle className="text-base font-bold text-foreground">
                     Member Standings & Streaks
                   </CardTitle>
                   <CardDescription className="text-secondary text-xs mt-0.5">
@@ -407,8 +404,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
             <CardContent className="p-0">
               <div className="divide-y divide-border/50">
                 {members.map((member, index) => {
-                  const rankIcons = ["🥇", "🥈", "🥉"];
-                  const rankDisplay = rankIcons[index] || `#${index + 1}`;
+                  const rankDisplay = `#${index + 1}`;
 
                   return (
                     <div
@@ -503,8 +499,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
         <div className="space-y-4 lg:col-span-5">
           <Card className="rounded-xl border border-border/70 bg-card shadow-xs overflow-hidden">
             <CardHeader className="pb-3 pt-4 sm:pt-5 px-4 sm:px-5 border-b border-border/50">
-              <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                <Activity className="h-4 w-4 text-accent-orange" />
+              <CardTitle className="text-base font-bold text-foreground">
                 Shared Activity Feed
               </CardTitle>
               <CardDescription className="text-secondary text-xs mt-0.5">
@@ -513,8 +508,7 @@ function GroupDetailContent({ params }: { params: Promise<{ id: string }> }) {
             </CardHeader>
             <CardContent className="p-4 sm:p-5">
               {activityFeed.length === 0 ? (
-                <div className="py-8 text-center text-xs text-secondary">
-                  <Activity className="h-7 w-7 mx-auto mb-1.5 text-secondary" />
+                <div className="py-6 text-left text-xs text-secondary">
                   No group activity yet. When members solve problems or submit code, their progress will show up here.
                 </div>
               ) : (
