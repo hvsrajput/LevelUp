@@ -11,14 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Flame,
-  Trophy,
   AlertCircle,
-  Sparkles,
-  Target,
   ArrowRight,
   Plus,
-  Compass,
-  CheckCircle2,
   Map,
 } from "lucide-react";
 import type { ProgressSnapshotData, TopicItem } from "@/lib/recommendations/progress-snapshot";
@@ -80,22 +75,17 @@ export function ProgressSnapshotCard() {
   if (!snapshot || snapshot.isEmpty) {
     return (
       <Card className="rounded-xl border border-dashed border-border/80 bg-card p-5">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5 text-center sm:text-left">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-tint text-muted-foreground shrink-0">
-              <Compass className="h-5 w-5 text-accent-orange" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-bold text-foreground">
-                Progress Snapshot
-              </CardTitle>
-              <p className="text-xs text-secondary mt-0.5 font-medium">
-                No problems or active roadmap yet. Start your journey by adding a problem or generating a roadmap.
-              </p>
-            </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-0.5 text-left">
+            <CardTitle className="text-base font-bold text-foreground">
+              Progress Snapshot
+            </CardTitle>
+            <p className="text-xs text-secondary font-medium">
+              No problems or active roadmap yet. Start your journey by adding a problem or generating a roadmap.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             <Button asChild size="sm" variant="outline" className="rounded-lg h-8 text-xs font-semibold">
               <Link href="/problems/new">
                 <Plus className="mr-1.5 h-3.5 w-3.5" />
@@ -119,50 +109,33 @@ export function ProgressSnapshotCard() {
       {/* Header with Streak indicator */}
       <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-border/50 bg-card">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors shrink-0 ${
-                streak.current > 0
-                  ? "bg-[#FFE5C4]/70 text-accent-orange dark:bg-orange-500/20"
-                  : "bg-tint text-muted-foreground"
-              }`}
-            >
-              <Flame
-                className={`h-5 w-5 ${
-                  streak.current > 0 ? "fill-accent-orange text-accent-orange" : ""
-                }`}
-              />
+          <div className="space-y-0.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                Progress Snapshot
+              </CardTitle>
+              {streak.current > 0 && (
+                <Badge
+                  variant="streak"
+                  className="gap-1 text-xs font-semibold"
+                >
+                  <Flame className="h-3 w-3 fill-accent-orange text-accent-orange" />
+                  <span className="tabular-nums">{streak.current}d</span> Streak
+                </Badge>
+              )}
+              {streak.current > 0 && streak.solvedToday && (
+                <Badge variant="solved" className="text-xs font-semibold hidden sm:inline-flex">
+                  Extended Today
+                </Badge>
+              )}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
-                  Progress Snapshot
-                </CardTitle>
-                {streak.current > 0 && (
-                  <Badge
-                    variant="streak"
-                    className="gap-1 text-xs font-semibold"
-                  >
-                    <Flame className="h-3 w-3 fill-accent-orange text-accent-orange" />
-                    <span className="tabular-nums">{streak.current}d</span> Streak
-                  </Badge>
-                )}
-                {streak.current > 0 && streak.solvedToday && (
-                  <Badge variant="solved" className="gap-1 text-xs font-semibold hidden sm:inline-flex">
-                    <Sparkles className="h-3 w-3" />
-                    Extended Today
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-secondary mt-0.5 font-medium">
-                Current topic coverage and recommended curriculum progression.
-              </p>
-            </div>
+            <p className="text-xs text-secondary font-medium">
+              Current topic coverage and recommended curriculum progression.
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <div className="flex items-center gap-1.5 rounded-full bg-tint px-3 py-1 text-xs font-semibold text-foreground border border-border/50">
-              <Trophy className="h-3.5 w-3.5 text-accent-orange" />
               <span className="text-secondary font-medium">Best:</span>
               <span className="font-bold text-foreground tabular-nums">{streak.longest}d</span>
             </div>
@@ -186,8 +159,7 @@ export function ProgressSnapshotCard() {
           {/* Item 1: Solved / Total Added with Progress Bar */}
           <div className="rounded-lg border border-border/60 bg-tint/30 p-3.5 flex flex-col justify-between space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-muted flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-accent-green" />
+              <span className="text-xs font-semibold text-text-muted">
                 Problem Completion
               </span>
               <span className="text-xs font-bold text-foreground tabular-nums">
@@ -223,8 +195,7 @@ export function ProgressSnapshotCard() {
           {/* Item 2: Current Topic */}
           <div className="rounded-lg border border-border/60 bg-tint/30 p-3.5 flex flex-col justify-between space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-text-muted flex items-center gap-1.5">
-                <Target className="h-3.5 w-3.5 text-accent-orange" />
+              <span className="text-xs font-semibold text-text-muted">
                 Current Topic
               </span>
               {snapshot.currentTopic && (
@@ -255,8 +226,7 @@ export function ProgressSnapshotCard() {
           {/* Item 3: Next Topic */}
           <div className="rounded-lg border border-border/60 bg-tint/30 p-3.5 flex flex-col justify-between space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-text-muted flex items-center gap-1.5">
-                <Compass className="h-3.5 w-3.5 text-indigo-500" />
+              <span className="text-xs font-semibold text-text-muted">
                 Next Topic
               </span>
               {snapshot.nextTopic && (
@@ -276,7 +246,7 @@ export function ProgressSnapshotCard() {
             <div className="pt-1">
               <Link
                 href="/roadmap"
-                className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
+                className="text-xs font-semibold text-accent-orange hover:underline inline-flex items-center gap-1"
               >
                 View roadmap
                 <ArrowRight className="h-3 w-3" />
@@ -294,7 +264,7 @@ function SourceBadge({ source }: { source: TopicItem["sourceLabel"] }) {
     return (
       <Badge
         variant="outline"
-        className="text-[10px] px-1.5 py-0 border-indigo-500/40 text-indigo-600 bg-indigo-500/10 font-bold"
+        className="text-[10px] px-1.5 py-0 border-border/70 text-secondary bg-tint/60 font-semibold rounded-md"
       >
         From roadmap
       </Badge>
@@ -304,7 +274,7 @@ function SourceBadge({ source }: { source: TopicItem["sourceLabel"] }) {
   return (
     <Badge
       variant="outline"
-      className="text-[10px] px-1.5 py-0 border-accent-orange/40 text-accent-orange bg-pill-streak-bg/30 font-bold"
+      className="text-[10px] px-1.5 py-0 border-accent-orange/40 text-accent-orange bg-pill-streak-bg/30 font-semibold rounded-md"
     >
       From your problems
     </Badge>
