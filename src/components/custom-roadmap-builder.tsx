@@ -24,7 +24,6 @@ import {
   HelpCircle,
   Loader2,
   Plus,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import {
@@ -412,8 +411,7 @@ function CustomRoadmapBuilderModal({
         <DialogHeader className="p-5 md:p-6 border-b border-border/60 bg-tint/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-accent-green" />
+              <DialogTitle className="text-lg font-bold text-foreground">
                 Custom Roadmap Builder
               </DialogTitle>
               <DialogDescription className="text-xs text-secondary mt-0.5">
@@ -478,7 +476,7 @@ function CustomRoadmapBuilderModal({
           </div>
 
           {switchError && (
-            <div className="mt-2.5 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
+            <div className="mt-2.5 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-xs text-destructive flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span>{switchError}</span>
             </div>
@@ -489,9 +487,9 @@ function CustomRoadmapBuilderModal({
         <DialogBody className="space-y-4 py-4 min-w-0">
           {/* Confirmation Overlay if existing active roadmap needs archiving */}
           {showConfirmArchive && (
-            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 space-y-2.5">
+            <div className="rounded-xl border border-[#8F4A0B]/30 bg-[#FFE5C4]/40 p-3.5 space-y-2.5">
               <div className="flex items-start gap-2.5">
-                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <AlertCircle className="h-4 w-4 text-[#8F4A0B] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
                   <h4 className="text-xs font-bold text-foreground">
                     Replace Active Roadmap?
@@ -575,7 +573,7 @@ function CustomRoadmapBuilderModal({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleRemoveWeek(week.weekNumber)}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 rounded-lg"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive/80 rounded-lg"
                             aria-label="Remove week"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -639,7 +637,7 @@ function CustomRoadmapBuilderModal({
                               />
 
                               {headerWarnings.length > 0 && (
-                                <p className="text-[10px] text-amber-600 leading-tight">
+                                <p className="text-[10px] text-[#8F4A0B] leading-tight">
                                   Warning: Header-like line treated as question.
                                 </p>
                               )}
@@ -660,8 +658,7 @@ function CustomRoadmapBuilderModal({
               {/* Left Column: Editor & Controls */}
               <div className="space-y-2.5 min-w-0">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <Code2 className="h-4 w-4 text-accent-green" />
+                  <label className="text-xs font-bold text-foreground">
                     Structured Text Input
                   </label>
                   <div className="flex items-center gap-2">
@@ -754,8 +751,8 @@ function CustomRoadmapBuilderModal({
                     key={idx}
                     className={`flex items-start gap-2 p-2 rounded-md text-xs ${
                       issue.type === "error"
-                        ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
-                        : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                        ? "bg-destructive/10 text-destructive border border-destructive/20"
+                        : "bg-[#FFE5C4]/50 text-[#8F4A0B] border border-[#8F4A0B]/30"
                     }`}
                   >
                     {issue.type === "error" ? (
@@ -774,7 +771,7 @@ function CustomRoadmapBuilderModal({
           )}
 
           {saveError && (
-            <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400">
+            <div className="p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-xs text-destructive">
               {saveError}
             </div>
           )}
@@ -793,7 +790,7 @@ function CustomRoadmapBuilderModal({
                 {resolvedDraft.totals.suggested > 0 && (
                   <>
                     <span>•</span>
-                    <span className="text-amber-600 font-semibold">
+                    <span className="text-[#8F4A0B] font-semibold">
                       {resolvedDraft.totals.suggested} suggestions
                     </span>
                   </>
@@ -893,8 +890,8 @@ function renderPreviewTree(
                               variant="outline"
                               className={`text-[10px] px-1.5 py-0 rounded ${
                                 q.matchSource === "user"
-                                  ? "border-emerald-500/50 text-emerald-600 bg-emerald-500/10"
-                                  : "border-indigo-500/50 text-indigo-600 bg-indigo-500/10"
+                                  ? "border-border/70 text-[#2D6A1E] bg-tint/60"
+                                  : "border-border/70 text-secondary bg-tint/60"
                               }`}
                             >
                               {q.matchSource === "user" ? "Your Problem" : "Catalog"}
@@ -904,7 +901,7 @@ function renderPreviewTree(
                           {q.status === "suggested" && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] px-1.5 py-0 rounded border-amber-500/50 text-amber-600 bg-amber-500/10"
+                              className="text-[10px] px-1.5 py-0 rounded border-[#8F4A0B]/30 text-[#8F4A0B] bg-[#FFE5C4]/50"
                             >
                               Suggested
                             </Badge>

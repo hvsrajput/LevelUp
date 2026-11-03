@@ -42,14 +42,12 @@ import {
   RefreshCw,
   Plus,
   Loader2,
-  Flame,
   AlertTriangle,
-  Compass,
-  Trophy,
   ArrowRight,
   Sparkles,
   CalendarDays,
   FileEdit,
+  Check,
 } from "lucide-react";
 import { formatDateDisplay } from "@/lib/date";
 import type { UserRoadmapData } from "@/lib/recommendations/roadmap";
@@ -328,18 +326,15 @@ export default function RoadmapPage() {
 
       {/* Main Roadmap Content */}
       {!data ? (
-        <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-8 sm:p-12 text-center">
-          <CardContent className="flex flex-col items-center justify-center space-y-3.5 p-0">
-            <div className="rounded-xl bg-tint p-3">
-              <Map className="h-8 w-8 text-accent-orange" />
-            </div>
+        <Card className="rounded-xl border border-dashed border-border/80 bg-card/60 p-6 sm:p-8 text-left">
+          <CardContent className="flex flex-col items-start space-y-3.5 p-0">
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-foreground">No active roadmap</h3>
-              <p className="text-xs text-secondary max-w-sm mx-auto">
+              <p className="text-xs text-secondary max-w-lg leading-relaxed">
                 Generate an ordered curriculum with questions scheduled for every day of every week to guide your preparation, or design your own custom multi-week syllabus.
               </p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-lg h-9 text-xs font-semibold">
                 <Sparkles className="h-3.5 w-3.5" />
                 Generate with AI
@@ -347,7 +342,7 @@ export default function RoadmapPage() {
               <Button
                 variant="outline"
                 onClick={() => setCustomBuilderOpen(true)}
-                className="gap-2 rounded-lg h-9 text-xs font-semibold"
+                className="gap-2 rounded-lg h-9 text-xs font-semibold bg-card border-border/70 hover:bg-tint"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Create your own roadmap
@@ -369,32 +364,27 @@ export default function RoadmapPage() {
           <div className="grid gap-3.5 md:grid-cols-3">
             {/* Overall Syllabus Progress */}
             <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 md:col-span-1 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                      Syllabus Progress
-                    </h3>
-                    {data.roadmap.source === "CUSTOM" && (
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] px-1.5 py-0 border-indigo-500/40 text-indigo-600 bg-indigo-500/10 font-bold"
-                      >
-                        Custom
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
-                      {data.progress.percentage}%
-                    </span>
-                    <span className="text-xs font-mono tabular-nums text-secondary">
-                      ({data.progress.completedDays}/{data.progress.totalDays} days)
-                    </span>
-                  </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">
+                    Syllabus Progress
+                  </h3>
+                  {data.roadmap.source === "CUSTOM" && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0 border-border/70 text-secondary bg-tint/60 font-semibold rounded-md"
+                    >
+                      Custom
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-lg bg-tint p-2.5 text-foreground">
-                  <Trophy className="h-5 w-5 text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.progress.percentage}%
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    ({data.progress.completedDays}/{data.progress.totalDays} days)
+                  </span>
                 </div>
               </div>
               <div className="mt-3.5 h-1.5 w-full rounded-full bg-muted-tint overflow-hidden">
@@ -407,69 +397,69 @@ export default function RoadmapPage() {
 
             {/* Overall Practice Streak */}
             <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Practice Streak</h3>
-                    {data.streaks.overall.atRisk && (
-                      <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
-                        At Risk
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
-                      {data.streaks.overall.current}d
-                    </span>
-                    <span className="text-xs font-mono tabular-nums text-secondary">
-                      (best: {data.streaks.overall.longest}d)
-                    </span>
-                  </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Practice Streak</h3>
+                  {data.streaks.overall.atRisk && (
+                    <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
+                      At Risk
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-lg bg-[#FFE5C4]/70 p-2.5 text-accent-orange dark:bg-orange-950/40">
-                  <Flame className="h-5 w-5 fill-accent-orange text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.streaks.overall.current}d
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    (best: {data.streaks.overall.longest}d)
+                  </span>
                 </div>
               </div>
-              <p className="mt-2.5 text-xs text-secondary">
-                {data.streaks.overall.solvedToday
-                  ? "✓ Solved a problem today"
-                  : data.streaks.overall.atRisk
-                  ? "Solve any problem today to keep alive!"
-                  : "Solve problems daily to grow your streak"}
+              <p className="mt-2.5 text-xs text-secondary flex items-center gap-1">
+                {data.streaks.overall.solvedToday && (
+                  <Check className="h-3.5 w-3.5 text-[#2D6A1E]" />
+                )}
+                <span>
+                  {data.streaks.overall.solvedToday
+                    ? "Solved a problem today"
+                    : data.streaks.overall.atRisk
+                    ? "Solve any problem today to keep alive!"
+                    : "Solve problems daily to grow your streak"}
+                </span>
               </p>
             </Card>
 
             {/* Roadmap Streak */}
             <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Roadmap Streak</h3>
-                    {data.streaks.roadmap.atRisk && (
-                      <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
-                        At Risk
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
-                      {data.streaks.roadmap.current}d
-                    </span>
-                    <span className="text-xs font-mono tabular-nums text-secondary">
-                      (best: {data.streaks.roadmap.longest}d)
-                    </span>
-                  </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">Roadmap Streak</h3>
+                  {data.streaks.roadmap.atRisk && (
+                    <Badge variant="streak" className="text-xs px-2 py-0 font-semibold">
+                      At Risk
+                    </Badge>
+                  )}
                 </div>
-                <div className="rounded-lg bg-tint p-2.5 text-foreground">
-                  <Compass className="h-5 w-5 text-accent-orange" />
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums">
+                    {data.streaks.roadmap.current}d
+                  </span>
+                  <span className="text-xs font-mono tabular-nums text-secondary">
+                    (best: {data.streaks.roadmap.longest}d)
+                  </span>
                 </div>
               </div>
-              <p className="mt-2.5 text-xs text-secondary">
-                {data.streaks.roadmap.solvedToday
-                  ? "✓ Completed today's roadmap goals"
-                  : data.streaks.roadmap.atRisk
-                  ? "Complete today's roadmap questions to keep alive!"
-                  : "Complete scheduled daily roadmap questions"}
+              <p className="mt-2.5 text-xs text-secondary flex items-center gap-1">
+                {data.streaks.roadmap.solvedToday && (
+                  <Check className="h-3.5 w-3.5 text-[#2D6A1E]" />
+                )}
+                <span>
+                  {data.streaks.roadmap.solvedToday
+                    ? "Completed today's roadmap goals"
+                    : data.streaks.roadmap.atRisk
+                    ? "Complete today's roadmap questions to keep alive!"
+                    : "Complete scheduled daily roadmap questions"}
+                </span>
               </p>
             </Card>
           </div>
@@ -478,16 +468,12 @@ export default function RoadmapPage() {
           <Card className="rounded-xl border border-border/70 bg-card overflow-hidden shadow-xs">
             <CardHeader className="bg-tint/40 p-4 sm:p-5 border-b border-border/50">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-tint p-2 text-foreground font-bold">
-                    <CalendarDays className="h-4 w-4 text-accent-orange" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                      Today&apos;s Roadmap Questions
-                      {data.todayItems.length > 0 && data.todayItems.every((i) => i.isCompleted) && (
-                        <Badge variant="solved" className="gap-1 text-xs font-semibold">
-                          <CheckCircle2 className="h-3 w-3" />
+                <div>
+                  <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                    Today&apos;s Roadmap Questions
+                    {data.todayItems.length > 0 && data.todayItems.every((i) => i.isCompleted) && (
+                      <Badge variant="solved" className="gap-1 text-xs font-semibold">
+                        <CheckCircle2 className="h-3 w-3" />
                           Day Completed!
                         </Badge>
                       )}
@@ -498,7 +484,6 @@ export default function RoadmapPage() {
                         : "Today's focus"} • Keep your roadmap streak going by completing these questions.
                     </CardDescription>
                   </div>
-                </div>
               </div>
             </CardHeader>
 
