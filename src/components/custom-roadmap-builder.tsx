@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -406,9 +407,9 @@ function CustomRoadmapBuilderModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[92vh] flex flex-col p-0 gap-0 overflow-hidden rounded-[24px] border border-border/80 bg-card shadow-2xl">
+      <DialogContent size="xl" className="rounded-[24px] border border-border/80 bg-card shadow-2xl">
         {/* Header */}
-        <DialogHeader className="p-6 border-b border-border/60 bg-tint/20">
+        <DialogHeader className="p-6 md:p-8 border-b border-border/60 bg-tint/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -485,7 +486,7 @@ function CustomRoadmapBuilderModal({
         </DialogHeader>
 
         {/* Body Container */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <DialogBody className="space-y-6 min-w-0">
           {/* Confirmation Overlay if existing active roadmap needs archiving */}
           {showConfirmArchive && (
             <div className="rounded-[16px] border border-amber-500/40 bg-amber-500/10 p-4 space-y-3">
@@ -657,7 +658,7 @@ function CustomRoadmapBuilderModal({
           {mode === "paste" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column: Editor & Controls */}
-              <div className="space-y-3">
+              <div className="space-y-3 min-w-0">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <Code2 className="h-4 w-4 text-accent-green" />
@@ -705,12 +706,12 @@ function CustomRoadmapBuilderModal({
                   onChange={(e) => setPasteText(e.target.value)}
                   rows={18}
                   placeholder={EXAMPLE_PASTE_TEXT}
-                  className="font-mono text-xs leading-relaxed p-3.5 rounded-[12px] bg-background border-border/80"
+                  className="font-mono text-xs leading-relaxed p-3.5 rounded-[12px] bg-background border-border/80 min-h-64 md:min-h-96"
                 />
               </div>
 
               {/* Right Column: Live Resolution Preview */}
-              <div className="space-y-3">
+              <div className="space-y-3 min-w-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     Live Parsed Preview
@@ -777,7 +778,7 @@ function CustomRoadmapBuilderModal({
               {saveError}
             </div>
           )}
-        </div>
+        </DialogBody>
 
         {/* Footer */}
         <DialogFooter className="p-4 border-t border-border/60 bg-tint/20 flex flex-col sm:flex-row items-center justify-between gap-3">

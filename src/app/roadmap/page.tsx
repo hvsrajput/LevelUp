@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -191,8 +192,8 @@ export default function RoadmapPage() {
                   )}
                 </Button>
               </DialogTrigger>
-          <DialogContent className="rounded-[24px] p-6 max-w-lg">
-            <form onSubmit={handleGenerate}>
+          <DialogContent size="md" className="rounded-[24px]">
+            <form onSubmit={handleGenerate} className="flex flex-col flex-1 min-h-0">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold">
                   {data ? "Regenerate Learning Roadmap" : "Create Learning Roadmap"}
@@ -202,7 +203,7 @@ export default function RoadmapPage() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4 py-4">
+              <DialogBody className="space-y-4 py-4 min-w-0">
                 {formError && (
                   <div className="flex items-start gap-2 rounded-[14px] bg-[#FFDAD6] p-3 text-xs font-semibold text-[#93000A]">
                     <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
@@ -210,7 +211,7 @@ export default function RoadmapPage() {
                   </div>
                 )}
 
-                <div className="space-y-2">
+                <div className="space-y-2 min-w-0">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="goal" className="text-xs font-semibold text-secondary">
                       Study Goal / Target
@@ -232,12 +233,12 @@ export default function RoadmapPage() {
                     onChange={(e) => setGoal(e.target.value)}
                     placeholder="e.g. Crack product-company interviews in 3 months; weak at DP and graphs"
                     maxLength={500}
-                    rows={3}
-                    className="bg-tint border-transparent rounded-[14px] text-xs resize-none p-3 text-foreground placeholder:text-text-muted focus-visible:ring-1 focus-visible:ring-accent-orange"
+                    rows={4}
+                    className="bg-tint border-transparent rounded-[14px] text-xs resize-none p-3 text-foreground placeholder:text-text-muted focus-visible:ring-1 focus-visible:ring-accent-orange min-h-24 md:min-h-36"
                   />
 
                   {/* Preset examples */}
-                  <div className="space-y-1 pt-1">
+                  <div className="space-y-1 pt-1 min-w-0">
                     <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
                       Example Goals:
                     </span>
@@ -260,7 +261,7 @@ export default function RoadmapPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0">
                   <Label htmlFor="level" className="text-xs font-semibold text-secondary">Starting Level</Label>
                   <Select
                     value={level}
@@ -279,7 +280,7 @@ export default function RoadmapPage() {
                   </Select>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0">
                   <Label htmlFor="timeline" className="text-xs font-semibold text-secondary">Timeline</Label>
                   <Select
                     value={timeline}
@@ -297,7 +298,7 @@ export default function RoadmapPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
+              </DialogBody>
 
               <DialogFooter>
                 <Button

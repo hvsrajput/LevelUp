@@ -124,6 +124,7 @@ model Problem {
   // LeetCode columns — nullable
   leetcodeQuestionId Int?
   titleSlug          String?
+  catalogProblemId   String?
 
   constraints String? @db.Text
 
@@ -163,6 +164,7 @@ model Problem {
   @@index([source])
   @@index([userId, status])
   @@index([userId, difficulty])
+  @@index([userId, catalogProblemId])
 }
 
 // =============================================================================

@@ -52,6 +52,10 @@ export const createProblemSchema = z.object({
   // LeetCode fields (optional, only when source=LEETCODE)
   leetcodeQuestionId: z.number().int().positive().nullable().optional(),
   titleSlug: z.string().nullable().optional(),
+  catalogProblemId: z.string().nullable().optional(),
+  url: z.string().nullable().optional(),
+  code: z.string().nullable().optional(),
+  language: z.string().nullable().optional(),
 
   constraints: z.string().max(5000).nullable().optional(),
   timeComplexity: z.string().max(100).nullable().optional(),

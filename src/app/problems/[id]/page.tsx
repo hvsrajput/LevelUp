@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -31,7 +32,7 @@ import { CodeEditor } from "@/components/code-editor";
 import { CodeViewer } from "@/components/code-viewer";
 import { SubmissionHistory, type SubmissionItem } from "@/components/submission-history";
 import { ExamplesViewer, type TestCaseItem } from "@/components/test-case-runner";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Pencil,
@@ -191,12 +192,12 @@ function ProblemDetailContent({
   const leetcodeUrl = getProblemLeetCodeUrl(problem);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Back button and actions */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <Button asChild variant="ghost" size="sm" className="rounded-[14px] text-secondary hover:text-foreground">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="ghost" size="sm" className="rounded-lg h-8 text-xs text-secondary hover:text-foreground">
           <Link href="/problems">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Problems
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Problems
           </Link>
         </Button>
         <div className="flex items-center gap-2">
@@ -206,7 +207,7 @@ function ProblemDetailContent({
             onValueChange={handleStatusChange}
             disabled={isUpdatingStatus}
           >
-            <SelectTrigger className="w-[140px] text-xs h-9 bg-tint border-transparent rounded-[14px]">
+            <SelectTrigger className="w-[130px] text-xs h-8 bg-tint/60 border border-border/70 rounded-lg">
               <span className="text-secondary mr-1">Status:</span>
               <SelectValue />
             </SelectTrigger>
@@ -218,16 +219,16 @@ function ProblemDetailContent({
           </Select>
 
           {leetcodeUrl && (
-            <Button asChild variant="outline" size="sm" className="rounded-[14px] bg-card border-border/70 gap-1.5 font-semibold text-xs">
+            <Button asChild variant="outline" size="sm" className="rounded-lg h-8 bg-card border-border/70 gap-1.5 font-semibold text-xs">
               <a href={leetcodeUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3.5 w-3.5" /> Open on LeetCode
+                <ExternalLink className="h-3 w-3" /> Open on LeetCode
               </a>
             </Button>
           )}
 
-          <Button asChild variant="outline" size="sm" className="rounded-[14px] bg-card border-border/70">
+          <Button asChild variant="outline" size="sm" className="rounded-lg h-8 bg-card border-border/70 text-xs">
             <Link href={`/problems/${id}/edit`}>
-              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
+              <Pencil className="mr-1.5 h-3 w-3" /> Edit
             </Link>
           </Button>
 
@@ -236,32 +237,34 @@ function ProblemDetailContent({
               <Button
                 variant="destructive"
                 size="sm"
-                className="rounded-[14px]"
+                className="rounded-lg h-8 text-xs"
               >
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
+                <Trash2 className="mr-1.5 h-3 w-3" /> Delete
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[24px] p-6">
+            <DialogContent size="sm" className="rounded-2xl">
               <DialogHeader>
                 <DialogTitle>Delete Problem</DialogTitle>
+              </DialogHeader>
+              <DialogBody className="py-4 min-w-0">
                 <DialogDescription className="text-secondary">
                   Are you sure you want to delete &ldquo;{problem.title}&rdquo;?
                   This will also remove all test cases and submissions. This
                   action cannot be undone.
                 </DialogDescription>
-              </DialogHeader>
+              </DialogBody>
               <DialogFooter className="gap-2 sm:gap-0">
-                <Button variant="outline" disabled={isDeleting} className="rounded-[14px]">
+                <Button variant="outline" disabled={isDeleting} className="rounded-lg h-8 text-xs">
                   Cancel
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="rounded-[14px]"
+                  className="rounded-lg h-8 text-xs"
                 >
                   {isDeleting ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   ) : null}
                   Delete
                 </Button>
@@ -272,9 +275,9 @@ function ProblemDetailContent({
       </div>
 
       {/* Header Info */}
-      <div className="mb-6 rounded-[24px] border border-border/70 bg-card p-6 sm:p-8 shadow-soft">
-        <div className="flex flex-wrap items-center gap-2.5 mb-3">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+      <div className="mb-5 rounded-xl border border-border/70 bg-card p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-2 mb-2.5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
             {problem.title}
           </h1>
           <Badge
@@ -302,18 +305,18 @@ function ProblemDetailContent({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-secondary">
-          <span className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-3.5 text-xs font-medium text-secondary">
+          <span className="flex items-center gap-1.5 font-mono tabular-nums text-xs">
             <Calendar className="h-3.5 w-3.5 text-secondary" />
             Added {formatDate(problem.createdAt)}
           </span>
           {problem.solvedAt && (
-            <span className="flex items-center gap-1.5 font-semibold text-[#2D6A1E]">
+            <span className="flex items-center gap-1.5 font-semibold text-badge-solved-text">
               <CheckCircle2 className="h-3.5 w-3.5" />
               Solved {formatDate(problem.solvedAt)}
             </span>
           )}
-          <span className="font-mono text-[11px] text-secondary">
+          <span className="font-mono text-xs tabular-nums text-secondary">
             ID: {problem.shortCode}
           </span>
           {leetcodeUrl && (
@@ -323,7 +326,7 @@ function ProblemDetailContent({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline ml-auto"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-3 w-3" />
               Open on LeetCode
             </a>
           )}
@@ -331,11 +334,11 @@ function ProblemDetailContent({
 
         {/* Complexity Pills */}
         {(problem.timeComplexity || problem.spaceComplexity) && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-3.5 flex flex-wrap items-center gap-2">
             {problem.timeComplexity && (
               <Badge
                 variant="secondary"
-                className="font-mono text-xs px-3 py-1 font-medium"
+                className="font-mono text-xs tabular-nums px-2.5 py-0.5 font-medium rounded-md border border-border/50 bg-tint/60"
               >
                 Time: {problem.timeComplexity}
               </Badge>
@@ -343,7 +346,7 @@ function ProblemDetailContent({
             {problem.spaceComplexity && (
               <Badge
                 variant="secondary"
-                className="font-mono text-xs px-3 py-1 font-medium"
+                className="font-mono text-xs tabular-nums px-2.5 py-0.5 font-medium rounded-md border border-border/50 bg-tint/60"
               >
                 Space: {problem.spaceComplexity}
               </Badge>
@@ -353,12 +356,12 @@ function ProblemDetailContent({
 
         {/* Topics */}
         {problem.topics.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div className="mt-3.5 flex flex-wrap gap-1.5">
             {problem.topics.map(({ topic }) => (
               <Badge
                 key={topic.id}
                 variant="outline"
-                className="text-xs rounded-full bg-tint/60 border-border/70 text-secondary font-medium px-3 py-0.5"
+                className="text-xs rounded-md bg-tint/60 border-border/70 text-secondary font-medium px-2.5 py-0.5"
               >
                 {topic.name}
               </Badge>
@@ -368,15 +371,18 @@ function ProblemDetailContent({
       </div>
 
       {/* View Tabs */}
-      <div className="mb-6 flex flex-wrap gap-2 border-b border-border/50 pb-3">
+      <div className="mb-5 flex flex-wrap gap-1.5 border-b border-border/50 pb-2.5">
         <Button
           type="button"
           variant={activeTab === "workspace" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("workspace")}
-          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
+          className={cn(
+            "gap-1.5 text-xs rounded-lg font-semibold px-3 py-1.5 h-8",
+            activeTab === "workspace" ? "bg-tint text-foreground border border-border/60" : ""
+          )}
         >
-          <Code2 className="h-4 w-4" />
+          <Code2 className="h-3.5 w-3.5" />
           Solutions &amp; Code ({problem.submissions.length})
         </Button>
         <Button
@@ -384,9 +390,12 @@ function ProblemDetailContent({
           variant={activeTab === "overview" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("overview")}
-          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
+          className={cn(
+            "gap-1.5 text-xs rounded-lg font-semibold px-3 py-1.5 h-8",
+            activeTab === "overview" ? "bg-tint text-foreground border border-border/60" : ""
+          )}
         >
-          <BookOpen className="h-4 w-4" />
+          <BookOpen className="h-3.5 w-3.5" />
           Description &amp; Examples ({problem.testCases.length})
         </Button>
         <Button
@@ -394,9 +403,12 @@ function ProblemDetailContent({
           variant={activeTab === "hints" ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setActiveTab("hints")}
-          className="gap-2 text-xs rounded-full font-semibold px-4 py-2"
+          className={cn(
+            "gap-1.5 text-xs rounded-lg font-semibold px-3 py-1.5 h-8",
+            activeTab === "hints" ? "bg-tint text-foreground border border-border/60" : ""
+          )}
         >
-          <Lightbulb className="h-4 w-4" />
+          <Lightbulb className="h-3.5 w-3.5" />
           Hints &amp; Approaches ({hints.length + approaches.length})
         </Button>
       </div>
@@ -434,14 +446,14 @@ function ProblemDetailContent({
       {/* Tab 2: Description & Examples */}
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-4 lg:col-span-2">
             {/* Description */}
-            <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-              <CardHeader className="pb-3 pt-6 px-6">
-                <CardTitle className="text-base font-bold text-foreground">Description</CardTitle>
+            <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+              <CardHeader className="pb-2.5 p-0">
+                <CardTitle className="text-sm font-bold text-foreground">Description</CardTitle>
               </CardHeader>
-              <CardContent className="pb-6 px-6">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+              <CardContent className="p-0 pt-2">
+                <div className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-foreground">
                   {problem.description}
                 </div>
               </CardContent>
@@ -449,12 +461,12 @@ function ProblemDetailContent({
 
             {/* Constraints */}
             {problem.constraints && (
-              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-                <CardHeader className="pb-3 pt-6 px-6">
-                  <CardTitle className="text-base font-bold text-foreground">Constraints</CardTitle>
+              <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+                <CardHeader className="pb-2.5 p-0">
+                  <CardTitle className="text-sm font-bold text-foreground">Constraints</CardTitle>
                 </CardHeader>
-                <CardContent className="pb-6 px-6">
-                  <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-secondary bg-tint rounded-[14px] p-3.5">
+                <CardContent className="p-0 pt-2">
+                  <pre className="whitespace-pre-wrap font-mono text-xs tabular-nums leading-relaxed text-secondary bg-tint/60 border border-border/50 rounded-lg p-3">
                     {problem.constraints}
                   </pre>
                 </CardContent>
@@ -463,21 +475,21 @@ function ProblemDetailContent({
 
             {/* Target Complexity */}
             {(problem.timeComplexity || problem.spaceComplexity) && (
-              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-                <CardHeader className="pb-3 pt-6 px-6">
-                  <CardTitle className="text-base font-bold text-foreground">Target Complexity</CardTitle>
+              <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+                <CardHeader className="pb-2.5 p-0">
+                  <CardTitle className="text-sm font-bold text-foreground">Target Complexity</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-6 px-6">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-0 pt-2">
                   {problem.timeComplexity && (
-                    <div className="rounded-[16px] bg-tint p-4 border border-transparent">
+                    <div className="rounded-lg bg-tint/60 border border-border/50 p-3">
                       <span className="text-xs font-semibold text-secondary">Time Complexity</span>
-                      <p className="mt-1 font-mono text-sm font-bold text-foreground">{problem.timeComplexity}</p>
+                      <p className="mt-0.5 font-mono text-xs font-bold tabular-nums text-foreground">{problem.timeComplexity}</p>
                     </div>
                   )}
                   {problem.spaceComplexity && (
-                    <div className="rounded-[16px] bg-tint p-4 border border-transparent">
+                    <div className="rounded-lg bg-tint/60 border border-border/50 p-3">
                       <span className="text-xs font-semibold text-secondary">Space Complexity</span>
-                      <p className="mt-1 font-mono text-sm font-bold text-foreground">{problem.spaceComplexity}</p>
+                      <p className="mt-0.5 font-mono text-xs font-bold tabular-nums text-foreground">{problem.spaceComplexity}</p>
                     </div>
                   )}
                 </CardContent>
@@ -486,12 +498,12 @@ function ProblemDetailContent({
 
             {/* Notes */}
             {problem.notes && (
-              <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-                <CardHeader className="pb-3 pt-6 px-6">
-                  <CardTitle className="text-base font-bold text-foreground">Personal Notes</CardTitle>
+              <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+                <CardHeader className="pb-2.5 p-0">
+                  <CardTitle className="text-sm font-bold text-foreground">Personal Notes</CardTitle>
                 </CardHeader>
-                <CardContent className="pb-6 px-6">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                <CardContent className="p-0 pt-2">
+                  <p className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed text-foreground">
                     {problem.notes}
                   </p>
                 </CardContent>
@@ -508,27 +520,27 @@ function ProblemDetailContent({
 
       {/* Tab 3: Hints & Approaches */}
       {activeTab === "hints" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Hints */}
-          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-            <CardHeader className="pb-3 pt-6 px-6">
-              <CardTitle className="text-base font-bold text-foreground">
+          <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+            <CardHeader className="pb-2.5 p-0">
+              <CardTitle className="text-sm font-bold text-foreground">
                 Hints ({hints.length})
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-6 px-6">
+            <CardContent className="p-0 pt-2">
               {hints.length === 0 ? (
-                <p className="text-sm text-secondary">
+                <p className="text-xs text-secondary">
                   No hints recorded yet.
                 </p>
               ) : (
-                <ol className="space-y-2.5">
+                <ol className="space-y-2">
                   {hints.map((hint, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-3 rounded-[16px] bg-tint p-3.5 text-sm"
+                      className="flex items-start gap-2.5 rounded-lg bg-tint/60 border border-border/50 p-3 text-xs leading-relaxed"
                     >
-                      <span className="shrink-0 font-mono text-xs font-bold text-accent-orange">
+                      <span className="shrink-0 font-mono text-xs font-bold text-accent-orange tabular-nums">
                         Hint {i + 1}
                       </span>
                       <span className="leading-relaxed text-foreground">{hint as string}</span>
@@ -540,25 +552,25 @@ function ProblemDetailContent({
           </Card>
 
           {/* Approaches */}
-          <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-            <CardHeader className="pb-3 pt-6 px-6">
-              <CardTitle className="text-base font-bold text-foreground">
+          <Card className="rounded-xl border border-border/70 bg-card p-4 sm:p-5">
+            <CardHeader className="pb-2.5 p-0">
+              <CardTitle className="text-sm font-bold text-foreground">
                 Approaches ({approaches.length})
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 pb-6 px-6">
+            <CardContent className="space-y-3 p-0 pt-2">
               {approaches.length === 0 ? (
-                <p className="text-sm text-secondary">
+                <p className="text-xs text-secondary">
                   No approaches recorded yet.
                 </p>
               ) : (
                 approaches.map((approach, i) => (
                   <div key={i}>
-                    {i > 0 && <Separator className="my-4 border-border/60" />}
-                    <h4 className="font-bold text-sm text-foreground">
+                    {i > 0 && <Separator className="my-3 border-border/60" />}
+                    <h4 className="font-bold text-xs sm:text-sm text-foreground">
                       {(approach as { title: string }).title}
                     </h4>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-secondary leading-relaxed">
+                    <p className="mt-1 whitespace-pre-wrap text-xs sm:text-sm text-secondary leading-relaxed">
                       {(approach as { description: string }).description}
                     </p>
                   </div>

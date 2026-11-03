@@ -237,13 +237,7 @@ function CatalogContent() {
 
               <div className="pt-5 border-t border-border/40 mt-4">
                 <Button asChild size="sm" className="w-full gap-2 rounded-[14px] font-semibold text-xs shadow-sm">
-                  <Link
-                    href={`/problems/new?title=${encodeURIComponent(
-                      p.title
-                    )}&difficulty=${p.difficulty}&description=${encodeURIComponent(
-                      p.summary
-                    )}`}
-                  >
+                  <Link href={`/problems/new?catalogId=${encodeURIComponent(p.id || p.title)}`}>
                     <Plus className="h-3.5 w-3.5" />
                     Track in My Problems
                   </Link>

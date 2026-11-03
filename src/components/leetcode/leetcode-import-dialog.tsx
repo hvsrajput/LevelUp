@@ -3,8 +3,10 @@
 import { useState } from "react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -131,7 +133,7 @@ export function LeetCodeImportDialog({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-[24px] p-6">
+      <DialogContent size="lg" className="rounded-[24px]">
         <DialogHeader>
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange font-bold text-sm">
@@ -144,9 +146,9 @@ export function LeetCodeImportDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 pt-2">
+        <DialogBody className="space-y-4 py-4 min-w-0">
           {/* Step 1: Script */}
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
                 <FileCode className="h-3.5 w-3.5 text-accent-orange" />
@@ -171,8 +173,8 @@ export function LeetCodeImportDialog({
               </Button>
             </div>
 
-            <div className="relative rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[11px] overflow-x-auto max-h-24">
-              <pre className="whitespace-pre">{CONSOLE_IMPORT_SCRIPT}</pre>
+            <div className="relative rounded-[14px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] p-3 font-mono text-[11px] overflow-x-auto max-w-full max-h-32">
+              <pre className="whitespace-pre max-w-full overflow-x-auto">{CONSOLE_IMPORT_SCRIPT}</pre>
             </div>
 
             <div className="flex items-start gap-2 rounded-[14px] bg-tint p-3 text-[11px] text-secondary leading-relaxed">
@@ -184,7 +186,7 @@ export function LeetCodeImportDialog({
           </div>
 
           {/* Step 2: Paste Area */}
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <label
               htmlFor="pasted-leetcode-json"
               className="text-xs font-bold uppercase tracking-wider text-secondary"
@@ -194,7 +196,7 @@ export function LeetCodeImportDialog({
             <Textarea
               id="pasted-leetcode-json"
               placeholder={`{\n  "version": 1,\n  "problems": [\n    {\n      "id": 1,\n      "title": "Two Sum",\n      "slug": "two-sum",\n      "difficulty": "EASY",\n      "topics": ["Array", "Hash Table"]\n    }\n  ]\n}`}
-              rows={6}
+              rows={8}
               value={pastedJson}
               onChange={(e) => {
                 setPastedJson(e.target.value);
@@ -202,7 +204,7 @@ export function LeetCodeImportDialog({
                 setPreviewError(null);
                 setConfirmSuccess(null);
               }}
-              className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3.5"
+              className="font-mono text-xs bg-tint border-transparent rounded-[14px] p-3.5 min-h-36 md:min-h-48"
             />
           </div>
 
@@ -215,7 +217,7 @@ export function LeetCodeImportDialog({
 
           {/* Preview Results */}
           {preview && (
-            <div className="rounded-[16px] bg-tint p-4 space-y-3 text-xs">
+            <div className="rounded-[16px] bg-tint p-4 space-y-3 text-xs min-w-0">
               <div className="flex items-center justify-between font-bold text-foreground">
                 <span>Preview Validation Summary:</span>
                 <span className="text-secondary text-[11px] font-medium">
@@ -253,7 +255,7 @@ export function LeetCodeImportDialog({
               </div>
 
               {preview.sampleTitles.length > 0 && (
-                <div className="text-[11px] text-secondary">
+                <div className="text-[11px] text-secondary break-words">
                   <span className="font-bold text-foreground">Sample new items: </span>
                   {preview.sampleTitles.join(", ")}
                   {preview.newCount > 5 ? ` and ${preview.newCount - 5} more...` : ""}
@@ -275,48 +277,48 @@ export function LeetCodeImportDialog({
               <span>{confirmSuccess}</span>
             </div>
           )}
+        </DialogBody>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/50">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handlePreview}
-              disabled={isPreviewing || !pastedJson.trim()}
-              className="rounded-[14px] font-semibold text-xs"
-            >
-              {isPreviewing ? (
-                <>
-                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Validating...
-                </>
-              ) : (
-                "Preview"
-              )}
-            </Button>
+        {/* Action Buttons Sticky Footer */}
+        <DialogFooter className="gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handlePreview}
+            disabled={isPreviewing || !pastedJson.trim()}
+            className="rounded-[14px] font-semibold text-xs"
+          >
+            {isPreviewing ? (
+              <>
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Validating...
+              </>
+            ) : (
+              "Preview"
+            )}
+          </Button>
 
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleConfirm}
-              className="rounded-[14px] font-semibold text-xs shadow-sm"
-              disabled={
-                isConfirming ||
-                !preview ||
-                preview.newCount === 0 ||
-                confirmSuccess !== null
-              }
-            >
-              {isConfirming ? (
-                <>
-                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Importing...
-                </>
-              ) : (
-                `Confirm Import (${preview ? preview.newCount : 0})`
-              )}
-            </Button>
-          </div>
-        </div>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleConfirm}
+            className="rounded-[14px] font-semibold text-xs shadow-sm"
+            disabled={
+              isConfirming ||
+              !preview ||
+              preview.newCount === 0 ||
+              confirmSuccess !== null
+            }
+          >
+            {isConfirming ? (
+              <>
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Importing...
+              </>
+            ) : (
+              `Confirm Import (${preview ? preview.newCount : 0})`
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

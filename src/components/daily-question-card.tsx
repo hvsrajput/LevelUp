@@ -53,9 +53,9 @@ export function DailyQuestionCard() {
 
   if (isLoading) {
     return (
-      <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft p-6 animate-pulse">
-        <div className="h-10 w-1/3 rounded-[12px] bg-tint mb-4" />
-        <div className="h-24 w-full rounded-[16px] bg-tint" />
+      <Card className="rounded-xl border border-border/70 bg-card p-5 animate-pulse">
+        <div className="h-9 w-1/3 rounded-lg bg-tint mb-3" />
+        <div className="h-20 w-full rounded-lg bg-tint" />
       </Card>
     );
   }
@@ -63,22 +63,22 @@ export function DailyQuestionCard() {
   if (!data) return null;
 
   return (
-    <Card className="rounded-[24px] border border-border/70 bg-card shadow-soft">
-      <CardHeader className="pb-3 pt-6 px-6">
+    <Card className="rounded-xl border border-border/70 bg-card">
+      <CardHeader className="pb-2.5 pt-4 sm:pt-5 px-4 sm:px-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-foreground font-bold">
-              <Calendar className="h-4 w-4 text-accent-orange" />
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-tint text-foreground font-bold">
+              <Calendar className="h-3.5 w-3.5 text-accent-orange" />
             </span>
-            <CardTitle className="text-base font-bold text-foreground">Daily Challenge</CardTitle>
+            <CardTitle className="text-sm font-bold text-foreground">Daily Challenge</CardTitle>
           </div>
           {data.isSpacedRepetition ? (
-            <Badge variant="streak" className="gap-1 text-[11px] font-semibold">
+            <Badge variant="streak" className="gap-1 text-xs font-semibold">
               <RotateCcw className="h-3 w-3" />
               Spaced Repetition
             </Badge>
           ) : (
-            <Badge variant="secondary" className="gap-1 text-[11px] font-semibold">
+            <Badge variant="secondary" className="gap-1 text-xs font-semibold">
               <Flame className="h-3 w-3 text-accent-orange fill-accent-orange" />
               Progressive Difficulty
             </Badge>
@@ -86,13 +86,13 @@ export function DailyQuestionCard() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3.5 pb-6 px-6">
+      <CardContent className="space-y-3 pb-4 sm:pb-5 px-4 sm:px-5">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h4 className="text-lg font-bold text-foreground hover:text-accent-orange transition-colors">
+            <h4 className="text-base font-bold text-foreground hover:text-accent-orange transition-colors">
               {data.problem.title}
             </h4>
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <Badge
                 variant={
                   data.problem.difficulty.toLowerCase() === "easy"
@@ -101,7 +101,7 @@ export function DailyQuestionCard() {
                     ? "medium"
                     : "hard"
                 }
-                className="text-[11px] px-2 py-0.5 font-semibold"
+                className="text-xs px-2 py-0.5 font-semibold"
               >
                 {data.problem.difficulty}
               </Badge>
@@ -109,7 +109,7 @@ export function DailyQuestionCard() {
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="text-[10px] px-2 py-0.5 font-normal rounded-full border-border/70 bg-tint/50 text-secondary"
+                  className="text-xs px-2 py-0.5 font-medium rounded-md border-border/70 bg-tint/50 text-secondary"
                 >
                   {tag}
                 </Badge>
@@ -123,8 +123,8 @@ export function DailyQuestionCard() {
         </p>
 
         {/* Explainability Box */}
-        <div className="rounded-[16px] bg-tint p-3.5 text-xs text-secondary">
-          <div className="flex items-center gap-1.5 font-semibold text-foreground text-[11px] mb-1">
+        <div className="rounded-lg bg-tint/60 border border-border/50 p-3 text-xs text-secondary">
+          <div className="flex items-center gap-1.5 font-semibold text-foreground text-xs mb-1">
             <Sparkles className="h-3.5 w-3.5 text-accent-orange" />
             Why this question was picked:
           </div>

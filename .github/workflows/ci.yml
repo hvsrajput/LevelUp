@@ -13,6 +13,7 @@ jobs:
 
     env:
       DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/levelup?schema=public"
+      DIRECT_URL: "postgresql://dummy:dummy@localhost:5432/levelup?schema=public"
       AUTH_SECRET: "dummy-secret-for-build-and-tests-min-32-chars-ok"
       NEXTAUTH_URL: "http://localhost:3000"
 
@@ -32,8 +33,11 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
+      - name: Next.js Typegen
+        run: npx next typegen
+
       - name: TypeScript Check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: ESLint
         run: npm run lint
@@ -43,3 +47,8 @@ jobs:
 
       - name: Production Build
         run: npm run build
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/levelup?schema=public"
+          DIRECT_URL: "postgresql://dummy:dummy@localhost:5432/levelup?schema=public"
+          AUTH_SECRET: "dummy-secret-for-build-and-tests-min-32-chars-ok"
+          NEXTAUTH_URL: "http://localhost:3000"

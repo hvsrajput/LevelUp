@@ -7,6 +7,7 @@
 import { useState, useEffect, useTransition } from "react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -121,7 +122,7 @@ export function TimezoneSettingsDialog({
       if (!val) setSavedSuccess(false);
       onOpenChange(val);
     }}>
-      <DialogContent className="sm:max-w-md rounded-[24px] p-6">
+      <DialogContent size="md" className="rounded-[24px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2.5 text-xl font-bold text-foreground">
             <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-tint text-accent-orange">
@@ -134,8 +135,8 @@ export function TimezoneSettingsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-1.5">
+        <DialogBody className="space-y-4 py-4 min-w-0">
+          <div className="space-y-1.5 min-w-0">
             <Label htmlFor="tz-select" className="text-xs font-semibold text-secondary">Current Timezone</Label>
             <Select
               value={selectedTz}
@@ -160,7 +161,7 @@ export function TimezoneSettingsDialog({
             </Select>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-secondary pt-1">
+          <div className="flex items-center justify-between text-xs text-secondary pt-1 min-w-0">
             <span className="font-medium">Detected browser timezone</span>
             <Button
               type="button"
@@ -173,9 +174,9 @@ export function TimezoneSettingsDialog({
               Auto-detect
             </Button>
           </div>
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="flex items-center justify-between sm:justify-between pt-2 border-t border-border/40">
+        <DialogFooter className="flex items-center justify-between sm:justify-between">
           <Button
             type="button"
             variant="ghost"

@@ -36,23 +36,23 @@ export function CodeViewer({
   const lines = code.split("\n");
 
   return (
-    <div className="overflow-hidden rounded-[16px] border border-[#223528] bg-[#14221A] text-[#E8F0DF] shadow-soft">
+    <div className="overflow-hidden rounded-lg border border-[#223528] bg-[#14221A] text-[#E8F0DF]">
       {/* Header bar with language label and copy button */}
-      <div className="flex items-center justify-between border-b border-[#223528] bg-[#0E1912] px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-[#223528] bg-[#0E1912] px-3.5 py-2">
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className="border-transparent bg-[#1E2B1D] font-mono text-[11px] font-bold uppercase tracking-wider text-accent-orange rounded-full px-2.5 py-0.5"
+            className="border-transparent bg-[#1E2B1D] font-mono text-xs font-semibold text-accent-orange rounded-md px-2 py-0.5"
           >
             {language}
           </Badge>
           {runtime && (
-            <span className="font-mono text-[11px] text-[#8A977E]">
+            <span className="font-mono text-xs tabular-nums text-[#8A977E]">
               Runtime: {runtime}
             </span>
           )}
           {memory && (
-            <span className="font-mono text-[11px] text-[#8A977E]">
+            <span className="font-mono text-xs tabular-nums text-[#8A977E]">
               Memory: {memory}
             </span>
           )}
@@ -63,7 +63,7 @@ export function CodeViewer({
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          className="h-7 gap-1.5 px-2.5 rounded-[10px] text-xs text-[#A5B79C] hover:bg-[#1E2B1D] hover:text-[#FFFFFF]"
+          className="h-7 gap-1.5 px-2 rounded-md text-xs text-[#A5B79C] hover:bg-[#1E2B1D] hover:text-[#FFFFFF]"
         >
           {copied ? (
             <>
