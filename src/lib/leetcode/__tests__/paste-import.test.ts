@@ -24,10 +24,12 @@ vi.mock("@/lib/prisma", () => ({
   prisma: prismaMock,
 }));
 
+import vm from "node:vm";
 import {
   parseAndValidateLeetCodePayload,
   previewLeetCodeImport,
   confirmLeetCodeImport,
+  CONSOLE_IMPORT_SCRIPT,
 } from "../paste-import";
 
 describe("Paste-Based LeetCode Import", () => {
@@ -179,6 +181,24 @@ describe("Paste-Based LeetCode Import", () => {
       expect(result.validProblems).toHaveLength(0);
       expect(result.invalidCount).toBe(3);
     });
+
+    it("accepts difficulty values case-insensitively (EASY, easy, Medium, hard)", () => {
+      const payload = JSON.stringify({
+        version: 1,
+        problems: [
+          { id: 1, title: "P1", slug: "p1", difficulty: "easy" },
+          { id: 2, title: "P2", slug: "p2", difficulty: "Medium" },
+          { id: 3, title: "P3", slug: "p3", difficulty: "HARD" },
+        ],
+      });
+
+      const result = parseAndValidateLeetCodePayload(payload);
+      expect(result.invalidCount).toBe(0);
+      expect(result.validProblems).toHaveLength(3);
+      expect(result.validProblems[0].difficulty).toBe("EASY");
+      expect(result.validProblems[1].difficulty).toBe("MEDIUM");
+      expect(result.validProblems[2].difficulty).toBe("HARD");
+    });
   });
 
   describe("previewLeetCodeImport", () => {
@@ -290,6 +310,200 @@ describe("Paste-Based LeetCode Import", () => {
       expect(res.importedCount).toBe(0);
       expect(res.alreadyExistedCount).toBe(2);
       expect(res.totalProcessed).toBe(2);
+    });
+  });
+
+  describe("CONSOLE_IMPORT_SCRIPT", () => {
+    it("contains no backtick, no ${, and no backslash", () => {
+      expect(CONSOLE_IMPORT_SCRIPT.includes("`")).toBe(false);
+      expect(CONSOLE_IMPORT_SCRIPT.includes("${")).toBe(false);
+      expect(CONSOLE_IMPORT_SCRIPT.includes("\\")).toBe(false);
+    });
+
+    it("serves 130 solved problems across pages of 50, 50, 30, then an empty page, calling copy once with 130 problems", async () => {
+      const generatedProblems = Array.from({ length: 130 }, (_, i) => ({
+        questionFrontendId: String(i + 1),
+        title: `Problem ${i + 1}`,
+        titleSlug: `problem-${i + 1}`,
+        difficulty: i % 3 === 0 ? "Easy" : i % 3 === 1 ? "Medium" : "Hard",
+        topicTags: [{ name: "Array" }],
+      }));
+
+      let fetchCallCount = 0;
+      const mockFetch = vi.fn(async (_url: string, opts: any) => {
+        fetchCallCount++;
+        const parsedBody = JSON.parse(opts.body);
+        const match = parsedBody.query.match(/skip: (\d+)/);
+        const skip = match ? parseInt(match[1], 10) : 0;
+        const slice = generatedProblems.slice(skip, skip + 50);
+
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              questionList: {
+                data: slice,
+              },
+            },
+          }),
+        };
+      });
+
+      const copyFn = vi.fn();
+      const sandbox = {
+        fetch: mockFetch,
+        copy: copyFn,
+        setTimeout: (fn: () => void) => fn(),
+        console: { log: vi.fn(), warn: vi.fn(), error: vi.fn() },
+        Set,
+        parseInt,
+        Number,
+        JSON,
+      };
+
+      await vm.runInNewContext(CONSOLE_IMPORT_SCRIPT, sandbox);
+
+      expect(copyFn).toHaveBeenCalledTimes(1);
+      const copiedPayload = JSON.parse(copyFn.mock.calls[0][0]);
+      expect(copiedPayload.version).toBe(1);
+      expect(copiedPayload.problems).toHaveLength(130);
+      expect(copiedPayload.problems[0]).toEqual({
+        id: 1,
+        title: "Problem 1",
+        slug: "problem-1",
+        difficulty: "EASY",
+        topics: ["Array"],
+      });
+      expect(copiedPayload.problems[129].id).toBe(130);
+      expect(fetchCallCount).toBe(4);
+    });
+
+    it("stops without infinite loop when a server repeats the same page forever", async () => {
+      let fetchCallCount = 0;
+      const mockFetch = vi.fn(async () => {
+        fetchCallCount++;
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              questionList: {
+                data: [
+                  {
+                    questionFrontendId: "1",
+                    title: "Two Sum",
+                    titleSlug: "two-sum",
+                    difficulty: "Easy",
+                    topicTags: [{ name: "Array" }],
+                  },
+                ],
+              },
+            },
+          }),
+        };
+      });
+
+      const copyFn = vi.fn();
+      const sandbox = {
+        fetch: mockFetch,
+        copy: copyFn,
+        setTimeout: (fn: () => void) => fn(),
+        console: { log: vi.fn(), warn: vi.fn(), error: vi.fn() },
+        Set,
+        parseInt,
+        Number,
+        JSON,
+      };
+
+      await vm.runInNewContext(CONSOLE_IMPORT_SCRIPT, sandbox);
+
+      expect(fetchCallCount).toBe(2);
+      expect(copyFn).toHaveBeenCalledTimes(1);
+      const copied = JSON.parse(copyFn.mock.calls[0][0]);
+      expect(copied.problems).toHaveLength(1);
+    });
+
+    it("does not call copy and logs error when a page fails 3 times", async () => {
+      let attemptCount = 0;
+      const mockFetch = vi.fn(async () => {
+        attemptCount++;
+        return {
+          ok: false,
+          status: 500,
+          json: async () => ({ errors: [{ message: "Internal server error" }] }),
+        };
+      });
+
+      const copyFn = vi.fn();
+      const errorLogFn = vi.fn();
+      const sandbox = {
+        fetch: mockFetch,
+        copy: copyFn,
+        setTimeout: (fn: () => void) => fn(),
+        console: { log: vi.fn(), warn: vi.fn(), error: errorLogFn },
+        Set,
+        parseInt,
+        Number,
+        JSON,
+      };
+
+      await vm.runInNewContext(CONSOLE_IMPORT_SCRIPT, sandbox);
+
+      expect(attemptCount).toBe(3);
+      expect(copyFn).not.toHaveBeenCalled();
+      expect(errorLogFn).toHaveBeenCalledTimes(1);
+      expect(errorLogFn.mock.calls[0][0]).toContain(
+        "Stopped at 0 problems because requests kept failing. Nothing was copied."
+      );
+    });
+
+    it("exports all problems when a transient failure on attempt 1 is followed by success", async () => {
+      let attemptCount = 0;
+      const mockFetch = vi.fn(async () => {
+        attemptCount++;
+        if (attemptCount === 1) {
+          throw new Error("Network transient disconnect");
+        }
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              questionList: {
+                data: [
+                  {
+                    questionFrontendId: "42",
+                    title: "Trapping Rain Water",
+                    titleSlug: "trapping-rain-water",
+                    difficulty: "Hard",
+                    topicTags: [{ name: "Two Pointers" }],
+                  },
+                ],
+              },
+            },
+          }),
+        };
+      });
+
+      const copyFn = vi.fn();
+      const warnLogFn = vi.fn();
+      const sandbox = {
+        fetch: mockFetch,
+        copy: copyFn,
+        setTimeout: (fn: () => void) => fn(),
+        console: { log: vi.fn(), warn: warnLogFn, error: vi.fn() },
+        Set,
+        parseInt,
+        Number,
+        JSON,
+      };
+
+      await vm.runInNewContext(CONSOLE_IMPORT_SCRIPT, sandbox);
+
+      expect(attemptCount).toBe(3);
+      expect(warnLogFn).toHaveBeenCalledWith("Attempt 1 failed:", expect.any(Error));
+      expect(copyFn).toHaveBeenCalledTimes(1);
+      const copied = JSON.parse(copyFn.mock.calls[0][0]);
+      expect(copied.problems).toHaveLength(1);
+      expect(copied.problems[0].id).toBe(42);
     });
   });
 });

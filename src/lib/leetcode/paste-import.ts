@@ -13,41 +13,73 @@ import {
 const MAX_PAYLOAD_BYTES = 1024 * 1024; // 1 MB limit
 
 export const CONSOLE_IMPORT_SCRIPT = `(async () => {
-  console.log("⏳ Fetching your solved LeetCode problems...");
-  const res = await fetch("https://leetcode.com/graphql", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: \`query userSolvedProblems {
-        problemsetQuestionList: questionList(categorySlug: "", limit: 5000, filters: { status: AC }) {
-          data {
-            questionFrontendId
-            title
-            titleSlug
-            difficulty
-            topicTags { name }
-          }
-        }
-      }\`,
-    }),
-  });
+  const PAGE = 50;
+  const MAX_PAGES = 200;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const all = [];
+  const seen = new Set();
+  let skip = 0;
 
-  const json = await res.json();
-  const raw = json.data?.problemsetQuestionList?.data || [];
-  const problems = raw.map((q) => ({
-    id: parseInt(q.questionFrontendId, 10),
-    title: q.title,
-    slug: q.titleSlug,
-    difficulty: q.difficulty.toUpperCase(),
-    topics: (q.topicTags || []).map((t) => t.name),
-  }));
+  console.log("Fetching all solved LeetCode problems...");
 
-  const payload = JSON.stringify({ version: 1, problems }, null, 2);
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const query =
+      'query userSolvedProblems { questionList(categorySlug: "", limit: ' +
+      PAGE + ', skip: ' + skip +
+      ', filters: { status: AC }) { data { questionFrontendId title titleSlug difficulty topicTags { name } } } }';
+
+    let json = null;
+    for (let attempt = 1; attempt <= 3 && !json; attempt++) {
+      try {
+        const res = await fetch("/graphql", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ query }),
+        });
+        const body = await res.json();
+        if (res.ok && !body.errors) json = body;
+        else console.warn("Attempt " + attempt + " failed:", body.errors || res.status);
+      } catch (e) {
+        console.warn("Attempt " + attempt + " failed:", e);
+      }
+      if (!json) await sleep(500 * attempt);
+    }
+    if (!json) {
+      console.error("Stopped at " + all.length + " problems because requests kept failing. Nothing was copied. Wait a minute, make sure you are logged in to leetcode.com, and run it again.");
+      return;
+    }
+
+    const batch = (json.data && json.data.questionList && json.data.questionList.data) || [];
+    if (batch.length === 0) break;
+
+    let added = 0;
+    for (const q of batch) {
+      const id = parseInt(q.questionFrontendId, 10);
+      if (!Number.isFinite(id) || seen.has(id)) continue;
+      seen.add(id);
+      added++;
+      all.push({
+        id,
+        title: q.title,
+        slug: q.titleSlug,
+        difficulty: q.difficulty.toUpperCase(),
+        topics: (q.topicTags || []).map((t) => t.name),
+      });
+    }
+    console.log("Fetched " + all.length + " problems...");
+    if (added === 0) break;
+    skip += batch.length;
+    await sleep(250);
+  }
+
+  const payload = JSON.stringify({ version: 1, problems: all });
+  console.log("Total unique solved problems: " + all.length + ". Compare this with the solved count on your LeetCode profile.");
   if (typeof copy === "function") {
     copy(payload);
-    console.log("Successfully copied " + problems.length + " problems to your clipboard! Paste into LevelUp.");
+    console.log("Copied to your clipboard. Paste it into Level Up.");
   } else {
-    console.log("Copy the JSON below and paste into LevelUp:\\n", payload);
+    console.log(payload);
   }
 })();`;
 

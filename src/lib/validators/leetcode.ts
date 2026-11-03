@@ -48,9 +48,12 @@ export const leetCodePastedItemSchema = z.object({
     .regex(/^[a-z0-9-]+$/, {
       message: "Slug must contain only lowercase alphanumeric characters and hyphens.",
     }),
-  difficulty: z.enum(["EASY", "MEDIUM", "HARD"], {
-    message: "Difficulty must be EASY, MEDIUM, or HARD.",
-  }),
+  difficulty: z.preprocess(
+    (val) => (typeof val === "string" ? val.trim().toUpperCase() : val),
+    z.enum(["EASY", "MEDIUM", "HARD"], {
+      message: "Difficulty must be EASY, MEDIUM, or HARD.",
+    })
+  ),
   topics: z
     .array(
       z
